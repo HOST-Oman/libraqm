@@ -51,7 +51,7 @@ Stack *create(int max) {
 }
 int pop(Stack *S) {
 	if(S->size == 0) {
-		printf("Stack is Empty\n");
+		DBG("Stack is Empty\n");
 		return 1;
 	}
 	else
@@ -61,13 +61,13 @@ int pop(Stack *S) {
 }
 hb_script_t top(Stack *S) {
 	if(S->size == 0) {
-		printf("Stack is Empty\n");
+		DBG("Stack is Empty\n");
 	}
 	return S->scripts[S->size-1];
 }
 void push(Stack *S, hb_script_t script, int pi) {
 	if(S->size == S->capacity) {
-		printf("Stack is Full\n");
+		DBG("Stack is Full\n");
 	}
 	else {
 		S->scripts[S->size++] = script;
@@ -164,6 +164,15 @@ static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
 	}
     }
 
+    DBG("\n\n");
+    for (i = 0; i < run_count; ++i) {
+	char buff[4];
+	hb_tag_to_string(hb_script_to_iso15924_tag (run[i].hb_script),buff);
+	DBG("script for run[%d]\t%s\n",i ,buff);
+    }
+    DBG("\n\n");
+
+
     free(levels);
     return run_count;
 }
@@ -193,6 +202,8 @@ static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
 
 /* Takes the input text and does the reordering and shaping */
 glyph_info *shape_text (const char *text , FT_Face face) {
+    DBG("*DEBUG mode is enabled*\n");
+    DBG("Text is: %s\n", text);
     int i = 0;
     const char *str = text;
     FriBidiStrIndex size = strlen(str);
@@ -212,8 +223,12 @@ glyph_info *shape_text (const char *text , FT_Face face) {
 	of the character before it except some special paired characters */
     hb_script_t *scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * length);
     hb_unicode_funcs_t *ufuncs = hb_unicode_funcs_get_default();
-    for (i = 0; i < length; ++i)
+    for (i = 0; i < length; ++i) {
 	scripts[i] = hb_unicode_script(ufuncs, uni_str[i]);
+	char buff[4];
+	hb_tag_to_string(hb_script_to_iso15924_tag (scripts[i]),buff);
+	DBG("script for ch[%d]\t%s\n",i ,buff);
+    }
     hb_script_t lastScriptValue;
     int lastScriptIndex = -1;
     int lastSetIndex = -1;
@@ -255,6 +270,12 @@ glyph_info *shape_text (const char *text , FT_Face face) {
 	}
     }
 
+    DBG("AFTER:\n");
+    for (i = 0; i < length; ++i) {
+	char buff[4];
+	hb_tag_to_string(hb_script_to_iso15924_tag (scripts[i]),buff);
+	DBG("script for ch[%d]\t%s\n",i ,buff);
+    }
 
     /* to get number of runs */
     int run_count = get_visual_runs(types, length, par_type, levels, scripts, NULL);
