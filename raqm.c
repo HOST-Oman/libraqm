@@ -247,6 +247,7 @@ glyph_info *shape_text (const char *text , FT_Face face) {
 			pop(scpt_stack);
 		    if(STACK_IS_NOT_EMPTY(scpt_stack)) {
 			scripts[i] = top(scpt_stack);
+			lastScriptValue = scripts[i];
 			lastSetIndex = i;
 		    } else {
 			scripts[i] = lastScriptValue;
