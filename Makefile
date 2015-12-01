@@ -1,17 +1,21 @@
-CFLAGS = `pkg-config --cflags freetype2 harfbuzz fribidi`
-LDLIBS = `pkg-config --libs freetype2 harfbuzz fribidi`
+PAKAGES = freetype2 harfbuzz fribidi
 
-all: test_raqm
+CFLAGS = `pkg-config --cflags $(PAKAGES)`
+LDLIBS = `pkg-config --libs $(PAKAGES)`
 
-raqm.o: raqm.c raqm.h
-	gcc -c raqm.c $(CFLAGS) -o $@
+OBJS = test_raqm.o raqm.o
 
-test_raqm.o: test_raqm.c raqm.h
-	gcc -c test_raqm.c $(CFLAGS) -o $@
+BIN = test_raqm
 
-test_raqm: test_raqm.o raqm.o
-	gcc test_raqm.o raqm.o -o $@ $(LDLIBS)
+all: $(BIN)
 
+%.o: %.c raqm.h
+	$(CC) -c $< $(CFLAGS) -o $@
 
+$(BIN): $(OBJS)
+	$(CC) $(OBJS) -o $@ $(LDLIBS)
+
+clean:
+	rm -f $(BIN) $(OBJS)
 
 
