@@ -15,13 +15,13 @@
 #include <hb-ft.h>
 
 /* Final glyph information gained from harfbuzz */
-typedef struct _glyph_info {
+typedef struct {
     int index;
     int x_offset;
     int x_advanced;
     int y_offset;
-} glyph_info;
+} raqm_glyph_info_t;
 
-glyph_info *shape_text (const char *text , FT_Face face);
+raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face);
 
 #endif

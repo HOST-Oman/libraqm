@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	abort();
 
 
-    glyph_info *info = shape_text (text, face);
+    raqm_glyph_info_t *info = raqm_shape (text, face);
 
     printf ("\n\n");
     while (info->index >= 0) {

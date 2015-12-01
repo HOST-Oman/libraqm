@@ -278,7 +278,7 @@ static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
 
 
 /* Takes the input text and does the reordering and shaping */
-glyph_info *shape_text (const char *text , FT_Face face) {
+raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face) {
     DBG("*DEBUG mode is enabled*\n");
     DBG("Text is: %s\n", text);
     int i = 0;
@@ -382,7 +382,7 @@ glyph_info *shape_text (const char *text , FT_Face face) {
 	hb_glyph_info = hb_buffer_get_glyph_infos(runs[i].hb_buffer, &glyph_count);
 	total_glyph_count += glyph_count ;
     }
-    glyph_info *g_info = (glyph_info*) malloc(sizeof(glyph_info) * total_glyph_count + 1);
+    raqm_glyph_info_t *g_info = (raqm_glyph_info_t*) malloc(sizeof(raqm_glyph_info_t) * total_glyph_count + 1);
     int index = 0;
     for (i = 0; i < run_count; i++) {
 	hb_glyph_info = hb_buffer_get_glyph_infos(runs[i].hb_buffer, &glyph_count);
