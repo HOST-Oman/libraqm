@@ -2,7 +2,7 @@
 #define _SHAPE_TEXT_H_
 
 /* For enabling debug mode */
-#define DEBUG 1
+/*#define DEBUG 1*/
 #ifdef DEBUG
 #define DBG(...) fprintf (stderr, __VA_ARGS__)
 #else
