@@ -261,7 +261,7 @@ static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
     /* adding text to current buffer */
     hb_buffer_add_utf32(curr_run->hb_buffer, uni_str, length, curr_run->run.pos, curr_run->run.len);
     /* setting script of current buffer */
-    //hb_buffer_set_script(curr_run->hb_buffer, curr_run->hb_script);
+    hb_buffer_set_script(curr_run->hb_buffer, curr_run->hb_script);
     /* setting language of current buffer */
     hb_buffer_set_language (curr_run->hb_buffer, hb_language_get_default());
     /* setting direction of current buffer */
@@ -269,8 +269,6 @@ static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
 	hb_buffer_set_direction(curr_run->hb_buffer, HB_DIRECTION_RTL);
     else
 	hb_buffer_set_direction(curr_run->hb_buffer, HB_DIRECTION_LTR);
-    /*TOFIX temporary */
-    hb_buffer_guess_segment_properties(curr_run->hb_buffer);
 
     /* shaping current buffer */
     hb_shape(hb_font, curr_run->hb_buffer, NULL, 0);
