@@ -30,92 +30,11 @@ static const FriBidiChar paired_chars[] = {
     0x301a, 0x301b
 };
 
-/* for older fribidi versions */
-#ifndef HAVE_FRIBIDI_REORDER_RUNS
-
-typedef struct _FriBidiRunStruct
-{
-  struct _FriBidiRunStruct *prev;
-  struct _FriBidiRunStruct *next;
-  FriBidiStrIndex pos, len;
-  FriBidiCharType type;
-  FriBidiLevel level;
-} FriBidiRun;
-
-/* Reverse an array of runs used in shape_text */
-static void reverse_run(FriBidiRun * run, int len) {
-    int i;
-    for (i = 0; i < len/2; i++) {
-	FriBidiRun temp = run[i];
-	run[i]=run[len - 1 - i];
-	run[len - 1 - i]= temp;
-    }
-}
-
-/* Seperates and reorders runs via fribidi using bidi algorithm*/
-static int fribidi_reorder_runs(FriBidiCharType *types, FriBidiStrIndex length,
-			   FriBidiParType par_type, FriBidiLevel *levels,
-			   FriBidiRun *run)
-{
-    int max_level = levels[0];
-    int i;
-    for (i = 0; i < length; i++) {
-	if(max_level < levels[i])
-	    max_level = levels[i];
-    }
-    max_level++;
-    /* counting runs based of levels */
-    int run_count = 0;
-    FriBidiLevel lastLevel = -1;
-    for (i = 0; i < length; i++) {
-	int level = levels[i];
-	if (level != lastLevel)
-	    run_count += 1;
-	lastLevel = level;
-    }
-
-    if (run == NULL)
-	return run_count;
-
-    int start = 0;
-    int index = 0;
-    while (start < length) {
-	int run_length = 0;
-	while ((start + run_length) < length && levels[start] == levels[start + run_length])
-	    run_length++;
-	run[index].pos = start;
-	run[index].level = levels[start];
-	run[index].len = run_length;
-	start += run_length;
-	index++;
-    }
-
-    /* Implementation of L1 from unicode bidi algorithm */
-    for (i = length - 1; (i >= 0) && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
-	levels[i] = FRIBIDI_DIR_TO_LEVEL (par_type);
-
-    /* Implementation of L2 from unicode bidi algorithm */
-    int curr_level ;
-    for (curr_level = max_level; curr_level > 0; curr_level--) {
-	for (i = run_count-1 ; i >= 0 ; i-- ) {
-	    if (run[i].level >= curr_level ) {
-		int end = i;
-		for (i-- ; (i >= 0 && run[i].level >= curr_level) ; i--)
-		    ;
-		reverse_run (run + i + 1 , end - i);
-	    }
-	}
-    }
-
-    free(levels);
-    return run_count;
-}
-
-#endif
-
-/* Struct that holds all runs information including FriBidiRun */
+/** ==========================WILL BE CHANGED */
 typedef struct _Run {
-    FriBidiRun run;
+    int start;
+    int length;
+    FriBidiLevel level;
     hb_buffer_t *hb_buffer;
     hb_script_t hb_script;
 } Run;
@@ -174,9 +93,18 @@ static int get_pair_index(const FriBidiChar ch) {
 #define STACK_IS_EMPTY(script) ((script)->size <= 0)
 #define STACK_IS_NOT_EMPTY(script) (! STACK_IS_EMPTY(script))
 #define IS_OPEN(pair_index) (((pair_index) & 1) == 0)
-//
+
+/* Reverses an array of runs used in shape_text */
+static void reverse_run(Run* run, int len) {
+    int i;
+    for (i = 0; i < len/2; i++) {
+	Run temp = run[i];
+	run[i]=run[len - 1 - i];
+	run[len - 1 - i] = temp;
+    }
+}
+
 /* Seperates and reorders runs via fribidi using bidi algorithm*/
-/*
 static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
 			   FriBidiParType par_type, FriBidiLevel *levels,
 			   hb_script_t *scripts, Run *run)
@@ -220,12 +148,11 @@ static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
     }
 
     /* Implementation of L1 from unicode bidi algorithm */
-   /* for (i = length - 1; (i >= 0) && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
+    for (i = length - 1; (i >= 0) && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
 	levels[i] = FRIBIDI_DIR_TO_LEVEL (par_type);
 
     /* Implementation of L2 from unicode bidi algorithm */
-   /* int curr_level ;
-    *
+    int curr_level ;
     for (curr_level = max_level; curr_level > 0; curr_level--) {
 	for (i = run_count-1 ; i >= 0 ; i-- ) {
 	    if (run[i].level >= curr_level ) {
@@ -249,29 +176,27 @@ static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
     free(levels);
     return run_count;
 }
-*/
-//
 
 /* Does the shaping for each run buffer */
 static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
-			   hb_font_t *hb_font, Run *curr_run)
+			   hb_font_t *hb_font, Run *run)
 {
-    curr_run->hb_buffer = hb_buffer_create ();
+    run->hb_buffer = hb_buffer_create ();
 
     /* adding text to current buffer */
-    hb_buffer_add_utf32(curr_run->hb_buffer, uni_str, length, curr_run->run.pos, curr_run->run.len);
+    hb_buffer_add_utf32(run->hb_buffer, uni_str, length, run->start, run->length);
     /* setting script of current buffer */
-    hb_buffer_set_script(curr_run->hb_buffer, curr_run->hb_script);
+    hb_buffer_set_script(run->hb_buffer, run->hb_script);
     /* setting language of current buffer */
-    hb_buffer_set_language (curr_run->hb_buffer, hb_language_get_default());
+    hb_buffer_set_language (run->hb_buffer, hb_language_get_default());
     /* setting direction of current buffer */
-    if (FRIBIDI_LEVEL_IS_RTL(curr_run->run.level))
-	hb_buffer_set_direction(curr_run->hb_buffer, HB_DIRECTION_RTL);
+    if (FRIBIDI_LEVEL_IS_RTL(run->level))
+	hb_buffer_set_direction(run->hb_buffer, HB_DIRECTION_RTL);
     else
-	hb_buffer_set_direction(curr_run->hb_buffer, HB_DIRECTION_LTR);
+	hb_buffer_set_direction(run->hb_buffer, HB_DIRECTION_LTR);
 
     /* shaping current buffer */
-    hb_shape(hb_font, curr_run->hb_buffer, NULL, 0);
+    hb_shape(hb_font, run->hb_buffer, NULL, 0);
 }
 
 
@@ -354,16 +279,10 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face) {
     }
 
     /* to get number of runs */
-    int run_count = fribidi_reorder_runs(types, length, par_type, levels, NULL);
-    FriBidiRun* fribidi_runs = (FriBidiRun*) malloc (sizeof(FriBidiRun) * run_count);
-    /* to populate fribidi run array */
-    fribidi_reorder_runs(types, length, par_type, levels, fribidi_runs);
-    DBG("Number of runs: %d\n", run_count);
-    Run *runs = (Run*) malloc(sizeof(Run) * run_count);
-    for (i = 0; i < run_count; i++) {
-	/* to populate fribidi run inside each run array */
-	runs[i].run = fribidi_runs[i];
-    }
+    int run_count = get_visual_runs(types, length, par_type, levels, scripts, NULL);
+    Run *run = (Run*) malloc(sizeof(Run) * run_count);
+    /* to populate run array */
+    get_visual_runs(types, length, par_type, levels, scripts, run);
 
     /* harfbuzz shaping */
     hb_font_t *hb_font;
@@ -375,16 +294,15 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face) {
     hb_glyph_position_t *hb_glyph_position;
 
     for (i = 0; i < run_count; i++) {
-
-	harfbuzz_shape(uni_str, length, hb_font, &runs[i]);
-	hb_glyph_info = hb_buffer_get_glyph_infos(runs[i].hb_buffer, &glyph_count);
+	harfbuzz_shape(uni_str, length, hb_font, &run[i]);
+	hb_glyph_info = hb_buffer_get_glyph_infos(run[i].hb_buffer, &glyph_count);
 	total_glyph_count += glyph_count ;
     }
     raqm_glyph_info_t *g_info = (raqm_glyph_info_t*) malloc(sizeof(raqm_glyph_info_t) * total_glyph_count + 1);
     int index = 0;
     for (i = 0; i < run_count; i++) {
-	hb_glyph_info = hb_buffer_get_glyph_infos(runs[i].hb_buffer, &glyph_count);
-	hb_glyph_position = hb_buffer_get_glyph_positions (runs[i].hb_buffer, &pos_length);
+	hb_glyph_info = hb_buffer_get_glyph_infos(run[i].hb_buffer, &glyph_count);
+	hb_glyph_position = hb_buffer_get_glyph_positions (run[i].hb_buffer, &pos_length);
 	int j;
 	for (j = 0; j < glyph_count; j++){
 	    g_info[index].index = hb_glyph_info[j].codepoint;
@@ -398,7 +316,7 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face) {
 
     free(types);
     free(uni_str);
-    free(runs);
+    free(run);
 
     return g_info;
 }
