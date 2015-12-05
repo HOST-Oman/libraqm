@@ -6,6 +6,8 @@ LDLIBS = `pkg-config --libs $(PAKAGES)`
 OBJS = test_raqm.o raqm.o
 
 BIN = test_raqm
+RUNTEST = runtest
+TESTS = $(wildcard tests/*.test)
 
 all: $(BIN)
 
@@ -14,6 +16,9 @@ all: $(BIN)
 
 $(BIN): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDLIBS)
+
+check: all $(TESTS)
+	@bash $(RUNTEST) $(abspath $(BIN)) $(TESTS)
 
 clean:
 	rm -f $(BIN) $(OBJS)

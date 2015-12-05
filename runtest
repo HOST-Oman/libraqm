@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+testtool=$1
+tests=$2
+
+for filename in $tests
+do
+	echo -n "Testing $filename... "
+
+	font=$(sed -n 1p $filename)
+	text=$(sed -n 2p $filename)
+	opts=$(sed -n 3p $filename)
+	expected=$(mktemp expected.XXXXXX)
+	tail -n +4 $filename > $expected
+
+	output=$(mktemp output.XXXXXX)
+	$testtool $font $text > $output
+
+	result=$(diff -u $expected $output)
+	if test "$result" = ""
+	then
+		echo "PASS"
+	else
+		echo "FAIL"
+		echo "The diff is:"
+		echo "$result"
+	fi
+
+	rm -f $expected $output
+done
