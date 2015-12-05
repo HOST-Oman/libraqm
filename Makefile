@@ -3,9 +3,9 @@ PAKAGES = freetype2 harfbuzz fribidi
 CFLAGS = `pkg-config --cflags $(PAKAGES)`
 LDLIBS = `pkg-config --libs $(PAKAGES)`
 
-OBJS = test_raqm.o raqm.o
+OBJS = raqm-test.o raqm.o
 
-BIN = test_raqm
+BIN = raqm-test
 RUNTEST = runtest
 TESTS = $(wildcard tests/*.test)
 
