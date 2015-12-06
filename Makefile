@@ -6,7 +6,7 @@ LDLIBS = `pkg-config --libs $(PAKAGES)`
 OBJS = raqm-test.o raqm.o
 
 BIN = raqm-test
-RUNTEST = runtest
+RUNTEST = tests/runtest
 TESTS = $(wildcard tests/*.test)
 
 all: $(BIN)
