@@ -18,7 +18,7 @@ $(BIN): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDLIBS)
 
 check: all $(TESTS)
-	@bash $(RUNTEST) $(abspath $(BIN)) $(TESTS)
+	@bash $(RUNTEST) $(abspath $(BIN)) "$(TESTS)"
 
 clean:
 	rm -f $(BIN) $(OBJS)
