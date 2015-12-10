@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	abort();
 
 
-    raqm_glyph_info_t *info = raqm_shape (text, face);
+    raqm_glyph_info_t *info = raqm_shape (text, face, RAQM_DIRECTION_DEFAULT);
 
     while (info->index >= 0) {
 	printf ("Glyph [%d]: x_advance %d, x_offset %d, y_offset %d\n",

@@ -224,7 +224,7 @@ static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
 
 
 /* Takes the input text and does the reordering and shaping */
-raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face) {
+raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t direction) {
     DBG("*DEBUG mode is enabled*\n");
     DBG("Text is: %s\n", text);
     int i = 0;
@@ -239,6 +239,11 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face) {
     fribidi_get_bidi_types (uni_str, length, types);
 
     FriBidiParType par_type = FRIBIDI_PAR_ON;
+    if (direction == RAQM_DIRECTION_RTL)
+        par_type = FRIBIDI_PAR_RTL;
+    else if (direction == RAQM_DIRECTION_LTR)
+        par_type = FRIBIDI_PAR_LTR;
+
     fribidi_get_par_embedding_levels (types, length, &par_type, levels);
 
     /* Handeling script detection for each character of the input string,

@@ -45,6 +45,12 @@ typedef struct {
     int y_offset;
 } raqm_glyph_info_t;
 
-raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face);
+typedef enum {
+    RAQM_DIRECTION_DEFAULT,
+    RAQM_DIRECTION_RTL,
+    RAQM_DIRECTION_LTR
+} raqm_direction_t;
+
+raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t);
 
 #endif
