@@ -170,6 +170,17 @@ static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
 	index++;
     }
 
+#ifdef TESTING
+    TEST("\n");
+    TEST("Run count: %d\n\n",run_count);
+    TEST("Before reverse:\n");
+    for (i = 0; i < run_count; ++i) {
+        char buff[4];
+        hb_tag_to_string(hb_script_to_iso15924_tag (run[i].hb_script),buff);
+        TEST("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
+    }
+#endif
+
     /* Implementation of L1 from unicode bidi algorithm */
     for (i = length - 1; (i >= 0) && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
 	levels[i] = FRIBIDI_DIR_TO_LEVEL (par_type);
@@ -187,14 +198,16 @@ static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
 	}
     }
 
-    DBG("\n\n");
+#ifdef TESTING
+    TEST("\n");
+    TEST("After reverse:\n");
     for (i = 0; i < run_count; ++i) {
 	char buff[4];
 	hb_tag_to_string(hb_script_to_iso15924_tag (run[i].hb_script),buff);
-	DBG("script for run[%d]\t%s\n",i ,buff);
+        TEST("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
     }
-    DBG("\n\n");
-
+    TEST("\n");
+#endif
 
     free(levels);
     return run_count;
@@ -225,8 +238,6 @@ static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
 
 /* Takes the input text and does the reordering and shaping */
 raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t direction) {
-    DBG("*DEBUG mode is enabled*\n");
-    DBG("Text is: %s\n", text);
     int i = 0;
     const char *str = text;
     FriBidiStrIndex size = strlen(str);
@@ -244,6 +255,8 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
     else if (direction == RAQM_DIRECTION_LTR)
         par_type = FRIBIDI_PAR_LTR;
 
+    TEST("Text is: %s\n\n", text);
+
     fribidi_get_par_embedding_levels (types, length, &par_type, levels);
 
     /* Handeling script detection for each character of the input string,
@@ -251,12 +264,17 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
 	of the character before it except some special paired characters */
     hb_script_t *scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * length);
     hb_unicode_funcs_t *ufuncs = hb_unicode_funcs_get_default();
+
+#ifdef TESTING
+    TEST("Before script detection:\n");
     for (i = 0; i < length; ++i) {
 	scripts[i] = hb_unicode_script(ufuncs, uni_str[i]);
 	char buff[4];
 	hb_tag_to_string(hb_script_to_iso15924_tag (scripts[i]),buff);
-	DBG("script for ch[%d]\t%s\n",i ,buff);
+	TEST("script for ch[%d]\t%s\n",i ,buff);
     }
+#endif
+
     hb_script_t lastScriptValue;
     int lastScriptIndex = -1;
     int lastSetIndex = -1;
@@ -299,12 +317,14 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
 	}
     }
 
-    DBG("AFTER:\n");
+#ifdef TESTING
+    TEST("\nAfter script detection:\n");
     for (i = 0; i < length; ++i) {
 	char buff[4];
 	hb_tag_to_string(hb_script_to_iso15924_tag (scripts[i]),buff);
-	DBG("script for ch[%d]\t%s\n",i ,buff);
+	TEST("script for ch[%d]\t%s\n",i ,buff);
     }
+#endif
 
     /* to get number of runs */
     int run_count = get_visual_runs(types, length, par_type, levels, scripts, NULL);
@@ -328,6 +348,7 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
     }
     raqm_glyph_info_t *g_info = (raqm_glyph_info_t*) malloc(sizeof(raqm_glyph_info_t) * total_glyph_count + 1);
     int index = 0;
+    TEST("Glyph information:\n");
     for (i = 0; i < run_count; i++) {
 	hb_glyph_info = hb_buffer_get_glyph_infos(run[i].hb_buffer, &glyph_count);
 	hb_glyph_position = hb_buffer_get_glyph_positions (run[i].hb_buffer, &pos_length);
@@ -337,6 +358,9 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
 	    g_info[index].x_offset = hb_glyph_position[j].x_offset;
 	    g_info[index].y_offset = hb_glyph_position[j].y_offset;
 	    g_info[index].x_advanced = hb_glyph_position[j].x_advance;
+	    TEST("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
+	         g_info[index].index, g_info[index].x_offset,
+	         g_info[index].y_offset, g_info[index].x_advanced);
 	    index++;
 	}
     }

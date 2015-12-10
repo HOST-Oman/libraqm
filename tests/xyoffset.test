@@ -1,8 +1,29 @@
 tests/fonts/sha1sum/a22e097e7f3cefffd1a602674dff5108efa0eec2.ttf
 حجج
 
-Glyph [4]: x_advance 0, x_offset 880, y_offset 56
-Glyph [6]: x_advance 339, x_offset 0, y_offset 0
-Glyph [4]: x_advance 0, x_offset 1022, y_offset 1208
-Glyph [10]: x_advance 486, x_offset 0, y_offset 976
-Glyph [9]: x_advance 1186, x_offset 0, y_offset 1871
+Text is: حجج
+
+Before script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+
+After script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+
+Run count: 1
+
+Before reverse:
+run[0]:	 start: 0	length: 3	level: 1	script: Arab
+
+After reverse:
+run[0]:	 start: 0	length: 3	level: 1	script: Arab
+
+Glyph information:
+glyph [4]	x_offset: 880	y_offset: 56	x_advance: 0
+glyph [6]	x_offset: 0	y_offset: 0	x_advance: 339
+glyph [4]	x_offset: 1022	y_offset: 1208	x_advance: 0
+glyph [10]	x_offset: 0	y_offset: 976	x_advance: 486
+glyph [9]	x_offset: 0	y_offset: 1871	x_advance: 1186

@@ -1,22 +1,83 @@
 tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf 
 عربي(English ) عربي
 
-Glyph [5132]: x_advance 1097, x_offset 0, y_offset 0
-Glyph [5049]: x_advance 595, x_offset 0, y_offset 0
-Glyph [3104]: x_advance 1293, x_offset 202, y_offset 0
-Glyph [2040]: x_advance 1100, x_offset 0, y_offset 0
-Glyph [3]: x_advance 675, x_offset 0, y_offset 0
-Glyph [11]: x_advance 1058, x_offset 0, y_offset 0
-Glyph [3]: x_advance 675, x_offset 0, y_offset 0
-Glyph [40]: x_advance 1321, x_offset 0, y_offset 0
-Glyph [81]: x_advance 1197, x_offset 0, y_offset 0
-Glyph [74]: x_advance 1049, x_offset 0, y_offset 0
-Glyph [79]: x_advance 574, x_offset 0, y_offset 0
-Glyph [76]: x_advance 608, x_offset 0, y_offset 0
-Glyph [86]: x_advance 830, x_offset 0, y_offset 0
-Glyph [75]: x_advance 1161, x_offset 0, y_offset 0
-Glyph [12]: x_advance 1058, x_offset 0, y_offset 0
-Glyph [5132]: x_advance 1097, x_offset 0, y_offset 0
-Glyph [5049]: x_advance 595, x_offset 0, y_offset 0
-Glyph [3104]: x_advance 1293, x_offset 202, y_offset 0
-Glyph [2040]: x_advance 1100, x_offset 0, y_offset 0
+Text is: عربي(English ) عربي
+
+Before script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+script for ch[4]	Zyyy
+script for ch[5]	Latn
+script for ch[6]	Latn
+script for ch[7]	Latn
+script for ch[8]	Latn
+script for ch[9]	Latn
+script for ch[10]	Latn
+script for ch[11]	Latn
+script for ch[12]	Zyyy
+script for ch[13]	Zyyy
+script for ch[14]	Zyyy
+script for ch[15]	Arab
+script for ch[16]	Arab
+script for ch[17]	Arab
+script for ch[18]	Arab
+
+After script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+script for ch[4]	Arab
+script for ch[5]	Latn
+script for ch[6]	Latn
+script for ch[7]	Latn
+script for ch[8]	Latn
+script for ch[9]	Latn
+script for ch[10]	Latn
+script for ch[11]	Latn
+script for ch[12]	Latn
+script for ch[13]	
+script for ch[14]	
+script for ch[15]	Arab
+script for ch[16]	Arab
+script for ch[17]	Arab
+script for ch[18]	Arab
+
+Run count: 5
+
+Before reverse:
+run[0]:	 start: 0	length: 5	level: 1	script: Arab
+run[1]:	 start: 5	length: 7	level: 2	script: Latn
+run[2]:	 start: 12	length: 1	level: 1	script: Latn
+run[3]:	 start: 13	length: 2	level: 1	script: 
+run[4]:	 start: 15	length: 4	level: 1	script: Arab
+
+After reverse:
+run[0]:	 start: 15	length: 4	level: 1	script: Arab
+run[1]:	 start: 13	length: 2	level: 1	script: 
+run[2]:	 start: 12	length: 1	level: 1	script: Latn
+run[3]:	 start: 5	length: 7	level: 2	script: Latn
+run[4]:	 start: 0	length: 5	level: 1	script: Arab
+
+Glyph information:
+glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 1097
+glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 595
+glyph [3104]	x_offset: 202	y_offset: 0	x_advance: 1293
+glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 1100
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
+glyph [11]	x_offset: 0	y_offset: 0	x_advance: 1058
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
+glyph [40]	x_offset: 0	y_offset: 0	x_advance: 1321
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1197
+glyph [74]	x_offset: 0	y_offset: 0	x_advance: 1049
+glyph [79]	x_offset: 0	y_offset: 0	x_advance: 574
+glyph [76]	x_offset: 0	y_offset: 0	x_advance: 608
+glyph [86]	x_offset: 0	y_offset: 0	x_advance: 830
+glyph [75]	x_offset: 0	y_offset: 0	x_advance: 1161
+glyph [12]	x_offset: 0	y_offset: 0	x_advance: 1058
+glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 1097
+glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 595
+glyph [3104]	x_offset: 202	y_offset: 0	x_advance: 1293
+glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 1100

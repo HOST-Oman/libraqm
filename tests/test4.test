@@ -1,21 +1,72 @@
 tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf 
 بيت سالم مصلى عمان
 
-Glyph [419]: x_advance 1320, x_offset 0, y_offset 0
-Glyph [2018]: x_advance 529, x_offset 0, y_offset 0
-Glyph [4992]: x_advance 500, x_offset 0, y_offset 0
-Glyph [4959]: x_advance 1131, x_offset 0, y_offset 0
-Glyph [3]: x_advance 675, x_offset 0, y_offset 0
-Glyph [2926]: x_advance 1081, x_offset 0, y_offset 0
-Glyph [2914]: x_advance 451, x_offset 0, y_offset 0
-Glyph [2382]: x_advance 1665, x_offset 0, y_offset 0
-Glyph [2334]: x_advance 897, x_offset 0, y_offset 0
-Glyph [3]: x_advance 675, x_offset 0, y_offset 0
-Glyph [5199]: x_advance 468, x_offset 0, y_offset 0
-Glyph [5154]: x_advance 549, x_offset 0, y_offset 0
-Glyph [2018]: x_advance 529, x_offset 0, y_offset 0
-Glyph [2396]: x_advance 1310, x_offset 0, y_offset 0
-Glyph [3]: x_advance 675, x_offset 0, y_offset 0
-Glyph [2052]: x_advance 2036, x_offset 0, y_offset 0
-Glyph [4494]: x_advance 563, x_offset 0, y_offset 0
-Glyph [4460]: x_advance 538, x_offset 0, y_offset 0
+Text is: بيت سالم مصلى عمان
+
+Before script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Zyyy
+script for ch[4]	Arab
+script for ch[5]	Arab
+script for ch[6]	Arab
+script for ch[7]	Arab
+script for ch[8]	Zyyy
+script for ch[9]	Arab
+script for ch[10]	Arab
+script for ch[11]	Arab
+script for ch[12]	Arab
+script for ch[13]	Zyyy
+script for ch[14]	Arab
+script for ch[15]	Arab
+script for ch[16]	Arab
+script for ch[17]	Arab
+
+After script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+script for ch[4]	Arab
+script for ch[5]	Arab
+script for ch[6]	Arab
+script for ch[7]	Arab
+script for ch[8]	Arab
+script for ch[9]	Arab
+script for ch[10]	Arab
+script for ch[11]	Arab
+script for ch[12]	Arab
+script for ch[13]	Arab
+script for ch[14]	Arab
+script for ch[15]	Arab
+script for ch[16]	Arab
+script for ch[17]	Arab
+
+Run count: 1
+
+Before reverse:
+run[0]:	 start: 0	length: 18	level: 1	script: Arab
+
+After reverse:
+run[0]:	 start: 0	length: 18	level: 1	script: Arab
+
+Glyph information:
+glyph [419]	x_offset: 0	y_offset: 0	x_advance: 1320
+glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 529
+glyph [4992]	x_offset: 0	y_offset: 0	x_advance: 500
+glyph [4959]	x_offset: 0	y_offset: 0	x_advance: 1131
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
+glyph [2926]	x_offset: 0	y_offset: 0	x_advance: 1081
+glyph [2914]	x_offset: 0	y_offset: 0	x_advance: 451
+glyph [2382]	x_offset: 0	y_offset: 0	x_advance: 1665
+glyph [2334]	x_offset: 0	y_offset: 0	x_advance: 897
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
+glyph [5199]	x_offset: 0	y_offset: 0	x_advance: 468
+glyph [5154]	x_offset: 0	y_offset: 0	x_advance: 549
+glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 529
+glyph [2396]	x_offset: 0	y_offset: 0	x_advance: 1310
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
+glyph [2052]	x_offset: 0	y_offset: 0	x_advance: 2036
+glyph [4494]	x_offset: 0	y_offset: 0	x_advance: 563
+glyph [4460]	x_offset: 0	y_offset: 0	x_advance: 538

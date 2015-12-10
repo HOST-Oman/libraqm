@@ -32,6 +32,12 @@
 #define DBG(...)
 #endif
 
+#ifdef TESTING
+#define TEST(...) printf (__VA_ARGS__)
+#else
+#define TEST(...)
+#endif
+
 #include <ft2build.h>
 #include <fribidi.h>
 #include <hb.h>
