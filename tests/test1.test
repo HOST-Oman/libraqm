@@ -38,28 +38,26 @@ script for ch[9]	Latn
 script for ch[10]	Latn
 script for ch[11]	Latn
 script for ch[12]	Latn
-script for ch[13]	
-script for ch[14]	
+script for ch[13]	Arab
+script for ch[14]	Arab
 script for ch[15]	Arab
 script for ch[16]	Arab
 script for ch[17]	Arab
 script for ch[18]	Arab
 
-Run count: 5
+Run count: 4
 
 Before reverse:
 run[0]:	 start: 0	length: 5	level: 1	script: Arab
 run[1]:	 start: 5	length: 7	level: 2	script: Latn
 run[2]:	 start: 12	length: 1	level: 1	script: Latn
-run[3]:	 start: 13	length: 2	level: 1	script: 
-run[4]:	 start: 15	length: 4	level: 1	script: Arab
+run[3]:	 start: 13	length: 6	level: 1	script: Arab
 
 After reverse:
-run[0]:	 start: 15	length: 4	level: 1	script: Arab
-run[1]:	 start: 13	length: 2	level: 1	script: 
-run[2]:	 start: 12	length: 1	level: 1	script: Latn
-run[3]:	 start: 5	length: 7	level: 2	script: Latn
-run[4]:	 start: 0	length: 5	level: 1	script: Arab
+run[0]:	 start: 13	length: 6	level: 1	script: Arab
+run[1]:	 start: 12	length: 1	level: 1	script: Latn
+run[2]:	 start: 5	length: 7	level: 2	script: Latn
+run[3]:	 start: 0	length: 5	level: 1	script: Arab
 
 Glyph information:
 glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 1097
