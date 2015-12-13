@@ -23,6 +23,13 @@
 
 #include "raqm.h"
 
+#ifdef TESTING
+#define SCRIPT_TO_STRING(script) \
+  char buff[5]; \
+  hb_tag_to_string(hb_script_to_iso15924_tag (script), buff); \
+  buff[4] = '\0';
+#endif
+
 /* Stack to handle script detection */
 typedef struct _Stack {
 	int capacity;
@@ -86,15 +93,16 @@ hb_script_t top(Stack *S) {
 	if(S->size == 0) {
 		DBG("Stack is Empty\n");
 	}
-	return S->scripts[S->size-1];
+	return S->scripts[S->size];
 }
 void push(Stack *S, hb_script_t script, int pi) {
 	if(S->size == S->capacity) {
 		DBG("Stack is Full\n");
 	}
 	else {
-		S->scripts[S->size++] = script;
-		S->pi[S->size++] = pi;
+		S->size++;
+		S->scripts[S->size] = script;
+		S->pi[S->size] = pi;
 	}
 	return;
 }
@@ -175,8 +183,7 @@ static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
     TEST("Run count: %d\n\n",run_count);
     TEST("Before reverse:\n");
     for (i = 0; i < run_count; ++i) {
-        char buff[4];
-        hb_tag_to_string(hb_script_to_iso15924_tag (run[i].hb_script),buff);
+        SCRIPT_TO_STRING(run[i].hb_script);
         TEST("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
     }
 #endif
@@ -202,8 +209,7 @@ static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
     TEST("\n");
     TEST("After reverse:\n");
     for (i = 0; i < run_count; ++i) {
-	char buff[4];
-	hb_tag_to_string(hb_script_to_iso15924_tag (run[i].hb_script),buff);
+        SCRIPT_TO_STRING(run[i].hb_script);
         TEST("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
     }
     TEST("\n");
@@ -265,15 +271,14 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
     hb_script_t *scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * length);
     hb_unicode_funcs_t *ufuncs = hb_unicode_funcs_get_default();
 
-#ifdef TESTING
     TEST("Before script detection:\n");
     for (i = 0; i < length; ++i) {
 	scripts[i] = hb_unicode_script(ufuncs, uni_str[i]);
-	char buff[4];
-	hb_tag_to_string(hb_script_to_iso15924_tag (scripts[i]),buff);
+#ifdef TESTING
+        SCRIPT_TO_STRING(scripts[i]);
 	TEST("script for ch[%d]\t%s\n",i ,buff);
-    }
 #endif
+    }
 
     hb_script_t lastScriptValue;
     int lastScriptIndex = -1;
@@ -320,8 +325,7 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
 #ifdef TESTING
     TEST("\nAfter script detection:\n");
     for (i = 0; i < length; ++i) {
-	char buff[4];
-	hb_tag_to_string(hb_script_to_iso15924_tag (scripts[i]),buff);
+        SCRIPT_TO_STRING(scripts[i]);
 	TEST("script for ch[%d]\t%s\n",i ,buff);
     }
 #endif
