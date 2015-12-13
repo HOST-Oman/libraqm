@@ -362,6 +362,7 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
 	    g_info[index].x_offset = hb_glyph_position[j].x_offset;
 	    g_info[index].y_offset = hb_glyph_position[j].y_offset;
 	    g_info[index].x_advanced = hb_glyph_position[j].x_advance;
+	    g_info[index].cluster = hb_glyph_info[j].cluster;
 	    TEST("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
 	         g_info[index].index, g_info[index].x_offset,
 	         g_info[index].y_offset, g_info[index].x_advanced);

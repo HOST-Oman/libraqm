@@ -49,6 +49,7 @@ typedef struct {
     int x_offset;
     int x_advanced;
     int y_offset;
+    uint32_t cluster;
 } raqm_glyph_info_t;
 
 typedef enum {
