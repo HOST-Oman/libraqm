@@ -44,7 +44,8 @@
 #include <hb-ft.h>
 
 /* Final glyph information gained from harfbuzz */
-typedef struct {
+typedef struct
+{
     int index;
     int x_offset;
     int x_advanced;
@@ -52,7 +53,8 @@ typedef struct {
     uint32_t cluster;
 } raqm_glyph_info_t;
 
-typedef enum {
+typedef enum
+{
     RAQM_DIRECTION_DEFAULT,
     RAQM_DIRECTION_RTL,
     RAQM_DIRECTION_LTR

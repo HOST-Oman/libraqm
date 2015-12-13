@@ -47,11 +47,17 @@ int main(int argc, char *argv[])
     FT_Face face;
     FT_Error ft_error;
     if ((ft_error = FT_Init_FreeType (&ft_library)))
+    {
         abort();
+    }
     if ((ft_error = FT_New_Face (ft_library, fontfile, 0, &face)))
+    {
         abort();
+    }
     if ((ft_error = FT_Set_Char_Size (face, FONT_SIZE*64, FONT_SIZE*64, 0, 0)))
+    {
         abort();
+    }
 
     raqm_glyph_info_t *info = raqm_shape (text, face, RAQM_DIRECTION_DEFAULT);
 
