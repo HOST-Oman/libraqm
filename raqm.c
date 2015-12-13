@@ -346,7 +346,7 @@ raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t 
 	hb_glyph_info = hb_buffer_get_glyph_infos(run[i].hb_buffer, &glyph_count);
 	total_glyph_count += glyph_count ;
     }
-    raqm_glyph_info_t *g_info = (raqm_glyph_info_t*) malloc(sizeof(raqm_glyph_info_t) * total_glyph_count + 1);
+    raqm_glyph_info_t *g_info = (raqm_glyph_info_t*) malloc(sizeof(raqm_glyph_info_t) * (total_glyph_count + 1));
     int index = 0;
     TEST("Glyph information:\n");
     for (i = 0; i < run_count; i++) {
