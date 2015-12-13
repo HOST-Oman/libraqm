@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 	return 1;
     }
 
-    //Initialize FreeType and create FreeType font face.
+    /*Initialize FreeType and create FreeType font face.*/
     FT_Library ft_library;
     FT_Face face;
     FT_Error ft_error;
