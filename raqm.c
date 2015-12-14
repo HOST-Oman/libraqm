@@ -83,7 +83,7 @@ static Stack* create(int max)
     return S;
 }
 
-static int pop(Stack *S)
+static int pop(Stack* S)
 {
     if(S->size == 0)
     {
@@ -98,7 +98,7 @@ static int pop(Stack *S)
     return 0;
 }
 
-static hb_script_t top(Stack *S)
+static hb_script_t top(Stack* S)
 {
     if(S->size == 0)
     {
@@ -108,7 +108,9 @@ static hb_script_t top(Stack *S)
     return S->scripts[S->size];
 }
 
-static void push(Stack *S, hb_script_t script, int pi)
+static void push(Stack* S,
+                 hb_script_t script,
+                 int pi)
 {
     if(S->size == S->capacity)
     {
@@ -153,7 +155,8 @@ static int get_pair_index(const FriBidiChar ch)
 #define IS_OPEN(pair_index) (((pair_index) & 1) == 0)
 
 /* Reverses an array of runs used in shape_text */
-static void reverse_run(Run* run, int len)
+static void reverse_run(Run* run,
+                        int len)
 {
     int i;
     for (i = 0; i < len/2; i++)
@@ -165,9 +168,12 @@ static void reverse_run(Run* run, int len)
 }
 
 /* Seperates and reorders runs via fribidi using bidi algorithm*/
-static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
-               FriBidiParType par_type, FriBidiLevel *levels,
-               hb_script_t *scripts, Run *run)
+static int get_visual_runs(FriBidiCharType* types,
+                           FriBidiStrIndex length,
+                           FriBidiParType par_type,
+                           FriBidiLevel* levels,
+                           hb_script_t* scripts,
+                           Run* run)
 {
     int max_level = levels[0];
     int i;
@@ -268,8 +274,10 @@ static int get_visual_runs(FriBidiCharType *types, FriBidiStrIndex length,
 }
 
 /* Does the shaping for each run buffer */
-static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
-               hb_font_t *hb_font, Run *run)
+static void harfbuzz_shape(FriBidiChar* uni_str,
+                           FriBidiStrIndex length,
+                           hb_font_t* hb_font,
+                           Run* run)
 {
     run->hb_buffer = hb_buffer_create ();
 
@@ -297,7 +305,9 @@ static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
 }
 
 /* Takes the input text and does the reordering and shaping */
-raqm_glyph_info_t* raqm_shape(const char *text , FT_Face face, raqm_direction_t direction)
+raqm_glyph_info_t* raqm_shape(const char *text,
+                              FT_Face face,
+                              raqm_direction_t direction)
 {
     int i = 0;
     const char *str = text;
