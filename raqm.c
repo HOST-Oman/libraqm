@@ -31,12 +31,12 @@
 #endif
 
 /* Stack to handle script detection */
-typedef struct _Stack
+typedef struct
 {
     int capacity;
     int size;
-    int *pi;
-    hb_script_t *scripts;
+    int* pi;
+    hb_script_t* scripts;
 } Stack;
 
 /* Special paired characters for script detection */
@@ -62,12 +62,12 @@ static const FriBidiChar paired_chars[] =
 };
 
 /** ==========================WILL BE CHANGED */
-typedef struct _Run
+typedef struct
 {
     int start;
     int length;
     FriBidiLevel level;
-    hb_buffer_t *hb_buffer;
+    hb_buffer_t* hb_buffer;
     hb_script_t hb_script;
 } Run;
 
