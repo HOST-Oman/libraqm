@@ -48,7 +48,7 @@ typedef struct
 {
     int index;
     int x_offset;
-    int x_advanced;
+    int x_advance;
     int y_offset;
     uint32_t cluster;
 } raqm_glyph_info_t;
