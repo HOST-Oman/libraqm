@@ -74,7 +74,7 @@ typedef struct
 /* Stack handeling functions */
 static Stack* create(int max)
 {
-    Stack *S;
+    Stack* S;
     S = (Stack *)malloc(sizeof(Stack));
     S->scripts = (hb_script_t *)malloc(sizeof(hb_script_t)*max);
     S->pi = (int *)malloc(sizeof(int)*max);
@@ -176,7 +176,14 @@ static int get_visual_runs(FriBidiCharType* types,
                            Run* run)
 {
     int max_level = levels[0];
+    int run_count = 0;
+    FriBidiLevel lastLevel = -1;
+    hb_script_t lastScript = -1;
+    int curr_level;
+    int start = 0;
+    int index = 0;
     int i;
+
     for (i = 0; i < length; i++)
     {
         if(max_level < levels[i])
@@ -186,9 +193,6 @@ static int get_visual_runs(FriBidiCharType* types,
     }
     max_level++;
 
-    int run_count = 0;
-    FriBidiLevel lastLevel = -1;
-    hb_script_t lastScript = -1;
     for (i = 0; i < length; i++)
     {
         int level = levels[i];
@@ -206,8 +210,6 @@ static int get_visual_runs(FriBidiCharType* types,
         return run_count;
     }
 
-    int start = 0;
-    int index = 0;
     while (start < length)
     {
         int run_length = 0;
@@ -243,7 +245,6 @@ static int get_visual_runs(FriBidiCharType* types,
     }
 
     /* Implementation of L2 from unicode bidi algorithm */
-    int curr_level ;
     for (curr_level = max_level; curr_level > 0; curr_level--)
     {
         for (i = run_count-1 ; i >= 0 ; i-- )
@@ -310,17 +311,38 @@ raqm_glyph_info_t* raqm_shape(const char *text,
                               raqm_direction_t direction)
 {
     int i = 0;
-    const char *str = text;
-    FriBidiStrIndex size = strlen(str);
+    const char* str;
+    FriBidiStrIndex size;
+    FriBidiChar* uni_str;
+    FriBidiCharType* types;
+    FriBidiLevel* levels;
+    FriBidiParType par_type;
+    hb_script_t* scripts;
+    hb_unicode_funcs_t* ufuncs;
+    hb_script_t lastScriptValue;
+    int lastScriptIndex = -1;
+    int lastSetIndex = -1;
+    Stack* scpt_stack;
+    int run_count;
+    Run* run;
+    hb_font_t* hb_font;
+    unsigned int glyph_count;
+    int total_glyph_count = 0;
+    unsigned int pos_length;
+    hb_glyph_info_t* hb_glyph_info;
+    hb_glyph_position_t* hb_glyph_position;
+    raqm_glyph_info_t* g_info;
+    str = text;
+    size = strlen(str);
 
-    FriBidiChar *uni_str = (FriBidiChar*) malloc (sizeof (FriBidiChar) * size);
+    uni_str = (FriBidiChar*) malloc (sizeof (FriBidiChar) * size);
     FriBidiStrIndex length = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, str, size, uni_str);
 
-    FriBidiCharType *types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * length);
-    FriBidiLevel *levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * length);
+    types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * length);
+    levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * length);
     fribidi_get_bidi_types (uni_str, length, types);
 
-    FriBidiParType par_type = FRIBIDI_PAR_ON;
+    par_type = FRIBIDI_PAR_ON;
     if (direction == RAQM_DIRECTION_RTL)
     {
         par_type = FRIBIDI_PAR_RTL;
@@ -337,8 +359,8 @@ raqm_glyph_info_t* raqm_shape(const char *text,
     /* Handeling script detection for each character of the input string,
     if the character script is common or inherited it takes the script
     of the character before it except some special paired characters */
-    hb_script_t *scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * length);
-    hb_unicode_funcs_t *ufuncs = hb_unicode_funcs_get_default();
+    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * length);
+    ufuncs = hb_unicode_funcs_get_default();
 
     TEST("Before script detection:\n");
 
@@ -351,10 +373,7 @@ raqm_glyph_info_t* raqm_shape(const char *text,
         #endif
     }
 
-    hb_script_t lastScriptValue;
-    int lastScriptIndex = -1;
-    int lastSetIndex = -1;
-    Stack *scpt_stack = create(length);
+    scpt_stack = create(length);
     for (i = 0; i < length; ++i)
     {
         if (scripts[i] == HB_SCRIPT_COMMON && lastScriptIndex != -1)
@@ -422,20 +441,14 @@ raqm_glyph_info_t* raqm_shape(const char *text,
 #endif
 
     /* to get number of runs */
-    int run_count = get_visual_runs(types, length, par_type, levels, scripts, NULL);
-    Run *run = (Run*) malloc(sizeof(Run) * run_count);
+    run_count = get_visual_runs(types, length, par_type, levels, scripts, NULL);
+    run = (Run*) malloc(sizeof(Run) * run_count);
 
     /* to populate run array */
     get_visual_runs(types, length, par_type, levels, scripts, run);
 
     /* harfbuzz shaping */
-    hb_font_t *hb_font;
     hb_font = hb_ft_font_create (face, NULL);
-    unsigned int glyph_count;
-    int total_glyph_count = 0;
-    unsigned int pos_length;
-    hb_glyph_info_t *hb_glyph_info;
-    hb_glyph_position_t *hb_glyph_position;
 
     for (i = 0; i < run_count; i++)
     {
@@ -444,7 +457,7 @@ raqm_glyph_info_t* raqm_shape(const char *text,
         total_glyph_count += glyph_count ;
     }
 
-    raqm_glyph_info_t *g_info = (raqm_glyph_info_t*) malloc(sizeof(raqm_glyph_info_t) * (total_glyph_count + 1));
+    g_info = (raqm_glyph_info_t*) malloc(sizeof(raqm_glyph_info_t) * (total_glyph_count + 1));
 
     int index = 0;
     TEST("Glyph information:\n");

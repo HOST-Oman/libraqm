@@ -31,10 +31,14 @@
 
 #define FONT_SIZE 36
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    const char *fontfile = argv[1];
-    const char *text = argv[2];
+    const char* fontfile = argv[1];
+    const char* text = argv[2];
+    raqm_glyph_info_t* info;
+    FT_Library ft_library;
+    FT_Face face;
+    FT_Error ft_error;
 
     if (argc < 3)
     {
@@ -43,9 +47,7 @@ int main(int argc, char *argv[])
     }
 
     /*Initialize FreeType and create FreeType font face.*/
-    FT_Library ft_library;
-    FT_Face face;
-    FT_Error ft_error;
+
     if ((ft_error = FT_Init_FreeType (&ft_library)))
     {
         abort();
@@ -59,7 +61,7 @@ int main(int argc, char *argv[])
         abort();
     }
 
-    raqm_glyph_info_t *info = raqm_shape (text, face, RAQM_DIRECTION_DEFAULT);
+    info = raqm_shape (text, face, RAQM_DIRECTION_DEFAULT);
 
     return 0;
 }
