@@ -42,7 +42,7 @@ int main (int argc, char* argv[])
 
     if (argc < 3)
     {
-        printf("\n\tError: no/missing input!\n");
+        printf ("\n\tError: no/missing input!\n");
         return 1;
     }
 
@@ -50,15 +50,15 @@ int main (int argc, char* argv[])
 
     if ((ft_error = FT_Init_FreeType (&ft_library)))
     {
-        abort();
+        abort ();
     }
     if ((ft_error = FT_New_Face (ft_library, fontfile, 0, &face)))
     {
-        abort();
+        abort ();
     }
     if ((ft_error = FT_Set_Char_Size (face, FONT_SIZE*64, FONT_SIZE*64, 0, 0)))
     {
-        abort();
+        abort ();
     }
 
     info = raqm_shape (text, face, RAQM_DIRECTION_DEFAULT);

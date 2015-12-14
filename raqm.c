@@ -72,7 +72,8 @@ typedef struct
 } Run;
 
 /* Stack handeling functions */
-static Stack* create (int max)
+static Stack*
+create (int max)
 {
     Stack* stack;
     stack = (Stack *)malloc (sizeof (Stack));
@@ -83,7 +84,8 @@ static Stack* create (int max)
     return stack;
 }
 
-static int pop (Stack* stack)
+static int
+pop (Stack* stack)
 {
     if (stack->size == 0)
     {
@@ -98,7 +100,8 @@ static int pop (Stack* stack)
     return 0;
 }
 
-static hb_script_t top (Stack* stack)
+static hb_script_t
+top (Stack* stack)
 {
     if (stack->size == 0)
     {
@@ -108,9 +111,10 @@ static hb_script_t top (Stack* stack)
     return stack->scripts[stack->size];
 }
 
-static void push (Stack* stack,
-                  hb_script_t script,
-                  int pi)
+static void
+push (Stack* stack,
+      hb_script_t script,
+      int pi)
 {
     if (stack->size == stack->capacity)
     {
@@ -126,7 +130,8 @@ static void push (Stack* stack,
     return;
 }
 
-static int get_pair_index (const FriBidiChar firbidi_ch)
+static int
+get_pair_index (const FriBidiChar firbidi_ch)
 {
     int lower = 0;
     int upper = 33; /* paired characters array length */
@@ -155,8 +160,9 @@ static int get_pair_index (const FriBidiChar firbidi_ch)
 #define IS_OPEN(pair_index)(((pair_index) & 1) == 0)
 
 /* Reverses an array of runs used in shape_text */
-static void reverse_run (Run* run,
-                         int length)
+static void
+reverse_run (Run* run,
+             int length)
 {
     int i;
     for (i = 0; i < length/2; i++)
@@ -168,12 +174,13 @@ static void reverse_run (Run* run,
 }
 
 /* Seperates and reorders runs via fribidi using bidi algorithm*/
-static int get_visual_runs (FriBidiCharType* types,
-                            FriBidiStrIndex length,
-                            FriBidiParType par_type,
-                            FriBidiLevel* levels,
-                            hb_script_t* scripts,
-                            Run* run)
+static int
+get_visual_runs (FriBidiCharType* types,
+                 FriBidiStrIndex length,
+                 FriBidiParType par_type,
+                 FriBidiLevel* levels,
+                 hb_script_t* scripts,
+                 Run* run)
 {
     int max_level = levels[0];
     int run_count = 0;
@@ -275,10 +282,11 @@ static int get_visual_runs (FriBidiCharType* types,
 }
 
 /* Does the shaping for each run buffer */
-static void harfbuzz_shape (FriBidiChar* unicode_str,
-                            FriBidiStrIndex length,
-                            hb_font_t* hb_font,
-                            Run* run)
+static void
+harfbuzz_shape (FriBidiChar* unicode_str,
+                FriBidiStrIndex length,
+                hb_font_t* hb_font,
+                Run* run)
 {
     run->hb_buffer = hb_buffer_create ();
 
@@ -306,9 +314,10 @@ static void harfbuzz_shape (FriBidiChar* unicode_str,
 }
 
 /* Takes the input text and does the reordering and shaping */
-raqm_glyph_info_t* raqm_shape (const char* text,
-                               FT_Face face,
-                               raqm_direction_t direction)
+raqm_glyph_info_t*
+raqm_shape (const char* text,
+            FT_Face face,
+            raqm_direction_t direction)
 {
     int i = 0;
     const char* str;

@@ -1,6 +1,6 @@
 PAKAGES = freetype2 harfbuzz fribidi
 
-CFLAGS = `pkg-config --cflags $(PAKAGES)` -DTESTING
+CFLAGS = `pkg-config --cflags $(PAKAGES)` -DTESTING -Wall -ansi 
 LDLIBS = `pkg-config --libs $(PAKAGES)`
 
 OBJS = raqm-test.o raqm.o
