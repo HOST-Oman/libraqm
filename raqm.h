@@ -60,6 +60,6 @@ typedef enum
     RAQM_DIRECTION_LTR
 } raqm_direction_t;
 
-raqm_glyph_info_t* raqm_shape(const char* text, FT_Face face, raqm_direction_t direction);
+raqm_glyph_info_t* raqm_shape (const char* text, FT_Face face, raqm_direction_t direction);
 
 #endif

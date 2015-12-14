@@ -26,7 +26,7 @@
 #ifdef TESTING
 #define SCRIPT_TO_STRING(script) \
     char buff[5]; \
-    hb_tag_to_string(hb_script_to_iso15924_tag (script), buff); \
+    hb_tag_to_string (hb_script_to_iso15924_tag (script), buff); \
     buff[4] = '\0';
 #endif
 
@@ -72,22 +72,22 @@ typedef struct
 } Run;
 
 /* Stack handeling functions */
-static Stack* create(int max)
+static Stack* create (int max)
 {
     Stack* stack;
-    stack = (Stack *)malloc(sizeof(Stack));
-    stack->scripts = (hb_script_t *)malloc(sizeof(hb_script_t)*max);
-    stack->pair_index = (int *)malloc(sizeof(int)*max);
+    stack = (Stack *)malloc (sizeof (Stack));
+    stack->scripts = (hb_script_t *)malloc (sizeof (hb_script_t)*max);
+    stack->pair_index = (int *)malloc (sizeof (int)*max);
     stack->size = 0;
     stack->capacity = max;
     return stack;
 }
 
-static int pop(Stack* stack)
+static int pop (Stack* stack)
 {
-    if(stack->size == 0)
+    if (stack->size == 0)
     {
-        DBG("Stack is Empty\n");
+        DBG ("Stack is Empty\n");
         return 1;
     }
     else
@@ -98,23 +98,23 @@ static int pop(Stack* stack)
     return 0;
 }
 
-static hb_script_t top(Stack* stack)
+static hb_script_t top (Stack* stack)
 {
-    if(stack->size == 0)
+    if (stack->size == 0)
     {
-        DBG("Stack is Empty\n");
+        DBG ("Stack is Empty\n");
     }
 
     return stack->scripts[stack->size];
 }
 
-static void push(Stack* stack,
-                 hb_script_t script,
-                 int pi)
+static void push (Stack* stack,
+                  hb_script_t script,
+                  int pi)
 {
-    if(stack->size == stack->capacity)
+    if (stack->size == stack->capacity)
     {
-        DBG("Stack is Full\n");
+        DBG ("Stack is Full\n");
     }
     else
     {
@@ -126,7 +126,7 @@ static void push(Stack* stack,
     return;
 }
 
-static int get_pair_index(const FriBidiChar firbidi_ch)
+static int get_pair_index (const FriBidiChar firbidi_ch)
 {
     int lower = 0;
     int upper = 33; /* paired characters array length */
@@ -150,30 +150,30 @@ static int get_pair_index(const FriBidiChar firbidi_ch)
     return -1;
 }
 
-#define STACK_IS_EMPTY(script) ((script)->size <= 0)
-#define STACK_IS_NOT_EMPTY(script) (! STACK_IS_EMPTY(script))
-#define IS_OPEN(pair_index) (((pair_index) & 1) == 0)
+#define STACK_IS_EMPTY(script)((script)->size <= 0)
+#define STACK_IS_NOT_EMPTY(script)(! STACK_IS_EMPTY(script))
+#define IS_OPEN(pair_index)(((pair_index) & 1) == 0)
 
 /* Reverses an array of runs used in shape_text */
-static void reverse_run(Run* run,
-                        int length)
+static void reverse_run (Run* run,
+                         int length)
 {
     int i;
     for (i = 0; i < length/2; i++)
     {
         Run temp = run[i];
-        run[i]=run[length - 1 - i];
+        run[i] = run[length - 1 - i];
         run[length - 1 - i] = temp;
     }
 }
 
 /* Seperates and reorders runs via fribidi using bidi algorithm*/
-static int get_visual_runs(FriBidiCharType* types,
-                           FriBidiStrIndex length,
-                           FriBidiParType par_type,
-                           FriBidiLevel* levels,
-                           hb_script_t* scripts,
-                           Run* run)
+static int get_visual_runs (FriBidiCharType* types,
+                            FriBidiStrIndex length,
+                            FriBidiParType par_type,
+                            FriBidiLevel* levels,
+                            hb_script_t* scripts,
+                            Run* run)
 {
     int max_level = levels[0];
     int run_count = 0;
@@ -186,7 +186,7 @@ static int get_visual_runs(FriBidiCharType* types,
 
     for (i = 0; i < length; i++)
     {
-        if(max_level < levels[i])
+        if (max_level < levels[i])
         {
             max_level = levels[i];
         }
@@ -227,14 +227,14 @@ static int get_visual_runs(FriBidiCharType* types,
     }
 
 #ifdef TESTING
-    TEST("\n");
-    TEST("Run count: %d\n\n",run_count);
-    TEST("Before reverse:\n");
+    TEST ("\n");
+    TEST ("Run count: %d\n\n",run_count);
+    TEST ("Before reverse:\n");
 
     for (i = 0; i < run_count; ++i)
     {
         SCRIPT_TO_STRING(run[i].hb_script);
-        TEST("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
+        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
     }
 #endif
 
@@ -260,55 +260,55 @@ static int get_visual_runs(FriBidiCharType* types,
     }
 
 #ifdef TESTING
-    TEST("\n");
-    TEST("After reverse:\n");
+    TEST ("\n");
+    TEST ("After reverse:\n");
     for (i = 0; i < run_count; ++i)
     {
-        SCRIPT_TO_STRING(run[i].hb_script);
-        TEST("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
+        SCRIPT_TO_STRING (run[i].hb_script);
+        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
     }
-    TEST("\n");
+    TEST ("\n");
 #endif
 
-    free(levels);
+    free (levels);
     return run_count;
 }
 
 /* Does the shaping for each run buffer */
-static void harfbuzz_shape(FriBidiChar* unicode_str,
-                           FriBidiStrIndex length,
-                           hb_font_t* hb_font,
-                           Run* run)
+static void harfbuzz_shape (FriBidiChar* unicode_str,
+                            FriBidiStrIndex length,
+                            hb_font_t* hb_font,
+                            Run* run)
 {
     run->hb_buffer = hb_buffer_create ();
 
     /* adding text to current buffer */
-    hb_buffer_add_utf32(run->hb_buffer, unicode_str, length, run->start, run->length);
+    hb_buffer_add_utf32 (run->hb_buffer, unicode_str, length, run->start, run->length);
 
     /* setting script of current buffer */
-    hb_buffer_set_script(run->hb_buffer, run->hb_script);
+    hb_buffer_set_script (run->hb_buffer, run->hb_script);
 
     /* setting language of current buffer */
-    hb_buffer_set_language (run->hb_buffer, hb_language_get_default());
+    hb_buffer_set_language (run->hb_buffer, hb_language_get_default ());
 
     /* setting direction of current buffer */
-    if (FRIBIDI_LEVEL_IS_RTL(run->level))
+    if (FRIBIDI_LEVEL_IS_RTL (run->level))
     {
-        hb_buffer_set_direction(run->hb_buffer, HB_DIRECTION_RTL);
+        hb_buffer_set_direction (run->hb_buffer, HB_DIRECTION_RTL);
     }
     else
     {
-        hb_buffer_set_direction(run->hb_buffer, HB_DIRECTION_LTR);
+        hb_buffer_set_direction (run->hb_buffer, HB_DIRECTION_LTR);
     }
 
     /* shaping current buffer */
-    hb_shape(hb_font, run->hb_buffer, NULL, 0);
+    hb_shape (hb_font, run->hb_buffer, NULL, 0);
 }
 
 /* Takes the input text and does the reordering and shaping */
-raqm_glyph_info_t* raqm_shape(const char *text,
-                              FT_Face face,
-                              raqm_direction_t direction)
+raqm_glyph_info_t* raqm_shape (const char* text,
+                               FT_Face face,
+                               raqm_direction_t direction)
 {
     int i = 0;
     const char* str;
@@ -333,7 +333,7 @@ raqm_glyph_info_t* raqm_shape(const char *text,
     hb_glyph_position_t* hb_glyph_position;
     raqm_glyph_info_t* glyph_info;
     str = text;
-    size = strlen(str);
+    size = strlen (str);
 
     unicode_str = (FriBidiChar*) malloc (sizeof (FriBidiChar) * size);
     FriBidiStrIndex length = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, str, size, unicode_str);
@@ -352,7 +352,7 @@ raqm_glyph_info_t* raqm_shape(const char *text,
         par_type = FRIBIDI_PAR_LTR;
     }
 
-    TEST("Text is: %s\n\n", text);
+    TEST ("Text is: %s\n\n", text);
 
     fribidi_get_par_embedding_levels (types, length, &par_type, levels);
 
@@ -360,20 +360,20 @@ raqm_glyph_info_t* raqm_shape(const char *text,
     if the character script is common or inherited it takes the script
     of the character before it except some special paired characters */
     scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * length);
-    unicode_funcs = hb_unicode_funcs_get_default();
+    unicode_funcs = hb_unicode_funcs_get_default ();
 
-    TEST("Before script detection:\n");
+    TEST ("Before script detection:\n");
 
     for (i = 0; i < length; ++i)
     {
-        scripts[i] = hb_unicode_script(unicode_funcs, unicode_str[i]);
+        scripts[i] = hb_unicode_script (unicode_funcs, unicode_str[i]);
         #ifdef TESTING
-            SCRIPT_TO_STRING(scripts[i]);
-            TEST("script for ch[%d]\t%s\n",i ,buff);
+            SCRIPT_TO_STRING (scripts[i]);
+            TEST ("script for ch[%d]\t%s\n",i ,buff);
         #endif
     }
 
-    script_stack = create(length);
+    script_stack = create (length);
     for (i = 0; i < length; ++i)
     {
         if (scripts[i] == HB_SCRIPT_COMMON && lastScriptIndex != -1)
@@ -385,18 +385,18 @@ raqm_glyph_info_t* raqm_shape(const char *text,
                 {
                     scripts[i] = lastScriptValue;
                     lastSetIndex = i;
-                    push(script_stack, scripts[i], pair_index);
+                    push (script_stack, scripts[i], pair_index);
                 }
                 else
                 {        /* is a close paired character */
                     int pi = pair_index & ~1; /* find matching opening (by getting the last even index for currnt odd index)*/
-                    while (STACK_IS_NOT_EMPTY(script_stack) && script_stack->pair_index[script_stack->size] != pi)
+                    while (STACK_IS_NOT_EMPTY (script_stack) && script_stack->pair_index[script_stack->size] != pi)
                     {
-                        pop(script_stack);
+                        pop (script_stack);
                     }
-                    if(STACK_IS_NOT_EMPTY(script_stack))
+                    if (STACK_IS_NOT_EMPTY (script_stack))
                     {
-                        scripts[i] = top(script_stack);
+                        scripts[i] = top (script_stack);
                         lastScriptValue = scripts[i];
                         lastSetIndex = i;
                     }
@@ -432,39 +432,39 @@ raqm_glyph_info_t* raqm_shape(const char *text,
     }
 
 #ifdef TESTING
-    TEST("\nAfter script detection:\n");
+    TEST ("\nAfter script detection:\n");
     for (i = 0; i < length; ++i)
     {
-        SCRIPT_TO_STRING(scripts[i]);
-        TEST("script for ch[%d]\t%s\n",i ,buff);
+        SCRIPT_TO_STRING (scripts[i]);
+        TEST ("script for ch[%d]\t%s\n",i ,buff);
     }
 #endif
 
     /* to get number of runs */
-    run_count = get_visual_runs(types, length, par_type, levels, scripts, NULL);
-    run = (Run*) malloc(sizeof(Run) * run_count);
+    run_count = get_visual_runs (types, length, par_type, levels, scripts, NULL);
+    run = (Run*) malloc (sizeof (Run) * run_count);
 
     /* to populate run array */
-    get_visual_runs(types, length, par_type, levels, scripts, run);
+    get_visual_runs (types, length, par_type, levels, scripts, run);
 
     /* harfbuzz shaping */
     hb_font = hb_ft_font_create (face, NULL);
 
     for (i = 0; i < run_count; i++)
     {
-        harfbuzz_shape(unicode_str, length, hb_font, &run[i]);
-        hb_glyph_info = hb_buffer_get_glyph_infos(run[i].hb_buffer, &glyph_count);
+        harfbuzz_shape (unicode_str, length, hb_font, &run[i]);
+        hb_glyph_info = hb_buffer_get_glyph_infos (run[i].hb_buffer, &glyph_count);
         total_glyph_count += glyph_count ;
     }
 
-    glyph_info = (raqm_glyph_info_t*) malloc(sizeof(raqm_glyph_info_t) * (total_glyph_count + 1));
+    glyph_info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count + 1));
 
     int index = 0;
-    TEST("Glyph information:\n");
+    TEST ("Glyph information:\n");
 
     for (i = 0; i < run_count; i++)
     {
-        hb_glyph_info = hb_buffer_get_glyph_infos(run[i].hb_buffer, &glyph_count);
+        hb_glyph_info = hb_buffer_get_glyph_infos (run[i].hb_buffer, &glyph_count);
         hb_glyph_position = hb_buffer_get_glyph_positions (run[i].hb_buffer, &postion_length);
         int j;
         for (j = 0; j < glyph_count; j++)
@@ -474,7 +474,7 @@ raqm_glyph_info_t* raqm_shape(const char *text,
             glyph_info[index].y_offset = hb_glyph_position[j].y_offset;
             glyph_info[index].x_advance = hb_glyph_position[j].x_advance;
 	    glyph_info[index].cluster = hb_glyph_info[j].cluster;
-            TEST("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
+            TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
             glyph_info[index].index, glyph_info[index].x_offset,
             glyph_info[index].y_offset, glyph_info[index].x_advance);
             index++;
@@ -482,9 +482,9 @@ raqm_glyph_info_t* raqm_shape(const char *text,
     }
     glyph_info[total_glyph_count].index = -1;
 
-    free(types);
-    free(unicode_str);
-    free(run);
+    free (types);
+    free (unicode_str);
+    free (run);
 
     return glyph_info;
 }

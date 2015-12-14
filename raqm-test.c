@@ -31,7 +31,7 @@
 
 #define FONT_SIZE 36
 
-int main(int argc, char* argv[])
+int main (int argc, char* argv[])
 {
     const char* fontfile = argv[1];
     const char* text = argv[2];
