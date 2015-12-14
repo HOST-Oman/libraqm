@@ -76,9 +76,9 @@ static Stack*
 create (int max)
 {
     Stack* stack;
-    stack = (Stack *)malloc (sizeof (Stack));
-    stack->scripts = (hb_script_t *)malloc (sizeof (hb_script_t)*max);
-    stack->pair_index = (int *)malloc (sizeof (int)*max);
+    stack = (Stack*) malloc (sizeof (Stack));
+    stack->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * max);
+    stack->pair_index = (int*) malloc (sizeof (int) * max);
     stack->size = 0;
     stack->capacity = max;
     return stack;
@@ -240,7 +240,7 @@ get_visual_runs (FriBidiCharType* types,
 
     for (i = 0; i < run_count; ++i)
     {
-        SCRIPT_TO_STRING(run[i].hb_script);
+        SCRIPT_TO_STRING (run[i].hb_script);
         TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
     }
 #endif
@@ -254,9 +254,9 @@ get_visual_runs (FriBidiCharType* types,
     /* Implementation of L2 from unicode bidi algorithm */
     for (current_level = max_level; current_level > 0; current_level--)
     {
-        for (i = run_count-1 ; i >= 0 ; i-- )
+        for (i = run_count-1 ; i >= 0 ; i--)
         {
-            if (run[i].level >= current_level )
+            if (run[i].level >= current_level)
             {
                 int end = i;
                 for (i-- ; (i >= 0 && run[i].level >= current_level) ; i--)
