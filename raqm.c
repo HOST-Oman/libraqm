@@ -72,7 +72,7 @@ typedef struct _Run
 } Run;
 
 /* Stack handeling functions */
-Stack *create(int max)
+static Stack* create(int max)
 {
     Stack *S;
     S = (Stack *)malloc(sizeof(Stack));
@@ -83,7 +83,7 @@ Stack *create(int max)
     return S;
 }
 
-int pop(Stack *S)
+static int pop(Stack *S)
 {
     if(S->size == 0)
     {
@@ -98,7 +98,7 @@ int pop(Stack *S)
     return 0;
 }
 
-hb_script_t top(Stack *S)
+static hb_script_t top(Stack *S)
 {
     if(S->size == 0)
     {
@@ -108,7 +108,7 @@ hb_script_t top(Stack *S)
     return S->scripts[S->size];
 }
 
-void push(Stack *S, hb_script_t script, int pi)
+static void push(Stack *S, hb_script_t script, int pi)
 {
     if(S->size == S->capacity)
     {
@@ -297,7 +297,7 @@ static void harfbuzz_shape(FriBidiChar *uni_str, FriBidiStrIndex length,
 }
 
 /* Takes the input text and does the reordering and shaping */
-raqm_glyph_info_t *raqm_shape(const char *text , FT_Face face, raqm_direction_t direction)
+raqm_glyph_info_t* raqm_shape(const char *text , FT_Face face, raqm_direction_t direction)
 {
     int i = 0;
     const char *str = text;
