@@ -113,8 +113,8 @@ stack_top (Stack* stack)
 
 static void
 stack_push (Stack* stack,
-      hb_script_t script,
-      int pi)
+            hb_script_t script,
+            int pi)
 {
     if (stack->size == stack->capacity)
     {
@@ -184,8 +184,8 @@ get_visual_runs (FriBidiCharType* types,
 {
     int max_level = levels[0];
     int run_count = 0;
-    FriBidiLevel lastLevel = -1;
-    hb_script_t lastScript = -1;
+    FriBidiLevel last_level = -1;
+    hb_script_t last_script = -1;
     int current_level;
     int start = 0;
     int index = 0;
@@ -204,12 +204,12 @@ get_visual_runs (FriBidiCharType* types,
     {
         int level = levels[i];
         int script = scripts[i];
-        if (level != lastLevel || script != lastScript )
+        if (level != last_level || script != last_script )
         {
             run_count += 1;
         }
-        lastLevel = level;
-        lastScript = script;
+        last_level = level;
+        last_script = script;
     }
 
     if (run == NULL)
@@ -329,9 +329,9 @@ raqm_shape (const char* text,
     FriBidiParType par_type;
     hb_script_t* scripts;
     hb_unicode_funcs_t* unicode_funcs;
-    hb_script_t lastScriptValue;
-    int lastScriptIndex = -1;
-    int lastSetIndex = -1;
+    hb_script_t last_script_value;
+    int last_script_index = -1;
+    int last_set_index = -1;
     Stack* script_stack;
     int run_count;
     Run* run;
@@ -342,6 +342,7 @@ raqm_shape (const char* text,
     hb_glyph_info_t* hb_glyph_info;
     hb_glyph_position_t* hb_glyph_position;
     raqm_glyph_info_t* glyph_info;
+    int index = 0;
     str = text;
     size = strlen (str);
 
@@ -386,15 +387,15 @@ raqm_shape (const char* text,
     script_stack = stack_create (length);
     for (i = 0; i < length; ++i)
     {
-        if (scripts[i] == HB_SCRIPT_COMMON && lastScriptIndex != -1)
+        if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
         {
             int pair_index = get_pair_index (unicode_str[i]);
             if (pair_index >= 0)
             {    /* is a paired character */
                 if (IS_OPEN (pair_index))
                 {
-                    scripts[i] = lastScriptValue;
-                    lastSetIndex = i;
+                    scripts[i] = last_script_value;
+                    last_set_index = i;
                     stack_push (script_stack, scripts[i], pair_index);
                 }
                 else
@@ -408,37 +409,37 @@ raqm_shape (const char* text,
                     if (STACK_IS_NOT_EMPTY (script_stack))
                     {
                         scripts[i] = stack_top (script_stack);
-                        lastScriptValue = scripts[i];
-                        lastSetIndex = i;
+                        last_script_value = scripts[i];
+                        last_set_index = i;
                     }
                     else
                     {
-                        scripts[i] = lastScriptValue;
-                        lastSetIndex = i;
+                        scripts[i] = last_script_value;
+                        last_set_index = i;
                     }
                 }
             }
             else
             {
-                scripts[i] = lastScriptValue;
-                lastSetIndex = i;
+                scripts[i] = last_script_value;
+                last_set_index = i;
             }
         }
-        else if (scripts[i] == HB_SCRIPT_INHERITED && lastScriptIndex != -1)
+        else if (scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
         {
-            scripts[i] = lastScriptValue;
-            lastSetIndex = i;
+            scripts[i] = last_script_value;
+            last_set_index = i;
         }
         else
         {
             int j;
-            for (j = lastSetIndex + 1; j < i; ++j)
+            for (j = last_set_index + 1; j < i; ++j)
             {
                 scripts[j] = scripts[i];
             }
-            lastScriptValue = scripts[i];
-            lastScriptIndex = i;
-            lastSetIndex = i;
+            last_script_value = scripts[i];
+            last_script_index = i;
+            last_set_index = i;
         }
     }
 
@@ -470,7 +471,6 @@ raqm_shape (const char* text,
 
     glyph_info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count + 1));
 
-    int index = 0;
     TEST ("Glyph information:\n");
 
     for (i = 0; i < run_count; i++)
