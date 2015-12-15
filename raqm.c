@@ -73,7 +73,7 @@ typedef struct
 
 /* Stack handeling functions */
 static Stack*
-create (int max)
+stack_create (int max)
 {
     Stack* stack;
     stack = (Stack*) malloc (sizeof (Stack));
@@ -85,7 +85,7 @@ create (int max)
 }
 
 static int
-pop (Stack* stack)
+stack_pop (Stack* stack)
 {
     if (stack->size == 0)
     {
@@ -101,7 +101,7 @@ pop (Stack* stack)
 }
 
 static hb_script_t
-top (Stack* stack)
+stack_top (Stack* stack)
 {
     if (stack->size == 0)
     {
@@ -112,7 +112,7 @@ top (Stack* stack)
 }
 
 static void
-push (Stack* stack,
+stack_push (Stack* stack,
       hb_script_t script,
       int pi)
 {
@@ -383,7 +383,7 @@ raqm_shape (const char* text,
         #endif
     }
 
-    script_stack = create (length);
+    script_stack = stack_create (length);
     for (i = 0; i < length; ++i)
     {
         if (scripts[i] == HB_SCRIPT_COMMON && lastScriptIndex != -1)
@@ -395,7 +395,7 @@ raqm_shape (const char* text,
                 {
                     scripts[i] = lastScriptValue;
                     lastSetIndex = i;
-                    push (script_stack, scripts[i], pair_index);
+                    stack_push (script_stack, scripts[i], pair_index);
                 }
                 else
                 {        /* is a close paired character */
@@ -403,11 +403,11 @@ raqm_shape (const char* text,
                     while (STACK_IS_NOT_EMPTY (script_stack) &&
                            script_stack->pair_index[script_stack->size] != pi)
                     {
-                        pop (script_stack);
+                        stack_pop (script_stack);
                     }
                     if (STACK_IS_NOT_EMPTY (script_stack))
                     {
-                        scripts[i] = top (script_stack);
+                        scripts[i] = stack_top (script_stack);
                         lastScriptValue = scripts[i];
                         lastSetIndex = i;
                     }
