@@ -46,20 +46,31 @@
 /* Final glyph information gained from harfbuzz */
 typedef struct
 {
-    int index;
-    int x_offset;
-    int x_advance;
-    int y_offset;
-    uint32_t cluster;
+    int index;         /* Glyph index */
+    int x_offset;      /* Horizontal glyph offset */
+    int x_advance;     /* Horizontal glyph advance width */
+    int y_offset;      /* Vertical glyph offset */
+    uint32_t cluster;  /* Index of original character in input text (in UTF-32 code points) */
 } raqm_glyph_info_t;
 
 typedef enum
 {
-    RAQM_DIRECTION_DEFAULT,
-    RAQM_DIRECTION_RTL,
-    RAQM_DIRECTION_LTR
+    RAQM_DIRECTION_DEFAULT,  /* Automatic paragraph direction based on first strong character */
+    RAQM_DIRECTION_RTL,      /* Right-To-Left paragraph */
+    RAQM_DIRECTION_LTR       /* Left-To-Right paragraph */
 } raqm_direction_t;
 
+/* raqm_shape - apply bidi algorithm and shape text.
+ *
+ * This function reorders and shapes the text using FriBiDi and HarfBuzz.
+ * It supports proper script detection for each character of the input string.
+ * If the character script is common or inherited it takes the script of the
+ * character before it except some special paired characters.
+ *
+ * You should provide the input text, FreeType face and paragraph base direction.
+ *
+ * Returns: array of raqm_glyph_info_t.
+ */
 raqm_glyph_info_t* raqm_shape (const char* text, FT_Face face, raqm_direction_t direction);
 
 #endif
