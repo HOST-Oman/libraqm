@@ -155,9 +155,9 @@ get_pair_index (const FriBidiChar firbidi_ch)
     return -1;
 }
 
-#define STACK_IS_EMPTY(script)((script)->size <= 0)
-#define STACK_IS_NOT_EMPTY(script)(! STACK_IS_EMPTY(script))
-#define IS_OPEN(pair_index)(((pair_index) & 1) == 0)
+#define STACK_IS_EMPTY(script)     ((script)->size <= 0)
+#define STACK_IS_NOT_EMPTY(script) (! STACK_IS_EMPTY(script))
+#define IS_OPEN(pair_index)        (((pair_index) & 1) == 0)
 
 /* Reverses an array of runs used in shape_text */
 static void
