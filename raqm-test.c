@@ -62,6 +62,7 @@ int main (int argc, char* argv[])
     }
 
     info = raqm_shape (text, face, RAQM_DIRECTION_DEFAULT);
+    (void) info;
 
     return 0;
 }
