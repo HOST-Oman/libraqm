@@ -165,7 +165,7 @@ reverse_run (Run* run,
              int length)
 {
     int i;
-    for (i = 0; i < length/2; i++)
+    for (i = 0; i < length / 2; i++)
     {
         Run temp = run[i];
         run[i] = run[length - 1 - i];
