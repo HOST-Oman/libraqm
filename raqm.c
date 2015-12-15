@@ -220,8 +220,9 @@ get_visual_runs (FriBidiCharType* types,
     while (start < length)
     {
         int run_length = 0;
-        while ((start + run_length) < length && levels[start] == levels[start + run_length]
-                         && scripts[start] == scripts[start + run_length])
+        while ((start + run_length) < length &&
+                levels[start] == levels[start + run_length] &&
+                scripts[start] == scripts[start + run_length])
         {
             run_length++;
         }
@@ -399,7 +400,8 @@ raqm_shape (const char* text,
                 else
                 {        /* is a close paired character */
                     int pi = pair_index & ~1; /* find matching opening (by getting the last even index for currnt odd index)*/
-                    while (STACK_IS_NOT_EMPTY (script_stack) && script_stack->pair_index[script_stack->size] != pi)
+                    while (STACK_IS_NOT_EMPTY (script_stack) &&
+                           script_stack->pair_index[script_stack->size] != pi)
                     {
                         pop (script_stack);
                     }
