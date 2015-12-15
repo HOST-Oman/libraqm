@@ -367,8 +367,8 @@ raqm_shape (const char* text,
     fribidi_get_par_embedding_levels (types, length, &par_type, levels);
 
     /* Handeling script detection for each character of the input string,
-    if the character script is common or inherited it takes the script
-    of the character before it except some special paired characters */
+       if the character script is common or inherited it takes the script
+       of the character before it except some special paired characters */
     scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * length);
     unicode_funcs = hb_unicode_funcs_get_default ();
 

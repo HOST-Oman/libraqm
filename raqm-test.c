@@ -48,7 +48,6 @@ main (int argc, char* argv[])
     }
 
     /*Initialize FreeType and create FreeType font face.*/
-
     if ((ft_error = FT_Init_FreeType (&ft_library)))
     {
         abort ();
