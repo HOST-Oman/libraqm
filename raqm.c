@@ -484,10 +484,10 @@ raqm_shape (const char* text,
             glyph_info[index].x_offset = hb_glyph_position[j].x_offset;
             glyph_info[index].y_offset = hb_glyph_position[j].y_offset;
             glyph_info[index].x_advance = hb_glyph_position[j].x_advance;
-	    glyph_info[index].cluster = hb_glyph_info[j].cluster;
+            glyph_info[index].cluster = hb_glyph_info[j].cluster;
             TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
-            glyph_info[index].index, glyph_info[index].x_offset,
-            glyph_info[index].y_offset, glyph_info[index].x_advance);
+                  glyph_info[index].index, glyph_info[index].x_offset,
+                  glyph_info[index].y_offset, glyph_info[index].x_advance);
             index++;
         }
     }
