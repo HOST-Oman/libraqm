@@ -235,13 +235,13 @@ get_visual_runs (FriBidiCharType* types,
 
 #ifdef TESTING
     TEST ("\n");
-    TEST ("Run count: %d\n\n",run_count);
+    TEST ("Run count: %d\n\n", run_count);
     TEST ("Before reverse:\n");
 
     for (i = 0; i < run_count; ++i)
     {
         SCRIPT_TO_STRING (run[i].hb_script);
-        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
+        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n", i, run[i].start, run[i].length, run[i].level, buff);
     }
 #endif
 
@@ -254,12 +254,12 @@ get_visual_runs (FriBidiCharType* types,
     /* Implementation of L2 from unicode bidi algorithm */
     for (current_level = max_level; current_level > 0; current_level--)
     {
-        for (i = run_count-1 ; i >= 0 ; i--)
+        for (i = run_count-1; i >= 0; i--)
         {
             if (run[i].level >= current_level)
             {
                 int end = i;
-                for (i-- ; (i >= 0 && run[i].level >= current_level) ; i--)
+                for (i--; (i >= 0 && run[i].level >= current_level); i--)
                     ;
                 reverse_run (run + i + 1 , end - i);
             }
@@ -272,7 +272,7 @@ get_visual_runs (FriBidiCharType* types,
     for (i = 0; i < run_count; ++i)
     {
         SCRIPT_TO_STRING (run[i].hb_script);
-        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",i,run[i].start,run[i].length,run[i].level,buff);
+        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n", i, run[i].start, run[i].length, run[i].level, buff);
     }
     TEST ("\n");
 #endif
@@ -378,7 +378,7 @@ raqm_shape (const char* text,
         scripts[i] = hb_unicode_script (unicode_funcs, unicode_str[i]);
         #ifdef TESTING
             SCRIPT_TO_STRING (scripts[i]);
-            TEST ("script for ch[%d]\t%s\n",i ,buff);
+            TEST ("script for ch[%d]\t%s\n", i, buff);
         #endif
     }
 
@@ -445,7 +445,7 @@ raqm_shape (const char* text,
     for (i = 0; i < length; ++i)
     {
         SCRIPT_TO_STRING (scripts[i]);
-        TEST ("script for ch[%d]\t%s\n",i ,buff);
+        TEST ("script for ch[%d]\t%s\n", i, buff);
     }
 #endif
 
@@ -463,7 +463,7 @@ raqm_shape (const char* text,
     {
         harfbuzz_shape (unicode_str, length, hb_font, &run[i]);
         hb_glyph_info = hb_buffer_get_glyph_infos (run[i].hb_buffer, &glyph_count);
-        total_glyph_count += glyph_count ;
+        total_glyph_count += glyph_count;
     }
 
     glyph_info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count + 1));
