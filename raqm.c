@@ -314,6 +314,20 @@ harfbuzz_shape (FriBidiChar* unicode_str,
     hb_shape (hb_font, run->hb_buffer, NULL, 0);
 }
 
+/* convert index from UTF-32 to UTF-8 */
+static uint32_t
+utf32_index_to_utf8 (FriBidiChar* unicode,
+                     uint32_t index)
+{
+    FriBidiStrIndex length;
+    char* output = (char*) malloc ((index * 4) + 1);
+
+    length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8, unicode, index, output);
+
+    free (output);
+    return length;
+}
+
 /* Takes the input text and does the reordering and shaping */
 raqm_glyph_info_t*
 raqm_shape (const char* text,
@@ -484,7 +498,7 @@ raqm_shape (const char* text,
             glyph_info[index].x_offset = hb_glyph_position[j].x_offset;
             glyph_info[index].y_offset = hb_glyph_position[j].y_offset;
             glyph_info[index].x_advance = hb_glyph_position[j].x_advance;
-            glyph_info[index].cluster = hb_glyph_info[j].cluster;
+            glyph_info[index].cluster = utf32_index_to_utf8 (unicode_str, hb_glyph_info[j].cluster);
             TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
                   glyph_info[index].index, glyph_info[index].x_offset,
                   glyph_info[index].y_offset, glyph_info[index].x_advance);
