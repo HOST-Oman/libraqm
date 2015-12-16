@@ -1,0 +1,134 @@
+/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+عربيעבריתأهلבריתمم(ُenglish ) مرحبا
+
+Text is: عربيעבריתأهلבריתمم(ُenglish ) مرحبا
+
+Before script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+script for ch[4]	Hebr
+script for ch[5]	Hebr
+script for ch[6]	Hebr
+script for ch[7]	Hebr
+script for ch[8]	Hebr
+script for ch[9]	Arab
+script for ch[10]	Arab
+script for ch[11]	Arab
+script for ch[12]	Hebr
+script for ch[13]	Hebr
+script for ch[14]	Hebr
+script for ch[15]	Hebr
+script for ch[16]	Arab
+script for ch[17]	Arab
+script for ch[18]	Zyyy
+script for ch[19]	Zinh
+script for ch[20]	Latn
+script for ch[21]	Latn
+script for ch[22]	Latn
+script for ch[23]	Latn
+script for ch[24]	Latn
+script for ch[25]	Latn
+script for ch[26]	Latn
+script for ch[27]	Zyyy
+script for ch[28]	Zyyy
+script for ch[29]	Zyyy
+script for ch[30]	Arab
+script for ch[31]	Arab
+script for ch[32]	Arab
+script for ch[33]	Arab
+script for ch[34]	Arab
+
+After script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+script for ch[4]	Hebr
+script for ch[5]	Hebr
+script for ch[6]	Hebr
+script for ch[7]	Hebr
+script for ch[8]	Hebr
+script for ch[9]	Arab
+script for ch[10]	Arab
+script for ch[11]	Arab
+script for ch[12]	Hebr
+script for ch[13]	Hebr
+script for ch[14]	Hebr
+script for ch[15]	Hebr
+script for ch[16]	Arab
+script for ch[17]	Arab
+script for ch[18]	Arab
+script for ch[19]	Arab
+script for ch[20]	Latn
+script for ch[21]	Latn
+script for ch[22]	Latn
+script for ch[23]	Latn
+script for ch[24]	Latn
+script for ch[25]	Latn
+script for ch[26]	Latn
+script for ch[27]	Latn
+script for ch[28]	Arab
+script for ch[29]	Arab
+script for ch[30]	Arab
+script for ch[31]	Arab
+script for ch[32]	Arab
+script for ch[33]	Arab
+script for ch[34]	Arab
+
+Number of runs before script itemization: 3
+
+Fribidi Runs:
+run[0]:	 start: 27	length: 8	level: 1
+run[1]:	 start: 20	length: 7	level: 2
+run[2]:	 start: 0	length: 20	level: 1
+
+Number of runs after script itemization: 8
+
+Final Runs:
+run[0]:	 start: 28	length: 7	level: 1	script: Arab
+run[1]:	 start: 27	length: 1	level: 1	script: Latn
+run[2]:	 start: 20	length: 7	level: 2	script: Latn
+run[3]:	 start: 16	length: 4	level: 1	script: Arab
+run[4]:	 start: 12	length: 4	level: 1	script: Hebr
+run[5]:	 start: 9	length: 3	level: 1	script: Arab
+run[6]:	 start: 4	length: 5	level: 1	script: Hebr
+run[7]:	 start: 0	length: 4	level: 1	script: Arab
+
+Glyph information:
+glyph [5248]	x_offset: 0	y_offset: 0	x_advance: 702
+glyph [5252]	x_offset: 0	y_offset: 0	x_advance: 695
+glyph [5269]	x_offset: 0	y_offset: 0	x_advance: 1424
+glyph [5280]	x_offset: 0	y_offset: 0	x_advance: 1271
+glyph [5333]	x_offset: 0	y_offset: 0	x_advance: 1234
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 732
+glyph [11]	x_offset: 0	y_offset: 0	x_advance: 899
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 732
+glyph [72]	x_offset: 0	y_offset: 0	x_advance: 1418
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1460
+glyph [74]	x_offset: 0	y_offset: 0	x_advance: 1463
+glyph [79]	x_offset: 0	y_offset: 0	x_advance: 640
+glyph [76]	x_offset: 0	y_offset: 0	x_advance: 640
+glyph [86]	x_offset: 0	y_offset: 0	x_advance: 1200
+glyph [75]	x_offset: 0	y_offset: 0	x_advance: 1460
+glyph [1399]	x_offset: 0	y_offset: 0	x_advance: 0
+glyph [12]	x_offset: 0	y_offset: 0	x_advance: 899
+glyph [5332]	x_offset: 0	y_offset: 0	x_advance: 1533
+glyph [5333]	x_offset: 0	y_offset: 0	x_advance: 1234
+glyph [1344]	x_offset: 0	y_offset: 0	x_advance: 1514
+glyph [1327]	x_offset: 0	y_offset: 0	x_advance: 515
+glyph [1342]	x_offset: 0	y_offset: 0	x_advance: 1301
+glyph [1319]	x_offset: 0	y_offset: 0	x_advance: 1332
+glyph [5328]	x_offset: 0	y_offset: 0	x_advance: 1745
+glyph [5341]	x_offset: 0	y_offset: 0	x_advance: 1215
+glyph [1360]	x_offset: 0	y_offset: 0	x_advance: 640
+glyph [1344]	x_offset: 0	y_offset: 0	x_advance: 1514
+glyph [1327]	x_offset: 0	y_offset: 0	x_advance: 515
+glyph [1342]	x_offset: 0	y_offset: 0	x_advance: 1301
+glyph [1319]	x_offset: 0	y_offset: 0	x_advance: 1332
+glyph [1336]	x_offset: 0	y_offset: 0	x_advance: 1442
+glyph [5348]	x_offset: 0	y_offset: 0	x_advance: 1920
+glyph [5251]	x_offset: 0	y_offset: 0	x_advance: 641
+glyph [5280]	x_offset: 0	y_offset: 0	x_advance: 1271
+glyph [5309]	x_offset: 0	y_offset: 0	x_advance: 1375
