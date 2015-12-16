@@ -1,3 +1,5 @@
+![Travis CI build status](https://travis-ci.org/HOST-Oman/libraqm.svg?branch=master)
+
 Raqm
 ====
 
