@@ -52,18 +52,18 @@ run[1]:	 start: 12	length: 3	level: 2	script: Arab
 run[2]:	 start: 7	length: 5	level: 1	script: Arab
 
 Glyph information:
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 970
-glyph [85]	x_offset: 0	y_offset: 0	x_advance: 862
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 970
-glyph [69]	x_offset: 0	y_offset: 0	x_advance: 1121
-glyph [76]	x_offset: 0	y_offset: 0	x_advance: 608
-glyph [70]	x_offset: 0	y_offset: 0	x_advance: 952
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [20]	x_offset: 0	y_offset: 0	x_advance: 1226
-glyph [21]	x_offset: 0	y_offset: 0	x_advance: 1226
-glyph [22]	x_offset: 0	y_offset: 0	x_advance: 1226
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 1097
-glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 595
-glyph [3104]	x_offset: 202	y_offset: 0	x_advance: 1293
-glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 1100
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
+glyph [85]	x_offset: 0	y_offset: 0	x_advance: 766
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
+glyph [69]	x_offset: 0	y_offset: 0	x_advance: 996
+glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540
+glyph [70]	x_offset: 0	y_offset: 0	x_advance: 846
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [20]	x_offset: 0	y_offset: 0	x_advance: 1090
+glyph [21]	x_offset: 0	y_offset: 0	x_advance: 1090
+glyph [22]	x_offset: 0	y_offset: 0	x_advance: 1090
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 975
+glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 529
+glyph [3104]	x_offset: 180	y_offset: 0	x_advance: 1150
+glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 978

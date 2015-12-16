@@ -1,4 +1,4 @@
-tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf 
+tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
 بيت سالم مصلى عمان
 
 Text is: بيت سالم مصلى عمان
@@ -54,21 +54,21 @@ Final Runs:
 run[0]:	 start: 0	length: 18	level: 1	script: Arab
 
 Glyph information:
-glyph [419]	x_offset: 0	y_offset: 0	x_advance: 1320
-glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 529
-glyph [4992]	x_offset: 0	y_offset: 0	x_advance: 500
-glyph [4959]	x_offset: 0	y_offset: 0	x_advance: 1131
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [2926]	x_offset: 0	y_offset: 0	x_advance: 1081
-glyph [2914]	x_offset: 0	y_offset: 0	x_advance: 451
-glyph [2382]	x_offset: 0	y_offset: 0	x_advance: 1665
-glyph [2334]	x_offset: 0	y_offset: 0	x_advance: 897
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [5199]	x_offset: 0	y_offset: 0	x_advance: 468
-glyph [5154]	x_offset: 0	y_offset: 0	x_advance: 549
-glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 529
-glyph [2396]	x_offset: 0	y_offset: 0	x_advance: 1310
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [2052]	x_offset: 0	y_offset: 0	x_advance: 2036
-glyph [4494]	x_offset: 0	y_offset: 0	x_advance: 563
-glyph [4460]	x_offset: 0	y_offset: 0	x_advance: 538
+glyph [419]	x_offset: 0	y_offset: 0	x_advance: 1173
+glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 470
+glyph [4992]	x_offset: 0	y_offset: 0	x_advance: 444
+glyph [4959]	x_offset: 0	y_offset: 0	x_advance: 1005
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [2926]	x_offset: 0	y_offset: 0	x_advance: 961
+glyph [2914]	x_offset: 0	y_offset: 0	x_advance: 401
+glyph [2382]	x_offset: 0	y_offset: 0	x_advance: 1480
+glyph [2334]	x_offset: 0	y_offset: 0	x_advance: 797
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [5199]	x_offset: 0	y_offset: 0	x_advance: 416
+glyph [5154]	x_offset: 0	y_offset: 0	x_advance: 488
+glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 470
+glyph [2396]	x_offset: 0	y_offset: 0	x_advance: 1164
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [2052]	x_offset: 0	y_offset: 0	x_advance: 1810
+glyph [4494]	x_offset: 0	y_offset: 0	x_advance: 500
+glyph [4460]	x_offset: 0	y_offset: 0	x_advance: 478

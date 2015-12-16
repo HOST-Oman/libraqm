@@ -29,8 +29,6 @@
 #include <hb-ft.h>
 #include "raqm.h"
 
-#define FONT_SIZE 36
-
 int
 main (int argc, char* argv[])
 {
@@ -62,7 +60,7 @@ main (int argc, char* argv[])
         return 1;
     }
 
-    ft_error = FT_Set_Char_Size (face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0);
+    ft_error = FT_Set_Char_Size (face, face->units_per_EM, face->units_per_EM, 0, 0);
     if (ft_error)
     {
         printf ("FT_Set_Char_Size() failed.\n");

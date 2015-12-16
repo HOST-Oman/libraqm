@@ -1,4 +1,4 @@
-tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf 
+tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
 عربي(English ) عربي
 
 Text is: عربي(English ) عربي
@@ -61,22 +61,22 @@ run[2]:	 start: 5	length: 7	level: 2	script: Latn
 run[3]:	 start: 0	length: 5	level: 1	script: Arab
 
 Glyph information:
-glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 1097
-glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 595
-glyph [3104]	x_offset: 202	y_offset: 0	x_advance: 1293
-glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 1100
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [11]	x_offset: 0	y_offset: 0	x_advance: 1058
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [40]	x_offset: 0	y_offset: 0	x_advance: 1321
-glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1197
-glyph [74]	x_offset: 0	y_offset: 0	x_advance: 1049
-glyph [79]	x_offset: 0	y_offset: 0	x_advance: 574
-glyph [76]	x_offset: 0	y_offset: 0	x_advance: 608
-glyph [86]	x_offset: 0	y_offset: 0	x_advance: 830
-glyph [75]	x_offset: 0	y_offset: 0	x_advance: 1161
-glyph [12]	x_offset: 0	y_offset: 0	x_advance: 1058
-glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 1097
-glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 595
-glyph [3104]	x_offset: 202	y_offset: 0	x_advance: 1293
-glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 1100
+glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 975
+glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 529
+glyph [3104]	x_offset: 180	y_offset: 0	x_advance: 1150
+glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 978
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [11]	x_offset: 0	y_offset: 0	x_advance: 940
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [40]	x_offset: 0	y_offset: 0	x_advance: 1174
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064
+glyph [74]	x_offset: 0	y_offset: 0	x_advance: 932
+glyph [79]	x_offset: 0	y_offset: 0	x_advance: 510
+glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540
+glyph [86]	x_offset: 0	y_offset: 0	x_advance: 738
+glyph [75]	x_offset: 0	y_offset: 0	x_advance: 1032
+glyph [12]	x_offset: 0	y_offset: 0	x_advance: 940
+glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 975
+glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 529
+glyph [3104]	x_offset: 180	y_offset: 0	x_advance: 1150
+glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 978

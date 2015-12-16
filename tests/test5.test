@@ -38,13 +38,13 @@ Final Runs:
 run[0]:	 start: 0	length: 10	level: 0	script: Latn
 
 Glyph information:
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 970
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 970
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [11]	x_offset: 0	y_offset: 0	x_advance: 1058
-glyph [69]	x_offset: 0	y_offset: 0	x_advance: 1121
-glyph [69]	x_offset: 0	y_offset: 0	x_advance: 1054
-glyph [12]	x_offset: 0	y_offset: 0	x_advance: 1058
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 675
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 970
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 970
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [11]	x_offset: 0	y_offset: 0	x_advance: 940
+glyph [69]	x_offset: 0	y_offset: 0	x_advance: 996
+glyph [69]	x_offset: 0	y_offset: 0	x_advance: 936
+glyph [12]	x_offset: 0	y_offset: 0	x_advance: 940
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
