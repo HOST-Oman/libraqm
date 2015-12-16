@@ -43,22 +43,30 @@ main (int argc, char* argv[])
 
     if (argc < 3)
     {
-        printf ("\n\tError: no/missing input!\n");
+        printf ("Usage: %s font text\n", argv[0]);
         return 1;
     }
 
-    /*Initialize FreeType and create FreeType font face.*/
-    if ((ft_error = FT_Init_FreeType (&ft_library)))
+    /* Initialize FreeType and create FreeType font face. */
+    ft_error = FT_Init_FreeType (&ft_library);
+    if (ft_error)
     {
-        abort ();
+        printf ("FT_Init_FreeType() failed.\n");
+        return 1;
     }
-    if ((ft_error = FT_New_Face (ft_library, fontfile, 0, &face)))
+
+    ft_error = FT_New_Face (ft_library, fontfile, 0, &face);
+    if (ft_error)
     {
-        abort ();
+        printf ("FT_New_Face() failed.\n");
+        return 1;
     }
-    if ((ft_error = FT_Set_Char_Size (face, FONT_SIZE*64, FONT_SIZE*64, 0, 0)))
+
+    ft_error = FT_Set_Char_Size (face, FONT_SIZE * 64, FONT_SIZE * 64, 0, 0);
+    if (ft_error)
     {
-        abort ();
+        printf ("FT_Set_Char_Size() failed.\n");
+        return 1;
     }
 
     info = raqm_shape (text, face, RAQM_DIRECTION_DEFAULT);
