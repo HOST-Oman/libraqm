@@ -25,8 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ft2build.h>
-#include <hb.h>
-#include <hb-ft.h>
 #include "raqm.h"
 
 int
