@@ -30,6 +30,125 @@
     buff[4] = '\0';
 #endif
 
+/* for older fribidi versions */
+#ifndef HAVE_FRIBIDI_REORDER_RUNS
+typedef struct _FriBidiRunStruct FriBidiRun;
+struct _FriBidiRunStruct
+{
+  FriBidiRun *prev;
+  FriBidiRun *next;
+
+  FriBidiStrIndex pos, len;
+  FriBidiCharType type;
+  FriBidiLevel level;
+};
+
+/* Reverse an array of runs */
+static void reverse_run (FriBidiRun *arr, const FriBidiStrIndex len)
+{
+  FriBidiStrIndex i;
+
+  assert (arr);
+
+  for (i = 0; i < len/2; i++)
+    {
+      FriBidiRun temp = arr[i];
+      arr[i] = arr[len - 1 - i];
+      arr[len - 1 - i] = temp;
+    }
+}
+
+/* Seperates and reorders runs via fribidi using bidi algorithm*/
+FriBidiStrIndex fribidi_reorder_runs (
+  /* input */
+  const FriBidiCharType *bidi_types,
+  const FriBidiStrIndex len,
+  const FriBidiParType base_dir,
+  /* input and output */
+  FriBidiLevel *embedding_levels,
+  /* output */
+  FriBidiRun *runs
+)
+{
+  FriBidiStrIndex i;
+  FriBidiLevel level;
+  FriBidiLevel last_level = -1;
+  FriBidiLevel max_level = 0;
+  FriBidiStrIndex run_count = 0;
+  FriBidiStrIndex run_start = 0;
+  FriBidiStrIndex run_index = 0;
+
+ if
+    (len == 0)
+    {
+      goto out;
+    }
+
+  assert (bidi_types);
+  assert (embedding_levels);
+
+  {
+    FriBidiStrIndex i;
+
+    /* L1. Reset the embedding levels of some chars:
+       4. any sequence of white space characters at the end of the line. */
+    for (i = len - 1; i >= 0 &&
+         FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (bidi_types[i]); i--)
+      embedding_levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
+  }
+  /* Find max_level of the line.  We don't reuse the paragraph
+   * max_level, both for a cleaner API, and that the line max_level
+   * may be far less than paragraph max_level. */
+  for (i = len - 1; i >= 0; i--)
+    if (embedding_levels[i] > max_level)
+       max_level = embedding_levels[i];
+
+  for (i = 0; i < len; i++)
+    {
+      if (embedding_levels[i] != last_level)
+        run_count++;
+
+      last_level = embedding_levels[i];
+    }
+
+  if (runs == NULL)
+    goto out;
+
+  while (run_start < len)
+    {
+      int runLength = 0;
+      while ((run_start + runLength) < len && embedding_levels[run_start] == embedding_levels[run_start + runLength])
+        runLength++;
+
+      runs[run_index].pos = run_start;
+      runs[run_index].level = embedding_levels[run_start];
+      runs[run_index].len = runLength;
+      run_start += runLength;
+      run_index++;
+    }
+
+  /* L2. Reorder. */
+  for (level = max_level; level > 0; level--)
+  {
+      for (i = run_count - 1; i >= 0; i--)
+      {
+          if (runs[i].level >= level)
+          {
+              int end = i;
+              for (i--; (i >= 0 && runs[i].level >= level); i--)
+                  ;
+              reverse_run (runs + i + 1, end - i);
+          }
+      }
+  }
+
+out:
+
+  return run_count;
+}
+
+#endif
+
 /* Stack to handle script detection */
 typedef struct
 {
@@ -61,12 +180,12 @@ static const FriBidiChar paired_chars[] =
     0x301a, 0x301b
 };
 
-/** ==========================WILL BE CHANGED */
 typedef struct
 {
-    int start;
-    int length;
+    FriBidiStrIndex pos, len;
+    FriBidiCharType type;
     FriBidiLevel level;
+
     hb_buffer_t* hb_buffer;
     hb_script_t hb_script;
 } Run;
@@ -159,126 +278,95 @@ get_pair_index (const FriBidiChar firbidi_ch)
 #define STACK_IS_NOT_EMPTY(script) (! STACK_IS_EMPTY(script))
 #define IS_OPEN(pair_index)        (((pair_index) & 1) == 0)
 
-/* Reverses an array of runs used in shape_text */
-static void
-reverse_run (Run* run,
-             int length)
-{
-    int i;
-    for (i = 0; i < length / 2; i++)
-    {
-        Run temp = run[i];
-        run[i] = run[length - 1 - i];
-        run[length - 1 - i] = temp;
-    }
-}
-
-/* Seperates and reorders runs via fribidi using bidi algorithm*/
+/* Seperates runs based on scripts */
 static int
-get_visual_runs (FriBidiCharType* types,
-                 FriBidiStrIndex length,
-                 FriBidiParType par_type,
-                 FriBidiLevel* levels,
-                 hb_script_t* scripts,
-                 Run* run)
+itemize_by_script(int bidirun_count,
+                 hb_script_t *scripts,
+                 FriBidiRun *bidiruns,
+                 Run *runs)
 {
-    int max_level = levels[0];
+    int i, j;
     int run_count = 0;
-    FriBidiLevel last_level = -1;
-    hb_script_t last_script = -1;
-    int current_level;
-    int start = 0;
-    int index = 0;
-    int i;
 
-    for (i = 0; i < length; i++)
+    /* To get number of runs after script seperation */
+    for (i = 0; i < bidirun_count; i++)
     {
-        if (max_level < levels[i])
-        {
-            max_level = levels[i];
+        FriBidiRun run = bidiruns[i];
+        hb_script_t last_script = scripts[run.pos];
+        run_count++;
+        for (j = 0; j < run.len; j++) {
+            hb_script_t script = scripts[run.pos + j];
+            if (script != last_script)
+            {
+                run_count++;
+            }
+            last_script = script;
         }
     }
-    max_level++;
 
-    for (i = 0; i < length; i++)
-    {
-        int level = levels[i];
-        int script = scripts[i];
-        if (level != last_level || script != last_script )
-        {
-            run_count += 1;
-        }
-        last_level = level;
-        last_script = script;
-    }
-
-    if (run == NULL)
+    if (runs == NULL)
     {
         return run_count;
     }
 
-    while (start < length)
+    run_count = 0;
+
+    /* By iterating through bidiruns, any detection of different scripts in the same run
+     * will split the run so that each run contains one script. Runs with odd levels but
+     * different scripts will need to be reordered to appear in the correct visual order */
+    for (i = 0; i < bidirun_count; i++)
     {
-        int run_length = 0;
-        while ((start + run_length) < length &&
-                levels[start] == levels[start + run_length] &&
-                scripts[start] == scripts[start + run_length])
+        FriBidiRun bidirun = bidiruns[i];
+
+        runs[run_count].level = bidirun.level;
+        runs[run_count].len = 0;
+
+        if (!FRIBIDI_LEVEL_IS_RTL (bidirun.level))
         {
-            run_length++;
-        }
-        run[index].start = start;
-        run[index].level = levels[start];
-        run[index].length = run_length;
-        run[index].hb_script = scripts[start];
-        start += run_length;
-        index++;
-    }
-
-#ifdef TESTING
-    TEST ("\n");
-    TEST ("Run count: %d\n\n", run_count);
-    TEST ("Before reverse:\n");
-
-    for (i = 0; i < run_count; ++i)
-    {
-        SCRIPT_TO_STRING (run[i].hb_script);
-        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n", i, run[i].start, run[i].length, run[i].level, buff);
-    }
-#endif
-
-    /* Implementation of L1 from unicode bidi algorithm */
-    for (i = length - 1; (i >= 0) && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
-    {
-        levels[i] = FRIBIDI_DIR_TO_LEVEL (par_type);
-    }
-
-    /* Implementation of L2 from unicode bidi algorithm */
-    for (current_level = max_level; current_level > 0; current_level--)
-    {
-        for (i = run_count-1; i >= 0; i--)
-        {
-            if (run[i].level >= current_level)
+            runs[run_count].pos = bidirun.pos;
+            runs[run_count].hb_script = scripts[bidirun.pos];
+            for (j = 0; j < bidirun.len; j++)
             {
-                int end = i;
-                for (i--; (i >= 0 && run[i].level >= current_level); i--)
-                    ;
-                reverse_run (run + i + 1 , end - i);
+                hb_script_t script = scripts[bidirun.pos + j];
+                if (script == runs[run_count].hb_script)
+                {
+                    runs[run_count].len++;
+                }
+                else
+                {
+                    run_count++;
+                    runs[run_count].pos = bidirun.pos + j;
+                    runs[run_count].level = bidirun.level;
+                    runs[run_count].hb_script = script;
+                    runs[run_count].len = 1;
+                }
             }
         }
+        else
+        {
+            runs[run_count].pos = bidirun.pos + bidirun.len -1;
+            runs[run_count].hb_script = scripts[bidirun.pos + bidirun.len - 1];
+            for (j = bidirun.len - 1; j >= 0; j--)
+            {
+                hb_script_t script = scripts[bidirun.pos + j];
+                if (script == runs[run_count].hb_script)
+                {
+                    runs[run_count].len++;
+                    runs[run_count].pos = bidirun.pos + j;
+                }
+                else
+                {
+                    run_count++;
+                    runs[run_count].pos = bidirun.pos + j;
+                    runs[run_count].level = bidirun.level;
+                    runs[run_count].hb_script = script;
+                    runs[run_count].len = 1;
+                }
+            }
+        }
+        run_count++;
     }
 
-#ifdef TESTING
-    TEST ("\n");
-    TEST ("After reverse:\n");
-    for (i = 0; i < run_count; ++i)
-    {
-        SCRIPT_TO_STRING (run[i].hb_script);
-        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n", i, run[i].start, run[i].length, run[i].level, buff);
-    }
-    TEST ("\n");
-#endif
-
-    free (levels);
     return run_count;
 }
 
@@ -292,7 +380,7 @@ harfbuzz_shape (FriBidiChar* unicode_str,
     run->hb_buffer = hb_buffer_create ();
 
     /* adding text to current buffer */
-    hb_buffer_add_utf32 (run->hb_buffer, unicode_str, length, run->start, run->length);
+    hb_buffer_add_utf32 (run->hb_buffer, unicode_str, length, run->pos, run->len);
 
     /* setting script of current buffer */
     hb_buffer_set_script (run->hb_buffer, run->hb_script);
@@ -348,7 +436,9 @@ raqm_shape (const char* text,
     int last_set_index = -1;
     Stack* script_stack;
     int run_count;
-    Run* run;
+    int bidirun_count;
+    FriBidiRun* fribidi_runs;
+    Run* runs;
     hb_font_t* hb_font;
     unsigned int glyph_count;
     int total_glyph_count = 0;
@@ -392,10 +482,10 @@ raqm_shape (const char* text,
     for (i = 0; i < length; ++i)
     {
         scripts[i] = hb_unicode_script (unicode_funcs, unicode_str[i]);
-        #ifdef TESTING
-            SCRIPT_TO_STRING (scripts[i]);
-            TEST ("script for ch[%d]\t%s\n", i, buff);
-        #endif
+#ifdef TESTING
+        SCRIPT_TO_STRING (scripts[i]);
+        TEST ("script for ch[%d]\t%s\n", i, buff);
+#endif
     }
 
     script_stack = stack_create (length);
@@ -466,20 +556,51 @@ raqm_shape (const char* text,
     }
 #endif
 
-    /* to get number of runs */
-    run_count = get_visual_runs (types, length, par_type, levels, scripts, NULL);
-    run = (Run*) malloc (sizeof (Run) * run_count);
+    /* to get number of bidi runs */
+    bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, NULL);
+    fribidi_runs = (FriBidiRun*) malloc (sizeof (FriBidiRun) * bidirun_count);
 
-    /* to populate run array */
-    get_visual_runs (types, length, par_type, levels, scripts, run);
+    /* to populate bidi run array */
+    fribidi_reorder_runs (types, length, par_type, levels, fribidi_runs);
+
+    TEST ("\nNumber of runs before script itemization: %d\n", bidirun_count);
+    TEST ("\n");
+    TEST ("Fribidi Runs:\n");
+    for (i = 0; i < bidirun_count; ++i)
+    {
+        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
+              i, fribidi_runs[i].pos, fribidi_runs[i].len,
+              fribidi_runs[i].level);
+    }
+    TEST ("\n");
+
+    /* to get number of runs after script seperation */
+    run_count = itemize_by_script (bidirun_count, scripts, fribidi_runs, NULL);
+    runs = (Run*) malloc (sizeof (Run) * run_count);
+
+    /* to populate runs_scripts array */
+    itemize_by_script (bidirun_count, scripts, fribidi_runs, runs);
+    TEST ("Number of runs after script itemization: %d\n", run_count);
+
+#ifdef TESTING
+    TEST ("\n");
+    TEST ("Final Runs:\n");
+    for (i = 0; i < run_count; ++i)
+    {
+        SCRIPT_TO_STRING (runs[i].hb_script);
+        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
+             i, runs[i].pos, runs[i].len, runs[i].level, buff);
+    }
+    TEST ("\n");
+#endif
 
     /* harfbuzz shaping */
     hb_font = hb_ft_font_create (face, NULL);
 
     for (i = 0; i < run_count; i++)
     {
-        harfbuzz_shape (unicode_str, length, hb_font, &run[i]);
-        hb_glyph_info = hb_buffer_get_glyph_infos (run[i].hb_buffer, &glyph_count);
+        harfbuzz_shape (unicode_str, length, hb_font, &runs[i]);
+        hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].hb_buffer, &glyph_count);
         total_glyph_count += glyph_count;
     }
 
@@ -489,8 +610,8 @@ raqm_shape (const char* text,
 
     for (i = 0; i < run_count; i++)
     {
-        hb_glyph_info = hb_buffer_get_glyph_infos (run[i].hb_buffer, &glyph_count);
-        hb_glyph_position = hb_buffer_get_glyph_positions (run[i].hb_buffer, &postion_length);
+        hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].hb_buffer, &glyph_count);
+        hb_glyph_position = hb_buffer_get_glyph_positions (runs[i].hb_buffer, &postion_length);
         int j;
         for (j = 0; j < glyph_count; j++)
         {
@@ -507,9 +628,12 @@ raqm_shape (const char* text,
     }
     glyph_info[total_glyph_count].index = -1;
 
-    free (types);
     free (unicode_str);
-    free (run);
+    free (levels);
+    free (scripts);
+    free (types);
+    free (fribidi_runs);
+    free (runs);
 
     return glyph_info;
 }

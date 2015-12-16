@@ -42,6 +42,7 @@
 #include <fribidi.h>
 #include <hb.h>
 #include <hb-ft.h>
+#include <assert.h>
 
 /* Final glyph information gained from harfbuzz */
 typedef struct
