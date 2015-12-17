@@ -1,6 +1,14 @@
 PAKAGES = freetype2 harfbuzz fribidi
 
-CFLAGS = `pkg-config --cflags $(PAKAGES)` -DTESTING -Wall -ansi 
+WARNINGS = -W -Wall -Wextra -Wformat=2 -Wstrict-prototypes \
+           -Wimplicit-function-declaration -Wredundant-decls \
+           -Wdeclaration-after-statement -Wconversion \
+           -Wsign-conversion -Winit-self -Wundef -Wshadow \
+           -Wpointer-arith -Wreturn-type -Wsign-compare \
+           -Wmultichar -Wformat-nonliteral -Wuninitialized \
+           -Wformat-security -pedantic
+
+CFLAGS = `pkg-config --cflags $(PAKAGES)` $(WARNINGS) -DTESTING
 LDLIBS = `pkg-config --libs $(PAKAGES)`
 
 OBJS = raqm-test.o raqm.o
