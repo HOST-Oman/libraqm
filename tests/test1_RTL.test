@@ -1,8 +1,8 @@
 tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
 عربي(English ) عربي
-
+-rtl
 Text is: عربي(English ) عربي
-Direction is: DEFAULT
+Direction is: RTL
 
 Before script detection:
 script for ch[0]	Arab

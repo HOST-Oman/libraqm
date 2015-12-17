@@ -1,8 +1,8 @@
 tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
 aa (bb) aa
-
+-rtl
 Text is: aa (bb) aa
-Direction is: DEFAULT
+Direction is: RTL
 
 Before script detection:
 script for ch[0]	Latn
@@ -31,12 +31,12 @@ script for ch[9]	Latn
 Number of runs before script itemization: 1
 
 Fribidi Runs:
-run[0]:	 start: 0	length: 10	level: 0
+run[0]:	 start: 0	length: 10	level: 2
 
 Number of runs after script itemization: 1
 
 Final Runs:
-run[0]:	 start: 0	length: 10	level: 0	script: Latn
+run[0]:	 start: 0	length: 10	level: 2	script: Latn
 
 Glyph information:
 glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862

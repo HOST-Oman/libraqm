@@ -1,8 +1,8 @@
 tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
 arabic عربي 123
-
+-ltr
 Text is: arabic عربي 123
-Direction is: DEFAULT
+Direction is: LTR
 
 Before script detection:
 script for ch[0]	Latn

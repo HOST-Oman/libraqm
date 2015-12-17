@@ -30,17 +30,29 @@
 int
 main (int argc, char* argv[])
 {
-    const char* fontfile = argv[1];
-    const char* text = argv[2];
+    const char* fontfile;
+    const char* direction = "default";
+    const char* text;
     raqm_glyph_info_t* info;
+    raqm_direction_t raqm_direction;
     FT_Library ft_library;
     FT_Face face;
     FT_Error ft_error;
-
     if (argc < 3)
     {
-        printf ("Usage: %s font text\n", argv[0]);
+        printf ("Usage: %s direction font text\n", argv[0]);
         return 1;
+    }
+    if(argc > 3)
+    {
+        direction = argv[1];
+        fontfile = argv[2];
+        text = argv[3];
+    }
+    else
+    {
+        fontfile = argv[1];
+        text = argv[2];
     }
 
     /* Initialize FreeType and create FreeType font face. */
@@ -65,7 +77,20 @@ main (int argc, char* argv[])
         return 1;
     }
 
-    info = raqm_shape (text, face, RAQM_DIRECTION_DEFAULT);
+    if (strcmp(direction, "-rtl") == 0 )
+    {
+        raqm_direction = RAQM_DIRECTION_RTL;
+    }
+    else if (strcmp(direction, "-ltr") == 0 )
+    {
+        raqm_direction = RAQM_DIRECTION_LTR;
+    }
+    else
+    {
+        raqm_direction = RAQM_DIRECTION_DEFAULT;
+    }
+
+    info = raqm_shape (text, face, raqm_direction);
     (void) info;
 
     return 0;

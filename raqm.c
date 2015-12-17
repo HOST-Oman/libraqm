@@ -467,7 +467,19 @@ raqm_shape (const char* text,
         par_type = FRIBIDI_PAR_LTR;
     }
 
-    TEST ("Text is: %s\n\n", text);
+    TEST ("Text is: %s\n", text);
+    switch (direction)
+    {
+        case RAQM_DIRECTION_RTL:
+            TEST ("Direction is: RTL\n\n");
+            break;
+        case RAQM_DIRECTION_LTR:
+            TEST ("Direction is: LTR\n\n");
+            break;
+        case RAQM_DIRECTION_DEFAULT:
+            TEST ("Direction is: DEFAULT\n\n");
+            break;
+    }
 
     fribidi_get_par_embedding_levels (types, length, &par_type, levels);
 

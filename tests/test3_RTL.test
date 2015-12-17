@@ -1,8 +1,8 @@
 tests/fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
 arabic عربي 123 عمان english
-
+-rtl
 Text is: arabic عربي 123 عمان english
-Direction is: DEFAULT
+Direction is: RTL
 
 Before script detection:
 script for ch[0]	Latn
@@ -67,29 +67,30 @@ script for ch[27]	Latn
 Number of runs before script itemization: 5
 
 Fribidi Runs:
-run[0]:	 start: 0	length: 7	level: 0
-run[1]:	 start: 15	length: 5	level: 1
+run[0]:	 start: 21	length: 7	level: 2
+run[1]:	 start: 15	length: 6	level: 1
 run[2]:	 start: 12	length: 3	level: 2
-run[3]:	 start: 7	length: 5	level: 1
-run[4]:	 start: 20	length: 8	level: 0
+run[3]:	 start: 6	length: 6	level: 1
+run[4]:	 start: 0	length: 6	level: 2
 
 Number of runs after script itemization: 6
 
 Final Runs:
-run[0]:	 start: 0	length: 7	level: 0	script: Latn
-run[1]:	 start: 15	length: 5	level: 1	script: Arab
+run[0]:	 start: 21	length: 7	level: 2	script: Latn
+run[1]:	 start: 15	length: 6	level: 1	script: Arab
 run[2]:	 start: 12	length: 3	level: 2	script: Arab
 run[3]:	 start: 7	length: 5	level: 1	script: Arab
-run[4]:	 start: 20	length: 1	level: 0	script: Arab
-run[5]:	 start: 21	length: 7	level: 0	script: Latn
+run[4]:	 start: 6	length: 1	level: 1	script: Latn
+run[5]:	 start: 0	length: 6	level: 2	script: Latn
 
 Glyph information:
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
-glyph [85]	x_offset: 0	y_offset: 0	x_advance: 766
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
-glyph [69]	x_offset: 0	y_offset: 0	x_advance: 996
+glyph [72]	x_offset: 0	y_offset: 0	x_advance: 860
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064
+glyph [74]	x_offset: 0	y_offset: 0	x_advance: 932
+glyph [79]	x_offset: 0	y_offset: 0	x_advance: 510
 glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540
-glyph [70]	x_offset: 0	y_offset: 0	x_advance: 846
+glyph [86]	x_offset: 0	y_offset: 0	x_advance: 738
+glyph [75]	x_offset: 0	y_offset: 0	x_advance: 1032
 glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
 glyph [419]	x_offset: 0	y_offset: 0	x_advance: 1173
 glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 470
@@ -105,10 +106,9 @@ glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 529
 glyph [3104]	x_offset: 180	y_offset: 0	x_advance: 1150
 glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 978
 glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600
-glyph [72]	x_offset: 0	y_offset: 0	x_advance: 860
-glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064
-glyph [74]	x_offset: 0	y_offset: 0	x_advance: 932
-glyph [79]	x_offset: 0	y_offset: 0	x_advance: 510
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
+glyph [85]	x_offset: 0	y_offset: 0	x_advance: 766
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
+glyph [69]	x_offset: 0	y_offset: 0	x_advance: 996
 glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540
-glyph [86]	x_offset: 0	y_offset: 0	x_advance: 738
-glyph [75]	x_offset: 0	y_offset: 0	x_advance: 1032
+glyph [70]	x_offset: 0	y_offset: 0	x_advance: 846

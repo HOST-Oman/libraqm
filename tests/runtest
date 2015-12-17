@@ -14,7 +14,7 @@ do
 	tail -n +4 $filename > $expected
 
 	output=$(mktemp output.XXXXXX)
-	$testtool $font "$text" > $output
+	$testtool $opts $font "$text" > $output
 
 	result=$(diff -u $expected $output)
 	if test "$result" = ""
