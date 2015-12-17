@@ -73,5 +73,6 @@ typedef enum
  * Returns: array of raqm_glyph_info_t.
  */
 raqm_glyph_info_t* raqm_shape (const char* text, FT_Face face, raqm_direction_t direction);
+raqm_glyph_info_t* raqm_shape_u32 (unsigned int* unicode_str, FT_Face face, raqm_direction_t direction);
 
 #endif
