@@ -38,21 +38,25 @@ main (int argc, char* argv[])
     FT_Library ft_library;
     FT_Face face;
     FT_Error ft_error;
-    if (argc < 3)
+
+    if ((argc != 3) && (argc != 4))
     {
-        printf ("Usage: %s direction font text\n", argv[0]);
+        printf ("Usage:\n%s DIRECTION FONT_FILE TEXT\n%s FONT_FILE TEXT\n", argv[0], argv[0]);
         return 1;
     }
-    if(argc > 3)
+
+    fontfile = (argc == 3) ? argv[1] : argv[2];
+
+    text = (argc == 3) ? argv[2] : argv[3];
+    if (strlen(text) == 0)
+    {
+        printf ("TEXT length is 0.\n");
+        return 1;
+    }
+
+    if (argc == 4)
     {
         direction = argv[1];
-        fontfile = argv[2];
-        text = argv[3];
-    }
-    else
-    {
-        fontfile = argv[1];
-        text = argv[2];
     }
 
     /* Initialize FreeType and create FreeType font face. */

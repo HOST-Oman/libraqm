@@ -35,26 +35,24 @@
 typedef struct _FriBidiRunStruct FriBidiRun;
 struct _FriBidiRunStruct
 {
-  FriBidiRun *prev;
-  FriBidiRun *next;
+    FriBidiRun *prev;
+    FriBidiRun *next;
 
-  FriBidiStrIndex pos, len;
-  FriBidiCharType type;
-  FriBidiLevel level;
+    FriBidiStrIndex pos, len;
+    FriBidiCharType type;
+    FriBidiLevel level;
 };
 
 /* Reverse an array of runs */
 static void reverse_run (FriBidiRun *arr, const FriBidiStrIndex len)
 {
-  FriBidiStrIndex i;
-
-  assert (arr);
-
-  for (i = 0; i < len/2; i++)
+    FriBidiStrIndex i;
+    assert (arr);
+    for (i = 0; i < len/2; i++)
     {
-      FriBidiRun temp = arr[i];
-      arr[i] = arr[len - 1 - i];
-      arr[len - 1 - i] = temp;
+        FriBidiRun temp = arr[i];
+        arr[i] = arr[len - 1 - i];
+        arr[len - 1 - i] = temp;
     }
 }
 
@@ -68,83 +66,92 @@ FriBidiStrIndex fribidi_reorder_runs (
   FriBidiLevel *embedding_levels,
   /* output */
   FriBidiRun *runs
-)
+  )
 {
-  FriBidiStrIndex i;
-  FriBidiLevel level;
-  FriBidiLevel last_level = -1;
-  FriBidiLevel max_level = 0;
-  FriBidiStrIndex run_count = 0;
-  FriBidiStrIndex run_start = 0;
-  FriBidiStrIndex run_index = 0;
-
- if
-    (len == 0)
-    {
-      goto out;
-    }
-
-  assert (bidi_types);
-  assert (embedding_levels);
-
-  {
+    FriBidiLevel level;
+    FriBidiLevel last_level = -1;
+    FriBidiLevel max_level = 0;
     FriBidiStrIndex i;
+    FriBidiStrIndex run_count = 0;
+    FriBidiStrIndex run_start = 0;
+    FriBidiStrIndex run_index = 0;
 
-    /* L1. Reset the embedding levels of some chars:
-       4. any sequence of white space characters at the end of the line. */
-    for (i = len - 1; i >= 0 &&
-         FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (bidi_types[i]); i--)
-      embedding_levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
-  }
-  /* Find max_level of the line.  We don't reuse the paragraph
-   * max_level, both for a cleaner API, and that the line max_level
-   * may be far less than paragraph max_level. */
-  for (i = len - 1; i >= 0; i--)
-    if (embedding_levels[i] > max_level)
-       max_level = embedding_levels[i];
-
-  for (i = 0; i < len; i++)
+    if (len == 0)
     {
-      if (embedding_levels[i] != last_level)
-        run_count++;
-
-      last_level = embedding_levels[i];
+        goto out;
     }
 
-  if (runs == NULL)
-    goto out;
+    assert (bidi_types);
+    assert (embedding_levels);
 
-  while (run_start < len)
     {
-      int runLength = 0;
-      while ((run_start + runLength) < len && embedding_levels[run_start] == embedding_levels[run_start + runLength])
-        runLength++;
-
-      runs[run_index].pos = run_start;
-      runs[run_index].level = embedding_levels[run_start];
-      runs[run_index].len = runLength;
-      run_start += runLength;
-      run_index++;
+        /* L1. Reset the embedding levels of some chars:
+           4. any sequence of white space characters at the end of the line. */
+        for (i = len - 1; i >= 0 &&
+             FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (bidi_types[i]); i--)
+        {
+            embedding_levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
+        }
+    }
+    /* Find max_level of the line.  We don't reuse the paragraph
+    * max_level, both for a cleaner API, and that the line max_level
+    * may be far less than paragraph max_level. */
+    for (i = len - 1; i >= 0; i--)
+    {
+        if (embedding_levels[i] > max_level)
+        {
+            max_level = embedding_levels[i];
+        }
     }
 
-  /* L2. Reorder. */
-  for (level = max_level; level > 0; level--)
-  {
-      for (i = run_count - 1; i >= 0; i--)
-      {
-          if (runs[i].level >= level)
-          {
-              int end = i;
-              for (i--; (i >= 0 && runs[i].level >= level); i--)
+    for (i = 0; i < len; i++)
+    {
+        if (embedding_levels[i] != last_level)
+        {
+            run_count++;
+        }
+
+        last_level = embedding_levels[i];
+    }
+
+    if (runs == NULL)
+    {
+        goto out;
+    }
+
+
+    while (run_start < len)
+    {
+        int runLength = 0;
+        while ((run_start + runLength) < len && embedding_levels[run_start] == embedding_levels[run_start + runLength])
+        {
+            runLength++;
+        }
+
+        runs[run_index].pos = run_start;
+        runs[run_index].level = embedding_levels[run_start];
+        runs[run_index].len = runLength;
+        run_start += runLength;
+        run_index++;
+    }
+
+    /* L2. Reorder. */
+    for (level = max_level; level > 0; level--)
+    {
+        for (i = run_count - 1; i >= 0; i--)
+        {
+            if (runs[i].level >= level)
+            {
+                int end = i;
+                for (i--; (i >= 0 && runs[i].level >= level); i--)
                   ;
-              reverse_run (runs + i + 1, end - i);
-          }
-      }
-  }
+                reverse_run (runs + i + 1, end - i);
+            }
+        }
+    }
 
 out:
-
-  return run_count;
+    return run_count;
 }
 
 #endif
@@ -196,8 +203,8 @@ stack_create (int max)
 {
     Stack* stack;
     stack = (Stack*) malloc (sizeof (Stack));
-    stack->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * max);
-    stack->pair_index = (int*) malloc (sizeof (int) * max);
+    stack->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t)(max));
+    stack->pair_index = (int*) malloc (sizeof (int) * (size_t)(max));
     stack->size = 0;
     stack->capacity = max;
     return stack;
@@ -245,8 +252,6 @@ stack_push (Stack* stack,
         stack->scripts[stack->size] = script;
         stack->pair_index[stack->size] = pi;
     }
-
-    return;
 }
 
 static int
@@ -285,8 +290,7 @@ itemize_by_script(int bidirun_count,
                  FriBidiRun *bidiruns,
                  Run *runs)
 {
-    int i, j;
-    int run_count = 0;
+    int i, j, run_count = 0;
 
     /* To get number of runs after script seperation */
     for (i = 0; i < bidirun_count; i++)
@@ -380,7 +384,7 @@ harfbuzz_shape (FriBidiChar* unicode_str,
     run->hb_buffer = hb_buffer_create ();
 
     /* adding text to current buffer */
-    hb_buffer_add_utf32 (run->hb_buffer, unicode_str, length, run->pos, run->len);
+    hb_buffer_add_utf32 (run->hb_buffer, unicode_str, length, (unsigned int)(run->pos), run->len);
 
     /* setting script of current buffer */
     hb_buffer_set_script (run->hb_buffer, run->hb_script);
@@ -408,12 +412,12 @@ utf32_index_to_utf8 (FriBidiChar* unicode,
                      uint32_t index)
 {
     FriBidiStrIndex length;
-    char* output = (char*) malloc ((index * 4) + 1);
+    char* output = (char*) malloc ((size_t)((index * 4) + 1));
 
-    length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8, unicode, index, output);
+    length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8, unicode, (FriBidiStrIndex)(index), output);
 
     free (output);
-    return length;
+    return (uint32_t)(length);
 }
 
 /* Takes the input text and does the reordering and shaping */
@@ -423,16 +427,16 @@ raqm_shape (const char* u8_str,
             raqm_direction_t direction)
 {
     FriBidiStrIndex u8_size;
-    FriBidiChar* u32_str;
     FriBidiStrIndex u32_size;
+    FriBidiChar* u32_str;
     raqm_glyph_info_t* glyph_info;
     raqm_glyph_info_t* temp;
 
-    u8_size = strlen (u8_str);
+    u8_size = (FriBidiStrIndex) strlen (u8_str);
 
     TEST ("Text is: %s\n", u8_str);
 
-    u32_str = (FriBidiChar*) calloc (sizeof (FriBidiChar), u8_size);
+    u32_str = (FriBidiChar*) calloc (sizeof (FriBidiChar), (size_t)(u8_size));
     u32_size = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, u8_str, u8_size, u32_str);
 
     glyph_info = raqm_shape_u32 (u32_str, u32_size, face, direction);
@@ -457,30 +461,34 @@ raqm_shape_u32 (unsigned int* u32_str,
                 raqm_direction_t direction)
 {
     int i = 0;
-    FriBidiCharType* types;
-    FriBidiLevel* levels;
-    FriBidiParType par_type;
-    hb_script_t* scripts;
-    hb_unicode_funcs_t* unicode_funcs;
-    hb_script_t last_script_value;
-    int last_script_index = -1;
-    int last_set_index = -1;
-    Stack* script_stack;
+    int j = 0;
+    unsigned int k;
+    unsigned int index = 0;
     int run_count;
     int bidirun_count;
-    FriBidiRun* fribidi_runs;
-    Run* runs;
-    hb_font_t* hb_font;
+    int last_script_index = -1;
+    int last_set_index = -1;
+    unsigned int total_glyph_count = 0;
     unsigned int glyph_count;
-    int total_glyph_count = 0;
     unsigned int postion_length;
+
+    hb_script_t last_script_value;
+    hb_script_t* scripts;
+    hb_font_t* hb_font;
     hb_glyph_info_t* hb_glyph_info;
     hb_glyph_position_t* hb_glyph_position;
+    hb_unicode_funcs_t* unicode_funcs;
+    FriBidiParType par_type;
+    FriBidiRun* fribidi_runs;
+    FriBidiCharType* types;
+    FriBidiLevel* levels;
+    Stack* script_stack;
+    Run* runs;
     raqm_glyph_info_t* glyph_info;
-    int index = 0;
 
-    types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * length);
-    levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * length);
+
+    types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * (size_t)(length));
+    levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * (size_t)(length));
     fribidi_get_bidi_types (u32_str, length, types);
 
     par_type = FRIBIDI_PAR_ON;
@@ -511,7 +519,7 @@ raqm_shape_u32 (unsigned int* u32_str,
     /* Handeling script detection for each character of the input string,
        if the character script is common or inherited it takes the script
        of the character before it except some special paired characters */
-    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * length);
+    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t)(length));
     unicode_funcs = hb_unicode_funcs_get_default ();
 
     TEST ("Before script detection:\n");
@@ -573,7 +581,6 @@ raqm_shape_u32 (unsigned int* u32_str,
         }
         else
         {
-            int j;
             for (j = last_set_index + 1; j < i; ++j)
             {
                 scripts[j] = scripts[i];
@@ -595,7 +602,7 @@ raqm_shape_u32 (unsigned int* u32_str,
 
     /* to get number of bidi runs */
     bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, NULL);
-    fribidi_runs = (FriBidiRun*) malloc (sizeof (FriBidiRun) * bidirun_count);
+    fribidi_runs = (FriBidiRun*) malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
 
     /* to populate bidi run array */
     fribidi_reorder_runs (types, length, par_type, levels, fribidi_runs);
@@ -613,7 +620,7 @@ raqm_shape_u32 (unsigned int* u32_str,
 
     /* to get number of runs after script seperation */
     run_count = itemize_by_script (bidirun_count, scripts, fribidi_runs, NULL);
-    runs = (Run*) malloc (sizeof (Run) * run_count);
+    runs = (Run*) malloc (sizeof (Run) * (size_t)(run_count));
 
     /* to populate runs_scripts array */
     itemize_by_script (bidirun_count, scripts, fribidi_runs, runs);
@@ -626,7 +633,7 @@ raqm_shape_u32 (unsigned int* u32_str,
     {
         SCRIPT_TO_STRING (runs[i].hb_script);
         TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
-             i, runs[i].pos, runs[i].len, runs[i].level, buff);
+              i, runs[i].pos, runs[i].len, runs[i].level, buff);
     }
     TEST ("\n");
 #endif
@@ -649,14 +656,14 @@ raqm_shape_u32 (unsigned int* u32_str,
     {
         hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].hb_buffer, &glyph_count);
         hb_glyph_position = hb_buffer_get_glyph_positions (runs[i].hb_buffer, &postion_length);
-        int j;
-        for (j = 0; j < glyph_count; j++)
+
+        for (k = 0; k < glyph_count; k++)
         {
-            glyph_info[index].index = hb_glyph_info[j].codepoint;
-            glyph_info[index].x_offset = hb_glyph_position[j].x_offset;
-            glyph_info[index].y_offset = hb_glyph_position[j].y_offset;
-            glyph_info[index].x_advance = hb_glyph_position[j].x_advance;
-            glyph_info[index].cluster = hb_glyph_info[j].cluster;
+            glyph_info[index].index = (int)(hb_glyph_info[k].codepoint);
+            glyph_info[index].x_offset = hb_glyph_position[k].x_offset;
+            glyph_info[index].y_offset = hb_glyph_position[k].y_offset;
+            glyph_info[index].x_advance = hb_glyph_position[k].x_advance;
+            glyph_info[index].cluster = hb_glyph_info[k].cluster;
             TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
                   glyph_info[index].index, glyph_info[index].x_offset,
                   glyph_info[index].y_offset, glyph_info[index].x_advance);
