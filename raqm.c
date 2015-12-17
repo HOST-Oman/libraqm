@@ -418,14 +418,45 @@ utf32_index_to_utf8 (FriBidiChar* unicode,
 
 /* Takes the input text and does the reordering and shaping */
 raqm_glyph_info_t*
-raqm_shape (const char* text,
+raqm_shape (const char* u8_str,
             FT_Face face,
             raqm_direction_t direction)
 {
+    FriBidiStrIndex u8_size;
+    FriBidiChar* u32_str;
+    FriBidiStrIndex u32_size;
+    raqm_glyph_info_t* glyph_info;
+    raqm_glyph_info_t* temp;
+
+    u8_size = strlen (u8_str);
+
+    TEST ("Text is: %s\n", u8_str);
+
+    u32_str = (FriBidiChar*) calloc (sizeof (FriBidiChar), u8_size);
+    u32_size = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, u8_str, u8_size, u32_str);
+
+    glyph_info = raqm_shape_u32 (u32_str, u32_size, face, direction);
+    temp = glyph_info;
+
+    while (temp->index >= 0)
+    {
+        temp->cluster = utf32_index_to_utf8 (u32_str, temp->cluster);
+        temp++;
+    }
+
+    free (u32_str);
+
+    return glyph_info;
+}
+
+/* Takes a utf-32 input text and does the reordering and shaping */
+raqm_glyph_info_t*
+raqm_shape_u32 (unsigned int* u32_str,
+                int length,
+                FT_Face face,
+                raqm_direction_t direction)
+{
     int i = 0;
-    const char* str;
-    FriBidiStrIndex size;
-    FriBidiChar* unicode_str;
     FriBidiCharType* types;
     FriBidiLevel* levels;
     FriBidiParType par_type;
@@ -447,15 +478,10 @@ raqm_shape (const char* text,
     hb_glyph_position_t* hb_glyph_position;
     raqm_glyph_info_t* glyph_info;
     int index = 0;
-    str = text;
-    size = strlen (str);
-
-    unicode_str = (FriBidiChar*) malloc (sizeof (FriBidiChar) * size);
-    FriBidiStrIndex length = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, str, size, unicode_str);
 
     types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * length);
     levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * length);
-    fribidi_get_bidi_types (unicode_str, length, types);
+    fribidi_get_bidi_types (u32_str, length, types);
 
     par_type = FRIBIDI_PAR_ON;
     if (direction == RAQM_DIRECTION_RTL)
@@ -467,7 +493,6 @@ raqm_shape (const char* text,
         par_type = FRIBIDI_PAR_LTR;
     }
 
-    TEST ("Text is: %s\n", text);
     switch (direction)
     {
         case RAQM_DIRECTION_RTL:
@@ -493,7 +518,7 @@ raqm_shape (const char* text,
 
     for (i = 0; i < length; ++i)
     {
-        scripts[i] = hb_unicode_script (unicode_funcs, unicode_str[i]);
+        scripts[i] = hb_unicode_script (unicode_funcs, u32_str[i]);
 #ifdef TESTING
         SCRIPT_TO_STRING (scripts[i]);
         TEST ("script for ch[%d]\t%s\n", i, buff);
@@ -505,7 +530,7 @@ raqm_shape (const char* text,
     {
         if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
         {
-            int pair_index = get_pair_index (unicode_str[i]);
+            int pair_index = get_pair_index (u32_str[i]);
             if (pair_index >= 0)
             {    /* is a paired character */
                 if (IS_OPEN (pair_index))
@@ -611,7 +636,7 @@ raqm_shape (const char* text,
 
     for (i = 0; i < run_count; i++)
     {
-        harfbuzz_shape (unicode_str, length, hb_font, &runs[i]);
+        harfbuzz_shape (u32_str, length, hb_font, &runs[i]);
         hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].hb_buffer, &glyph_count);
         total_glyph_count += glyph_count;
     }
@@ -631,16 +656,16 @@ raqm_shape (const char* text,
             glyph_info[index].x_offset = hb_glyph_position[j].x_offset;
             glyph_info[index].y_offset = hb_glyph_position[j].y_offset;
             glyph_info[index].x_advance = hb_glyph_position[j].x_advance;
-            glyph_info[index].cluster = utf32_index_to_utf8 (unicode_str, hb_glyph_info[j].cluster);
+            glyph_info[index].cluster = hb_glyph_info[j].cluster;
             TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
                   glyph_info[index].index, glyph_info[index].x_offset,
                   glyph_info[index].y_offset, glyph_info[index].x_advance);
             index++;
         }
     }
+
     glyph_info[total_glyph_count].index = -1;
 
-    free (unicode_str);
     free (levels);
     free (scripts);
     free (types);
