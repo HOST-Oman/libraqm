@@ -95,7 +95,7 @@ main (int argc, char* argv[])
         raqm_direction = RAQM_DIRECTION_DEFAULT;
     }
 
-    glyph_count = raqm_shape (text, face, raqm_direction, &info);
+    glyph_count = raqm_shape (text, (int) strlen (text), face, raqm_direction, &info);
     (void) info;
     (void) glyph_count;
 
