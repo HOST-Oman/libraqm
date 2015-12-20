@@ -432,13 +432,35 @@ raqm_shape (const char* u8_str,
     u32_size = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, u8_str, u8_size, u32_str);
 
     glyph_info = raqm_shape_u32 (u32_str, u32_size, face, direction);
-    temp = glyph_info;
 
+#ifdef TESTING
+    temp = glyph_info;
+    TEST ("\nUTF-32 clusters:");
+    while (temp->index >= 0)
+    {
+        TEST (" %02d", temp->cluster);
+        temp++;
+    }
+    TEST ("\n");
+#endif
+
+    temp = glyph_info;
     while (temp->index >= 0)
     {
         temp->cluster = utf32_index_to_utf8 (u32_str, temp->cluster);
         temp++;
     }
+
+#ifdef TESTING
+    temp = glyph_info;
+    TEST ("UTF-8 clusters: ");
+    while (temp->index >= 0)
+    {
+        TEST (" %02d", temp->cluster);
+        temp++;
+    }
+    TEST ("\n");
+#endif
 
     free (u32_str);
 

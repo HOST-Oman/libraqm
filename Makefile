@@ -15,6 +15,7 @@ OBJS = raqm-test.o raqm.o
 
 BIN = raqm-test
 RUNTEST = tests/runtest
+UPDATETEST = tests/updatetest
 TESTS = $(wildcard tests/*.test)
 
 all: $(BIN)
@@ -27,6 +28,9 @@ $(BIN): $(OBJS)
 
 check: all $(TESTS)
 	@bash $(RUNTEST) $(abspath $(BIN)) "$(TESTS)"
+
+update-tests: all $(TESTS)
+	@bash $(UPDATETEST) $(abspath $(BIN)) "$(TESTS)"
 
 clean:
 	rm -f $(BIN) $(OBJS)

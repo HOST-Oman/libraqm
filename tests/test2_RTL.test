@@ -69,3 +69,6 @@ glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862
 glyph [69]	x_offset: 0	y_offset: 0	x_advance: 996
 glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540
 glyph [70]	x_offset: 0	y_offset: 0	x_advance: 846
+
+UTF-32 clusters: 12 13 14 11 10 09 08 07 06 00 01 02 03 04 05
+UTF-8 clusters:  16 17 18 15 13 11 09 07 06 00 01 02 03 04 05

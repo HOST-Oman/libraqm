@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+testtool=$1
+tests=$2
+
+for filename in $tests
+do
+	echo "Updating $filename... "
+
+	font=$(sed -n 1p $filename)
+	text=$(sed -n 2p $filename)
+	opts=$(sed -n 3p $filename)
+	rm $filename
+	echo "$font" >> $filename
+	echo "$text" >> $filename
+	echo "$opts" >> $filename
+	$testtool $opts $font "$text" >> $filename
+
+done
