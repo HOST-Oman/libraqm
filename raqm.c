@@ -453,27 +453,28 @@ raqm_shape_u32 (unsigned int* u32_str,
                 raqm_direction_t direction)
 {
     int i = 0;
-    FriBidiCharType* types;
-    FriBidiLevel* levels;
-    FriBidiParType par_type;
-    hb_script_t* scripts;
-    hb_unicode_funcs_t* unicode_funcs;
-    hb_script_t last_script_value;
-    int last_script_index = -1;
-    int last_set_index = -1;
-    Stack* script_stack;
+    unsigned int index = 0;
     int run_count;
     int bidirun_count;
-    FriBidiRun* fribidi_runs;
-    Run* runs;
-    hb_font_t* hb_font;
-    unsigned int glyph_count;
+    int last_script_index = -1;
+    int last_set_index = -1;
     unsigned int total_glyph_count = 0;
+    unsigned int glyph_count;
     unsigned int postion_length;
+
+    hb_script_t last_script_value;
+    hb_script_t* scripts;
+    hb_font_t* hb_font;
     hb_glyph_info_t* hb_glyph_info;
     hb_glyph_position_t* hb_glyph_position;
+    hb_unicode_funcs_t* unicode_funcs;
+    FriBidiParType par_type;
+    FriBidiRun* fribidi_runs;
+    FriBidiCharType* types;
+    FriBidiLevel* levels;
+    Stack* script_stack;
+    Run* runs;
     raqm_glyph_info_t* glyph_info;
-    unsigned int index = 0;
 
     types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * (size_t)(length));
     levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * (size_t)(length));
