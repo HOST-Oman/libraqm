@@ -33,6 +33,7 @@ main (int argc, char* argv[])
     const char* fontfile;
     const char* direction = "default";
     const char* text;
+    unsigned glyph_count;
     raqm_glyph_info_t* info;
     raqm_direction_t raqm_direction;
     FT_Library ft_library;
@@ -94,8 +95,9 @@ main (int argc, char* argv[])
         raqm_direction = RAQM_DIRECTION_DEFAULT;
     }
 
-    info = raqm_shape (text, face, raqm_direction);
+    glyph_count = raqm_shape (text, face, raqm_direction, &info);
     (void) info;
+    (void) glyph_count;
 
     return 0;
 }

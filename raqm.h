@@ -47,7 +47,7 @@
 /* Final glyph information gained from harfbuzz */
 typedef struct
 {
-    int index;         /* Glyph index */
+    unsigned index;    /* Glyph index */
     int x_offset;      /* Horizontal glyph offset */
     int x_advance;     /* Horizontal glyph advance width */
     int y_offset;      /* Vertical glyph offset */
@@ -72,7 +72,7 @@ typedef enum
  *
  * Returns: array of raqm_glyph_info_t.
  */
-raqm_glyph_info_t* raqm_shape (const char* text, FT_Face face, raqm_direction_t direction);
-raqm_glyph_info_t* raqm_shape_u32 (unsigned int* u32_str, int length, FT_Face face, raqm_direction_t direction);
+unsigned raqm_shape (const char* text, FT_Face face, raqm_direction_t direction, raqm_glyph_info_t** glyph_info);
+unsigned raqm_shape_u32 (unsigned int* u32_str, int length, FT_Face face, raqm_direction_t direction, raqm_glyph_info_t** glyph_info);
 
 #endif

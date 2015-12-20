@@ -413,17 +413,18 @@ utf32_index_to_utf8 (FriBidiChar* unicode,
 }
 
 /* Takes the input text and does the reordering and shaping */
-raqm_glyph_info_t*
+unsigned
 raqm_shape (const char* u8_str,
             FT_Face face,
-            raqm_direction_t direction)
+            raqm_direction_t direction,
+            raqm_glyph_info_t** glyph_info)
 {
     FriBidiStrIndex u8_size;
     FriBidiChar* u32_str;
     FriBidiStrIndex u32_size;
-    raqm_glyph_info_t* glyph_info;
-    raqm_glyph_info_t* temp;
-
+    raqm_glyph_info_t* g_info;
+    unsigned glyph_count;
+    unsigned i;
     u8_size = (FriBidiStrIndex) strlen (u8_str);
 
     TEST ("Text is: %s\n", u8_str);
@@ -431,48 +432,43 @@ raqm_shape (const char* u8_str,
     u32_str = (FriBidiChar*) calloc (sizeof (FriBidiChar), (size_t)(u8_size));
     u32_size = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, u8_str, u8_size, u32_str);
 
-    glyph_info = raqm_shape_u32 (u32_str, u32_size, face, direction);
+    glyph_count = raqm_shape_u32 (u32_str, u32_size, face, direction, &g_info);
 
 #ifdef TESTING
-    temp = glyph_info;
     TEST ("\nUTF-32 clusters:");
-    while (temp->index >= 0)
+    for (i = 0; i < glyph_count; i++)
     {
-        TEST (" %02d", temp->cluster);
-        temp++;
+        TEST (" %02d", g_info[i].cluster);
     }
     TEST ("\n");
 #endif
 
-    temp = glyph_info;
-    while (temp->index >= 0)
+    for (i = 0; i < glyph_count; i++)
     {
-        temp->cluster = utf32_index_to_utf8 (u32_str, temp->cluster);
-        temp++;
+        g_info[i].cluster = utf32_index_to_utf8 (u32_str, g_info[i].cluster);
     }
 
 #ifdef TESTING
-    temp = glyph_info;
     TEST ("UTF-8 clusters: ");
-    while (temp->index >= 0)
+    for (i = 0; i < glyph_count; i++)
     {
-        TEST (" %02d", temp->cluster);
-        temp++;
+        TEST (" %02d", g_info[i].cluster);
     }
     TEST ("\n");
 #endif
 
     free (u32_str);
-
-    return glyph_info;
+    *glyph_info = g_info;
+    return glyph_count;
 }
 
 /* Takes a utf-32 input text and does the reordering and shaping */
-raqm_glyph_info_t*
+unsigned
 raqm_shape_u32 (unsigned int* u32_str,
                 int length,
                 FT_Face face,
-                raqm_direction_t direction)
+                raqm_direction_t direction,
+                raqm_glyph_info_t** glyph_info)
 {
     int i = 0;
     unsigned int index = 0;
@@ -495,7 +491,7 @@ raqm_shape_u32 (unsigned int* u32_str,
     FriBidiLevel* levels;
     Stack* script_stack;
     Run* runs;
-    raqm_glyph_info_t* glyph_info;
+    raqm_glyph_info_t* g_info;
 
     types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * (size_t)(length));
     levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * (size_t)(length));
@@ -659,7 +655,7 @@ raqm_shape_u32 (unsigned int* u32_str,
         total_glyph_count += glyph_count;
     }
 
-    glyph_info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count + 1));
+    g_info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count));
 
     TEST ("Glyph information:\n");
 
@@ -671,19 +667,19 @@ raqm_shape_u32 (unsigned int* u32_str,
 
         for (j = 0; j < glyph_count; j++)
         {
-            glyph_info[index].index = (int)(hb_glyph_info[j].codepoint);
-            glyph_info[index].x_offset = hb_glyph_position[j].x_offset;
-            glyph_info[index].y_offset = hb_glyph_position[j].y_offset;
-            glyph_info[index].x_advance = hb_glyph_position[j].x_advance;
-            glyph_info[index].cluster = hb_glyph_info[j].cluster;
+            g_info[index].index = hb_glyph_info[j].codepoint;
+            g_info[index].x_offset = hb_glyph_position[j].x_offset;
+            g_info[index].y_offset = hb_glyph_position[j].y_offset;
+            g_info[index].x_advance = hb_glyph_position[j].x_advance;
+            g_info[index].cluster = hb_glyph_info[j].cluster;
             TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
-                  glyph_info[index].index, glyph_info[index].x_offset,
-                  glyph_info[index].y_offset, glyph_info[index].x_advance);
+                  g_info[index].index, g_info[index].x_offset,
+                  g_info[index].y_offset, g_info[index].x_advance);
             index++;
         }
     }
 
-    glyph_info[total_glyph_count].index = -1;
+    *glyph_info = g_info;
 
     free (levels);
     free (scripts);
@@ -691,5 +687,5 @@ raqm_shape_u32 (unsigned int* u32_str,
     free (fribidi_runs);
     free (runs);
 
-    return glyph_info;
+    return total_glyph_count;
 }
