@@ -5,7 +5,7 @@ tests=$2
 
 for filename in $tests
 do
-	echo -n "Testing $filename... "
+	echo -ne "Testing $filename...\t"
 
 	font=$(sed -n 1p $filename)
 	text=$(sed -n 2p $filename)
