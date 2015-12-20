@@ -150,8 +150,8 @@ out:
 /* Stack to handle script detection */
 typedef struct
 {
-    int capacity;
-    int size;
+    size_t capacity;
+    size_t size;
     int* pair_index;
     hb_script_t* scripts;
 } Stack;
@@ -190,12 +190,12 @@ typedef struct
 
 /* Stack handeling functions */
 static Stack*
-stack_create (int max)
+stack_create (size_t max)
 {
     Stack* stack;
     stack = (Stack*) malloc (sizeof (Stack));
-    stack->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t)(max));
-    stack->pair_index = (int*) malloc (sizeof (int) * (size_t)(max));
+    stack->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * max);
+    stack->pair_index = (int*) malloc (sizeof (int) * max);
     stack->size = 0;
     stack->capacity = max;
     return stack;
@@ -521,7 +521,7 @@ raqm_shape_u32 (unsigned int* u32_str,
         scripts[i] = script;
     }
 
-    script_stack = stack_create (length);
+    script_stack = stack_create ((size_t) length);
     for (i = 0; i < length; ++i)
     {
         if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
