@@ -8,7 +8,7 @@ WARNINGS = -W -Wall -Wextra -Wformat=2 -Wstrict-prototypes \
            -Wmultichar -Wformat-nonliteral -Wuninitialized \
            -Wformat-security -pedantic
 
-CFLAGS = `pkg-config --cflags $(PAKAGES)` $(WARNINGS) -DTESTING
+CFLAGS = `pkg-config --cflags $(PAKAGES) | sed -e "s/ -I/ -isystem/g"` $(WARNINGS) -DTESTING
 LDLIBS = `pkg-config --libs $(PAKAGES)`
 
 OBJS = raqm-test.o raqm.o
