@@ -6,7 +6,8 @@ WARNINGS = -W -Wall -Wextra -Wformat=2 -Wstrict-prototypes \
            -Wsign-conversion -Winit-self -Wundef -Wshadow \
            -Wpointer-arith -Wreturn-type -Wsign-compare \
            -Wmultichar -Wformat-nonliteral -Wuninitialized \
-           -Wformat-security -pedantic
+           -Wformat-security -pedantic \
+           -Wno-variadic-macros
 
 CFLAGS = $(shell pkg-config --cflags $(PAKAGES) | sed -e "s/-I/-isystem/g") $(WARNINGS) -DTESTING
 LDLIBS = $(shell pkg-config --libs $(PAKAGES))
