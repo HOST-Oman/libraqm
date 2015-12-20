@@ -467,7 +467,6 @@ raqm_shape_u32 (unsigned int* u32_str,
     hb_font_t* hb_font;
     hb_glyph_info_t* hb_glyph_info;
     hb_glyph_position_t* hb_glyph_position;
-    hb_unicode_funcs_t* unicode_funcs;
     FriBidiParType par_type;
     FriBidiRun* fribidi_runs;
     FriBidiCharType* types;
@@ -509,13 +508,12 @@ raqm_shape_u32 (unsigned int* u32_str,
        if the character script is common or inherited it takes the script
        of the character before it except some special paired characters */
     scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t)(length));
-    unicode_funcs = hb_unicode_funcs_get_default ();
 
     TEST ("Before script detection:\n");
 
     for (i = 0; i < length; ++i)
     {
-        hb_script_t script = hb_unicode_script (unicode_funcs, u32_str[i]);
+        hb_script_t script = hb_unicode_script (hb_unicode_funcs_get_default (), u32_str[i]);
 #ifdef TESTING
         SCRIPT_TO_STRING (script);
         TEST ("script for ch[%d]\t%s\n", i, buff);
