@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef _SHAPE_TEXT_H_
-#define _SHAPE_TEXT_H_
+#ifndef _RAQM_H_
+#define _RAQM_H_
 
 /* For enabling debug mode */
 /*#define DEBUG 1*/
@@ -75,4 +75,4 @@ typedef enum
 unsigned raqm_shape (const char* text, int length, FT_Face face, raqm_direction_t direction, raqm_glyph_info_t** glyph_info);
 unsigned raqm_shape_u32 (unsigned int* u32_str, int length, FT_Face face, raqm_direction_t direction, raqm_glyph_info_t** glyph_info);
 
-#endif
+#endif /* _RAQM_H_ */
