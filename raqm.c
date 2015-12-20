@@ -515,11 +515,12 @@ raqm_shape_u32 (unsigned int* u32_str,
 
     for (i = 0; i < length; ++i)
     {
-        scripts[i] = hb_unicode_script (unicode_funcs, u32_str[i]);
+        hb_script_t script = hb_unicode_script (unicode_funcs, u32_str[i]);
 #ifdef TESTING
-        SCRIPT_TO_STRING (scripts[i]);
+        SCRIPT_TO_STRING (script);
         TEST ("script for ch[%d]\t%s\n", i, buff);
 #endif
+        scripts[i] = script;
     }
 
     script_stack = stack_create (length);
