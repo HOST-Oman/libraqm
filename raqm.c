@@ -478,19 +478,20 @@ raqm_shape_u32 (unsigned int* u32_str,
     unsigned int total_glyph_count = 0;
     unsigned int glyph_count;
     unsigned int postion_length;
+    int max_level;
 
     hb_script_t last_script_value;
-    hb_script_t* scripts;
-    hb_font_t* hb_font;
-    hb_glyph_info_t* hb_glyph_info;
-    hb_glyph_position_t* hb_glyph_position;
+    hb_script_t* scripts = NULL;
+    hb_font_t* hb_font = NULL;
+    hb_glyph_info_t* hb_glyph_info = NULL;
+    hb_glyph_position_t* hb_glyph_position = NULL;
     FriBidiParType par_type;
-    FriBidiRun* fribidi_runs;
-    FriBidiCharType* types;
-    FriBidiLevel* levels;
-    Stack* script_stack;
-    Run* runs;
-    raqm_glyph_info_t* g_info;
+    FriBidiRun* fribidi_runs = NULL;
+    FriBidiCharType* types = NULL;
+    FriBidiLevel* levels = NULL;
+    Stack* script_stack = NULL;
+    Run* runs = NULL;
+    raqm_glyph_info_t* g_info = NULL;
 
     types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * (size_t)(length));
     levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * (size_t)(length));
@@ -519,7 +520,9 @@ raqm_shape_u32 (unsigned int* u32_str,
             break;
     }
 
-    fribidi_get_par_embedding_levels (types, length, &par_type, levels);
+    max_level = fribidi_get_par_embedding_levels (types, length, &par_type, levels);
+    if (max_level <= 0)
+        goto out;
 
     /* Handeling script detection for each character of the input string,
        if the character script is common or inherited it takes the script
@@ -611,7 +614,7 @@ raqm_shape_u32 (unsigned int* u32_str,
     fribidi_runs = (FriBidiRun*) malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
 
     /* to populate bidi run array */
-    fribidi_reorder_runs (types, length, par_type, levels, fribidi_runs);
+    bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, fribidi_runs);
 
     TEST ("\nNumber of runs before script itemization: %d\n", bidirun_count);
     TEST ("\n");
@@ -677,6 +680,8 @@ raqm_shape_u32 (unsigned int* u32_str,
             index++;
         }
     }
+
+out:
 
     *glyph_info = g_info;
 
