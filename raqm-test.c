@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ft2build.h>
+#include FT_FREETYPE_H
 #include "raqm.h"
 
 int
@@ -96,8 +97,11 @@ main (int argc, char* argv[])
     }
 
     glyph_count = raqm_shape (text, (int) strlen (text), face, raqm_direction, &info);
-    (void) info;
     (void) glyph_count;
+
+    free(info);
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft_library);
 
     return 0;
 }
