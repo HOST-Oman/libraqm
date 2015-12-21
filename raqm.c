@@ -516,6 +516,7 @@ raqm_shape_u32 (unsigned int* u32_str,
         par_type = FRIBIDI_PAR_LTR;
     }
 
+#ifdef TESTING
     switch (direction)
     {
         case RAQM_DIRECTION_RTL:
@@ -528,6 +529,7 @@ raqm_shape_u32 (unsigned int* u32_str,
             TEST ("Direction is: DEFAULT\n\n");
             break;
     }
+#endif
 
     max_level = fribidi_get_par_embedding_levels (types, length, &par_type, levels);
     if (max_level <= 0)
@@ -625,6 +627,7 @@ raqm_shape_u32 (unsigned int* u32_str,
     /* to populate bidi run array */
     bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, fribidi_runs);
 
+#ifdef TESTING
     TEST ("\nNumber of runs before script itemization: %d\n", bidirun_count);
     TEST ("\n");
     TEST ("Fribidi Runs:\n");
@@ -635,6 +638,7 @@ raqm_shape_u32 (unsigned int* u32_str,
               fribidi_runs[i].level);
     }
     TEST ("\n");
+#endif
 
     /* to get number of runs after script seperation */
     run_count = itemize_by_script (bidirun_count, scripts, fribidi_runs, NULL);
