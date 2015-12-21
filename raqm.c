@@ -201,6 +201,15 @@ stack_create (size_t max)
     return stack;
 }
 
+static void
+stack_free (Stack* stack)
+{
+    free (stack->scripts);
+    free (stack->pair_index);
+    free (stack);
+
+}
+
 static int
 stack_pop (Stack* stack)
 {
@@ -679,17 +688,20 @@ raqm_shape_u32 (unsigned int* u32_str,
                   g_info[index].y_offset, g_info[index].x_advance);
             index++;
         }
+        hb_buffer_destroy (runs[i].hb_buffer);
     }
 
 out:
 
     *glyph_info = g_info;
 
+    hb_font_destroy (hb_font);
     free (levels);
     free (scripts);
     free (types);
     free (fribidi_runs);
     free (runs);
+    stack_free(script_stack);
 
     return total_glyph_count;
 }
