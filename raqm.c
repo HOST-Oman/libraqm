@@ -291,7 +291,7 @@ get_pair_index (const FriBidiChar firbidi_ch)
 static int
 itemize_by_script(int bidirun_count,
                  FriBidiRun *bidiruns,
-                 unsigned int* u32_str,
+                 uint32_t* u32_str,
                  int length,
                  Run *runs)
 {
@@ -603,7 +603,7 @@ raqm_shape (const char* u8_str,
 
 /* Takes a utf-32 input text and does the reordering and shaping */
 unsigned
-raqm_shape_u32 (unsigned int* u32_str,
+raqm_shape_u32 (uint32_t* u32_str,
                 int length,
                 FT_Face face,
                 raqm_direction_t direction,
