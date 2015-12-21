@@ -291,7 +291,7 @@ get_pair_index (const FriBidiChar firbidi_ch)
 static int
 itemize_by_script(int bidirun_count,
                  FriBidiRun *bidiruns,
-                 uint32_t* u32_str,
+                 uint32_t* text,
                  int length,
                  Run *runs)
 {
@@ -306,7 +306,7 @@ itemize_by_script(int bidirun_count,
     scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) length);
     for (i = 0; i < length; ++i)
     {
-        scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), u32_str[i]);
+        scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), text[i]);
     }
 
 #ifdef TESTING
@@ -327,7 +327,7 @@ itemize_by_script(int bidirun_count,
     {
         if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
         {
-            int pair_index = get_pair_index (u32_str[i]);
+            int pair_index = get_pair_index (text[i]);
             if (pair_index >= 0)
             {    /* is a paired character */
                 if (IS_OPEN (pair_index))
@@ -603,7 +603,7 @@ raqm_shape (const char* u8_str,
 
 /* Takes a utf-32 input text and does the reordering and shaping */
 unsigned
-raqm_shape_u32 (uint32_t* u32_str,
+raqm_shape_u32 (uint32_t* text,
                 int length,
                 FT_Face face,
                 raqm_direction_t direction,
@@ -630,7 +630,7 @@ raqm_shape_u32 (uint32_t* u32_str,
 
     types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * (size_t)(length));
     levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * (size_t)(length));
-    fribidi_get_bidi_types (u32_str, length, types);
+    fribidi_get_bidi_types (text, length, types);
 
     par_type = FRIBIDI_PAR_ON;
     if (direction == RAQM_DIRECTION_RTL)
@@ -669,18 +669,18 @@ raqm_shape_u32 (uint32_t* u32_str,
     bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, bidiruns);
 
     /* to get number of runs after script seperation */
-    run_count = itemize_by_script (bidirun_count, bidiruns, u32_str, length, NULL);
+    run_count = itemize_by_script (bidirun_count, bidiruns, text, length, NULL);
     runs = (Run*) malloc (sizeof (Run) * (size_t)(run_count));
 
     /* to populate runs_scripts array */
-    itemize_by_script (bidirun_count, bidiruns, u32_str, length, runs);
+    itemize_by_script (bidirun_count, bidiruns, text, length, runs);
 
     /* harfbuzz shaping */
     hb_font = hb_ft_font_create (face, NULL);
 
     for (i = 0; i < run_count; i++)
     {
-        harfbuzz_shape (u32_str, length, hb_font, &runs[i]);
+        harfbuzz_shape (text, length, hb_font, &runs[i]);
         hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].hb_buffer, &glyph_count);
         total_glyph_count += glyph_count;
     }
