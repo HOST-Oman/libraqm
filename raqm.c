@@ -283,19 +283,132 @@ get_pair_index (const FriBidiChar firbidi_ch)
 #define STACK_IS_NOT_EMPTY(script) (! STACK_IS_EMPTY(script))
 #define IS_OPEN(pair_index)        (((pair_index) & 1) == 0)
 
-/* Seperates runs based on scripts */
+/* Detecting script for each character in the input string, if the character
+ * script is common or inherited it takes the script of the character before it
+ * except paired characters which we try to make them use the same script. We
+ * then split the BiDi runs, if necessary, on script boundaries.
+ */
 static int
 itemize_by_script(int bidirun_count,
-                 hb_script_t *scripts,
                  FriBidiRun *bidiruns,
+                 unsigned int* u32_str,
+                 int length,
                  Run *runs)
 {
-    int i, j;
+    int i;
     int run_count = 0;
+    int last_script_index = -1;
+    int last_set_index = -1;
+    hb_script_t last_script_value;
+    hb_script_t* scripts = NULL;
+    Stack* script_stack = NULL;
+
+    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) length);
+    for (i = 0; i < length; ++i)
+    {
+        scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), u32_str[i]);
+    }
+
+#ifdef TESTING
+    if (runs)
+    {
+        TEST ("Before script detection:\n");
+        for (i = 0; i < length; ++i)
+        {
+            SCRIPT_TO_STRING (scripts[i]);
+            TEST ("script for ch[%d]\t%s\n", i, buff);
+        }
+        TEST ("\n");
+    }
+#endif
+
+    script_stack = stack_create ((size_t) length);
+    for (i = 0; i < length; ++i)
+    {
+        if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
+        {
+            int pair_index = get_pair_index (u32_str[i]);
+            if (pair_index >= 0)
+            {    /* is a paired character */
+                if (IS_OPEN (pair_index))
+                {
+                    scripts[i] = last_script_value;
+                    last_set_index = i;
+                    stack_push (script_stack, scripts[i], pair_index);
+                }
+                else
+                {        /* is a close paired character */
+                    int pi = pair_index & ~1; /* find matching opening (by getting the last even index for currnt odd index)*/
+                    while (STACK_IS_NOT_EMPTY (script_stack) &&
+                           script_stack->pair_index[script_stack->size] != pi)
+                    {
+                        stack_pop (script_stack);
+                    }
+                    if (STACK_IS_NOT_EMPTY (script_stack))
+                    {
+                        scripts[i] = stack_top (script_stack);
+                        last_script_value = scripts[i];
+                        last_set_index = i;
+                    }
+                    else
+                    {
+                        scripts[i] = last_script_value;
+                        last_set_index = i;
+                    }
+                }
+            }
+            else
+            {
+                scripts[i] = last_script_value;
+                last_set_index = i;
+            }
+        }
+        else if (scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
+        {
+            scripts[i] = last_script_value;
+            last_set_index = i;
+        }
+        else
+        {
+            int j;
+            for (j = last_set_index + 1; j < i; ++j)
+            {
+                scripts[j] = scripts[i];
+            }
+            last_script_value = scripts[i];
+            last_script_index = i;
+            last_set_index = i;
+        }
+    }
+
+#ifdef TESTING
+    if (runs)
+    {
+        TEST ("After script detection:\n");
+        for (i = 0; i < length; ++i)
+        {
+            SCRIPT_TO_STRING (scripts[i]);
+            TEST ("script for ch[%d]\t%s\n", i, buff);
+        }
+        TEST ("\n");
+
+        TEST ("Number of runs before script itemization: %d\n", bidirun_count);
+        TEST ("\n");
+        TEST ("Fribidi Runs:\n");
+        for (i = 0; i < bidirun_count; ++i)
+        {
+            TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
+                  i, bidiruns[i].pos, bidiruns[i].len, bidiruns[i].level);
+        }
+        TEST ("\n");
+    }
+#endif
+
 
     /* To get number of runs after script seperation */
     for (i = 0; i < bidirun_count; i++)
     {
+        int j;
         FriBidiRun run = bidiruns[i];
         hb_script_t last_script = scripts[run.pos];
         run_count++;
@@ -311,7 +424,7 @@ itemize_by_script(int bidirun_count,
 
     if (runs == NULL)
     {
-        return run_count;
+        goto out;
     }
 
     run_count = 0;
@@ -321,6 +434,7 @@ itemize_by_script(int bidirun_count,
      * different scripts will need to be reordered to appear in the correct visual order */
     for (i = 0; i < bidirun_count; i++)
     {
+        int j;
         FriBidiRun bidirun = bidiruns[i];
 
         runs[run_count].level = bidirun.level;
@@ -372,6 +486,23 @@ itemize_by_script(int bidirun_count,
         run_count++;
     }
 
+#ifdef TESTING
+    TEST ("Number of runs after script itemization: %d\n", run_count);
+    TEST ("\n");
+    TEST ("Final Runs:\n");
+    for (i = 0; i < run_count; ++i)
+    {
+        SCRIPT_TO_STRING (runs[i].hb_script);
+        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
+              i, runs[i].pos, runs[i].len, runs[i].level, buff);
+    }
+    TEST ("\n");
+#endif
+
+out:
+
+    stack_free(script_stack);
+    free (scripts);
     return run_count;
 }
 
@@ -482,15 +613,11 @@ raqm_shape_u32 (unsigned int* u32_str,
     unsigned int index = 0;
     int run_count;
     int bidirun_count;
-    int last_script_index = -1;
-    int last_set_index = -1;
     unsigned int total_glyph_count = 0;
     unsigned int glyph_count;
     unsigned int postion_length;
     int max_level;
 
-    hb_script_t last_script_value;
-    hb_script_t* scripts = NULL;
     hb_font_t* hb_font = NULL;
     hb_glyph_info_t* hb_glyph_info = NULL;
     hb_glyph_position_t* hb_glyph_position = NULL;
@@ -498,7 +625,6 @@ raqm_shape_u32 (unsigned int* u32_str,
     FriBidiRun* fribidi_runs = NULL;
     FriBidiCharType* types = NULL;
     FriBidiLevel* levels = NULL;
-    Stack* script_stack = NULL;
     Run* runs = NULL;
     raqm_glyph_info_t* g_info = NULL;
 
@@ -535,91 +661,6 @@ raqm_shape_u32 (unsigned int* u32_str,
     if (max_level <= 0)
         goto out;
 
-    /* Handeling script detection for each character of the input string,
-       if the character script is common or inherited it takes the script
-       of the character before it except some special paired characters */
-    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t)(length));
-
-    TEST ("Before script detection:\n");
-
-    for (i = 0; i < length; ++i)
-    {
-        hb_script_t script = hb_unicode_script (hb_unicode_funcs_get_default (), u32_str[i]);
-#ifdef TESTING
-        SCRIPT_TO_STRING (script);
-        TEST ("script for ch[%d]\t%s\n", i, buff);
-#endif
-        scripts[i] = script;
-    }
-
-    script_stack = stack_create ((size_t) length);
-    for (i = 0; i < length; ++i)
-    {
-        if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
-        {
-            int pair_index = get_pair_index (u32_str[i]);
-            if (pair_index >= 0)
-            {    /* is a paired character */
-                if (IS_OPEN (pair_index))
-                {
-                    scripts[i] = last_script_value;
-                    last_set_index = i;
-                    stack_push (script_stack, scripts[i], pair_index);
-                }
-                else
-                {        /* is a close paired character */
-                    int pi = pair_index & ~1; /* find matching opening (by getting the last even index for currnt odd index)*/
-                    while (STACK_IS_NOT_EMPTY (script_stack) &&
-                           script_stack->pair_index[script_stack->size] != pi)
-                    {
-                        stack_pop (script_stack);
-                    }
-                    if (STACK_IS_NOT_EMPTY (script_stack))
-                    {
-                        scripts[i] = stack_top (script_stack);
-                        last_script_value = scripts[i];
-                        last_set_index = i;
-                    }
-                    else
-                    {
-                        scripts[i] = last_script_value;
-                        last_set_index = i;
-                    }
-                }
-            }
-            else
-            {
-                scripts[i] = last_script_value;
-                last_set_index = i;
-            }
-        }
-        else if (scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
-        {
-            scripts[i] = last_script_value;
-            last_set_index = i;
-        }
-        else
-        {
-            int j;
-            for (j = last_set_index + 1; j < i; ++j)
-            {
-                scripts[j] = scripts[i];
-            }
-            last_script_value = scripts[i];
-            last_script_index = i;
-            last_set_index = i;
-        }
-    }
-
-#ifdef TESTING
-    TEST ("\nAfter script detection:\n");
-    for (i = 0; i < length; ++i)
-    {
-        SCRIPT_TO_STRING (scripts[i]);
-        TEST ("script for ch[%d]\t%s\n", i, buff);
-    }
-#endif
-
     /* to get number of bidi runs */
     bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, NULL);
     fribidi_runs = (FriBidiRun*) malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
@@ -627,38 +668,12 @@ raqm_shape_u32 (unsigned int* u32_str,
     /* to populate bidi run array */
     bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, fribidi_runs);
 
-#ifdef TESTING
-    TEST ("\nNumber of runs before script itemization: %d\n", bidirun_count);
-    TEST ("\n");
-    TEST ("Fribidi Runs:\n");
-    for (i = 0; i < bidirun_count; ++i)
-    {
-        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
-              i, fribidi_runs[i].pos, fribidi_runs[i].len,
-              fribidi_runs[i].level);
-    }
-    TEST ("\n");
-#endif
-
     /* to get number of runs after script seperation */
-    run_count = itemize_by_script (bidirun_count, scripts, fribidi_runs, NULL);
+    run_count = itemize_by_script (bidirun_count, fribidi_runs, u32_str, length, NULL);
     runs = (Run*) malloc (sizeof (Run) * (size_t)(run_count));
 
     /* to populate runs_scripts array */
-    itemize_by_script (bidirun_count, scripts, fribidi_runs, runs);
-    TEST ("Number of runs after script itemization: %d\n", run_count);
-
-#ifdef TESTING
-    TEST ("\n");
-    TEST ("Final Runs:\n");
-    for (i = 0; i < run_count; ++i)
-    {
-        SCRIPT_TO_STRING (runs[i].hb_script);
-        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
-              i, runs[i].pos, runs[i].len, runs[i].level, buff);
-    }
-    TEST ("\n");
-#endif
+    itemize_by_script (bidirun_count, fribidi_runs, u32_str, length, runs);
 
     /* harfbuzz shaping */
     hb_font = hb_ft_font_create (face, NULL);
@@ -701,11 +716,9 @@ out:
 
     hb_font_destroy (hb_font);
     free (levels);
-    free (scripts);
     free (types);
     free (fribidi_runs);
     free (runs);
-    stack_free(script_stack);
 
     return total_glyph_count;
 }
