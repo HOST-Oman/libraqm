@@ -540,8 +540,8 @@ harfbuzz_shape (FriBidiChar* unicode_str,
 
 /* convert index from UTF-32 to UTF-8 */
 static uint32_t
-utf32_index_to_utf8 (FriBidiChar* unicode,
-                     uint32_t index)
+u32_index_to_u8 (FriBidiChar* unicode,
+                 uint32_t index)
 {
     FriBidiStrIndex length;
     char* output = (char*) malloc ((size_t)((index * 4) + 1));
@@ -584,7 +584,7 @@ raqm_shape (const char* u8_str,
 
     for (i = 0; i < glyph_count; i++)
     {
-        g_info[i].cluster = utf32_index_to_utf8 (u32_str, g_info[i].cluster);
+        g_info[i].cluster = u32_index_to_u8 (u32_str, g_info[i].cluster);
     }
 
 #ifdef TESTING
