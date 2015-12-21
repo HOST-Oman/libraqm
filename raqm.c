@@ -622,7 +622,7 @@ raqm_shape_u32 (unsigned int* u32_str,
     hb_glyph_info_t* hb_glyph_info = NULL;
     hb_glyph_position_t* hb_glyph_position = NULL;
     FriBidiParType par_type;
-    FriBidiRun* fribidi_runs = NULL;
+    FriBidiRun* bidiruns = NULL;
     FriBidiCharType* types = NULL;
     FriBidiLevel* levels = NULL;
     Run* runs = NULL;
@@ -663,17 +663,17 @@ raqm_shape_u32 (unsigned int* u32_str,
 
     /* to get number of bidi runs */
     bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, NULL);
-    fribidi_runs = (FriBidiRun*) malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
+    bidiruns = (FriBidiRun*) malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
 
     /* to populate bidi run array */
-    bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, fribidi_runs);
+    bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, bidiruns);
 
     /* to get number of runs after script seperation */
-    run_count = itemize_by_script (bidirun_count, fribidi_runs, u32_str, length, NULL);
+    run_count = itemize_by_script (bidirun_count, bidiruns, u32_str, length, NULL);
     runs = (Run*) malloc (sizeof (Run) * (size_t)(run_count));
 
     /* to populate runs_scripts array */
-    itemize_by_script (bidirun_count, fribidi_runs, u32_str, length, runs);
+    itemize_by_script (bidirun_count, bidiruns, u32_str, length, runs);
 
     /* harfbuzz shaping */
     hb_font = hb_ft_font_create (face, NULL);
@@ -717,7 +717,7 @@ out:
     hb_font_destroy (hb_font);
     free (levels);
     free (types);
-    free (fribidi_runs);
+    free (bidiruns);
     free (runs);
 
     return total_glyph_count;
