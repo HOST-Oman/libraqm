@@ -190,7 +190,7 @@ typedef struct
 
 /* Stack handeling functions */
 static Stack*
-stack_create (size_t max)
+stack_new (size_t max)
 {
     Stack* stack;
     stack = (Stack*) malloc (sizeof (Stack));
@@ -322,7 +322,7 @@ itemize_by_script(int bidirun_count,
     }
 #endif
 
-    script_stack = stack_create ((size_t) length);
+    script_stack = stack_new ((size_t) length);
     for (i = 0; i < length; ++i)
     {
         if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
