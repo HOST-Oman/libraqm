@@ -68,11 +68,20 @@ typedef enum
  * If the character script is common or inherited it takes the script of the
  * character before it except some special paired characters.
  *
- * You should provide the input text, FreeType face and paragraph base direction.
- *
- * Returns: array of raqm_glyph_info_t.
+ * Returns: number of glyphs.
  */
-unsigned raqm_shape (const char* text, int length, FT_Face face, raqm_direction_t direction, raqm_glyph_info_t** glyph_info);
-unsigned raqm_shape_u32 (uint32_t* u32_str, int length, FT_Face face, raqm_direction_t direction, raqm_glyph_info_t** glyph_info);
+unsigned raqm_shape     (const char* text,              /* input text, UTF-8 encoded */
+                         int length,                    /* length of text array  */
+                         FT_Face face,                  /* font to use for shaping */
+                         raqm_direction_t direction,    /* base paragraph direction */
+                         raqm_glyph_info_t** glyph_info /* output glyph info, should be freed by the client */
+                         );
+
+unsigned raqm_shape_u32 (uint32_t* text,                /* input text, UTF-32 encoded */
+                         int length,                    /* length of text array */
+                         FT_Face face,                  /* font to use for shaping */
+                         raqm_direction_t direction,    /* base paragraph direction */
+                         raqm_glyph_info_t** glyph_info /* output glyph info, should be freed by the client */
+                         );
 
 #endif /* _RAQM_H_ */
