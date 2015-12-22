@@ -19,6 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
+ * The most recent version of this code can be found in:
+ * https://github.com/HOST-Oman/libraqm
+ *
  */
 
 #include "raqm.h"
