@@ -187,8 +187,8 @@ typedef struct
     FriBidiCharType type;
     FriBidiLevel level;
 
-    hb_buffer_t* hb_buffer;
-    hb_script_t hb_script;
+    hb_buffer_t* buffer;
+    hb_script_t script;
 } Run;
 
 /* Stack handeling functions */
@@ -446,11 +446,11 @@ itemize_by_script(int bidirun_count,
         if (!FRIBIDI_LEVEL_IS_RTL (bidirun.level))
         {
             runs[run_count].pos = bidirun.pos;
-            runs[run_count].hb_script = scripts[bidirun.pos];
+            runs[run_count].script = scripts[bidirun.pos];
             for (j = 0; j < bidirun.len; j++)
             {
                 hb_script_t script = scripts[bidirun.pos + j];
-                if (script == runs[run_count].hb_script)
+                if (script == runs[run_count].script)
                 {
                     runs[run_count].len++;
                 }
@@ -459,7 +459,7 @@ itemize_by_script(int bidirun_count,
                     run_count++;
                     runs[run_count].pos = bidirun.pos + j;
                     runs[run_count].level = bidirun.level;
-                    runs[run_count].hb_script = script;
+                    runs[run_count].script = script;
                     runs[run_count].len = 1;
                 }
             }
@@ -467,11 +467,11 @@ itemize_by_script(int bidirun_count,
         else
         {
             runs[run_count].pos = bidirun.pos + bidirun.len -1;
-            runs[run_count].hb_script = scripts[bidirun.pos + bidirun.len - 1];
+            runs[run_count].script = scripts[bidirun.pos + bidirun.len - 1];
             for (j = bidirun.len - 1; j >= 0; j--)
             {
                 hb_script_t script = scripts[bidirun.pos + j];
-                if (script == runs[run_count].hb_script)
+                if (script == runs[run_count].script)
                 {
                     runs[run_count].len++;
                     runs[run_count].pos = bidirun.pos + j;
@@ -481,7 +481,7 @@ itemize_by_script(int bidirun_count,
                     run_count++;
                     runs[run_count].pos = bidirun.pos + j;
                     runs[run_count].level = bidirun.level;
-                    runs[run_count].hb_script = script;
+                    runs[run_count].script = script;
                     runs[run_count].len = 1;
                 }
             }
@@ -495,7 +495,7 @@ itemize_by_script(int bidirun_count,
     TEST ("Final Runs:\n");
     for (i = 0; i < run_count; ++i)
     {
-        SCRIPT_TO_STRING (runs[i].hb_script);
+        SCRIPT_TO_STRING (runs[i].script);
         TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
               i, runs[i].pos, runs[i].len, runs[i].level, buff);
     }
@@ -516,29 +516,29 @@ harfbuzz_shape (FriBidiChar* unicode_str,
                 hb_font_t* hb_font,
                 Run* run)
 {
-    run->hb_buffer = hb_buffer_create ();
+    run->buffer = hb_buffer_create ();
 
     /* adding text to current buffer */
-    hb_buffer_add_utf32 (run->hb_buffer, unicode_str, length, (unsigned int)(run->pos), run->len);
+    hb_buffer_add_utf32 (run->buffer, unicode_str, length, (unsigned int)(run->pos), run->len);
 
     /* setting script of current buffer */
-    hb_buffer_set_script (run->hb_buffer, run->hb_script);
+    hb_buffer_set_script (run->buffer, run->script);
 
     /* setting language of current buffer */
-    hb_buffer_set_language (run->hb_buffer, hb_language_get_default ());
+    hb_buffer_set_language (run->buffer, hb_language_get_default ());
 
     /* setting direction of current buffer */
     if (FRIBIDI_LEVEL_IS_RTL (run->level))
     {
-        hb_buffer_set_direction (run->hb_buffer, HB_DIRECTION_RTL);
+        hb_buffer_set_direction (run->buffer, HB_DIRECTION_RTL);
     }
     else
     {
-        hb_buffer_set_direction (run->hb_buffer, HB_DIRECTION_LTR);
+        hb_buffer_set_direction (run->buffer, HB_DIRECTION_LTR);
     }
 
     /* shaping current buffer */
-    hb_shape (hb_font, run->hb_buffer, NULL, 0);
+    hb_shape (hb_font, run->buffer, NULL, 0);
 }
 
 /* convert index from UTF-32 to UTF-8 */
@@ -684,7 +684,7 @@ raqm_shape_u32 (uint32_t* text,
     for (i = 0; i < run_count; i++)
     {
         harfbuzz_shape (text, length, hb_font, &runs[i]);
-        hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].hb_buffer, &glyph_count);
+        hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].buffer, &glyph_count);
         total_glyph_count += glyph_count;
     }
 
@@ -695,8 +695,8 @@ raqm_shape_u32 (uint32_t* text,
     for (i = 0; i < run_count; i++)
     {
         unsigned int j;
-        hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].hb_buffer, &glyph_count);
-        hb_glyph_position = hb_buffer_get_glyph_positions (runs[i].hb_buffer, &postion_length);
+        hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].buffer, &glyph_count);
+        hb_glyph_position = hb_buffer_get_glyph_positions (runs[i].buffer, &postion_length);
 
         for (j = 0; j < glyph_count; j++)
         {
@@ -710,7 +710,7 @@ raqm_shape_u32 (uint32_t* text,
                   info[index].y_offset, info[index].x_advance);
             index++;
         }
-        hb_buffer_destroy (runs[i].hb_buffer);
+        hb_buffer_destroy (runs[i].buffer);
     }
 
 out:
