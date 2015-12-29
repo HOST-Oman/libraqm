@@ -99,7 +99,7 @@ main (int argc, char* argv[])
     glyph_count = raqm_shape (text, (int) strlen (text), face, raqm_direction, &info);
     (void) glyph_count;
 
-    free(info);
+    raqm_free(info);
     FT_Done_Face(face);
     FT_Done_FreeType(ft_library);
 

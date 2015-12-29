@@ -196,9 +196,9 @@ static Stack*
 stack_new (size_t max)
 {
     Stack* stack;
-    stack = (Stack*) malloc (sizeof (Stack));
-    stack->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * max);
-    stack->pair_index = (int*) malloc (sizeof (int) * max);
+    stack = (Stack*) raqm_malloc (sizeof (Stack));
+    stack->scripts = (hb_script_t*) raqm_malloc (sizeof (hb_script_t) * max);
+    stack->pair_index = (int*) raqm_malloc (sizeof (int) * max);
     stack->size = 0;
     stack->capacity = max;
     return stack;
@@ -207,9 +207,9 @@ stack_new (size_t max)
 static void
 stack_free (Stack* stack)
 {
-    free (stack->scripts);
-    free (stack->pair_index);
-    free (stack);
+    raqm_free (stack->scripts);
+    raqm_free (stack->pair_index);
+    raqm_free (stack);
 
 }
 
@@ -306,7 +306,7 @@ itemize_by_script(int bidirun_count,
     hb_script_t* scripts = NULL;
     Stack* script_stack = NULL;
 
-    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) length);
+    scripts = (hb_script_t*) raqm_malloc (sizeof (hb_script_t) * (size_t) length);
     for (i = 0; i < length; ++i)
     {
         scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), text[i]);
@@ -505,7 +505,7 @@ itemize_by_script(int bidirun_count,
 out:
 
     stack_free(script_stack);
-    free (scripts);
+    raqm_free (scripts);
     return run_count;
 }
 
@@ -547,11 +547,11 @@ u32_index_to_u8 (FriBidiChar* unicode,
                  uint32_t index)
 {
     FriBidiStrIndex length;
-    char* output = (char*) malloc ((size_t)((index * 4) + 1));
+    char* output = (char*) raqm_malloc ((size_t)((index * 4) + 1));
 
     length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8, unicode, (FriBidiStrIndex)(index), output);
 
-    free (output);
+    raqm_free (output);
     return (uint32_t)(length);
 }
 
@@ -571,7 +571,7 @@ raqm_shape (const char* u8_str,
 
     TEST ("Text is: %s\n", u8_str);
 
-    u32_str = (FriBidiChar*) calloc (sizeof (FriBidiChar), (size_t)(u8_size));
+    u32_str = (FriBidiChar*) raqm_calloc (sizeof (FriBidiChar), (size_t)(u8_size));
     u32_size = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, u8_str, u8_size, u32_str);
 
     glyph_count = raqm_shape_u32 (u32_str, u32_size, face, direction, &info);
@@ -599,7 +599,7 @@ raqm_shape (const char* u8_str,
     TEST ("\n");
 #endif
 
-    free (u32_str);
+    raqm_free (u32_str);
     *glyph_info = info;
     return glyph_count;
 }
@@ -631,8 +631,8 @@ raqm_shape_u32 (uint32_t* text,
     Run* runs = NULL;
     raqm_glyph_info_t* info = NULL;
 
-    types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * (size_t)(length));
-    levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * (size_t)(length));
+    types = (FriBidiCharType*) raqm_malloc (sizeof (FriBidiCharType) * (size_t)(length));
+    levels = (FriBidiLevel*) raqm_malloc (sizeof (FriBidiLevel) * (size_t)(length));
     fribidi_get_bidi_types (text, length, types);
 
     par_type = FRIBIDI_PAR_ON;
@@ -666,14 +666,14 @@ raqm_shape_u32 (uint32_t* text,
 
     /* to get number of bidi runs */
     bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, NULL);
-    bidiruns = (FriBidiRun*) malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
+    bidiruns = (FriBidiRun*) raqm_malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
 
     /* to populate bidi run array */
     bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, bidiruns);
 
     /* to get number of runs after script seperation */
     run_count = itemize_by_script (bidirun_count, bidiruns, text, length, NULL);
-    runs = (Run*) malloc (sizeof (Run) * (size_t)(run_count));
+    runs = (Run*) raqm_malloc (sizeof (Run) * (size_t)(run_count));
 
     /* to populate runs_scripts array */
     itemize_by_script (bidirun_count, bidiruns, text, length, runs);
@@ -688,7 +688,7 @@ raqm_shape_u32 (uint32_t* text,
         total_glyph_count += glyph_count;
     }
 
-    info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count));
+    info = (raqm_glyph_info_t*) raqm_malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count));
 
     TEST ("Glyph information:\n");
 
@@ -718,10 +718,10 @@ out:
     *glyph_info = info;
 
     hb_font_destroy (hb_font);
-    free (levels);
-    free (types);
-    free (bidiruns);
-    free (runs);
+    raqm_free (levels);
+    raqm_free (types);
+    raqm_free (bidiruns);
+    raqm_free (runs);
 
     return total_glyph_count;
 }
