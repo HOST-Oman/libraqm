@@ -53,7 +53,7 @@ static void reverse_run (FriBidiRun *arr, const FriBidiStrIndex len)
 
   assert (arr);
 
-  for (i = 0; i < len/2; i++)
+  for (i = 0; i < len / 2; i++)
     {
       FriBidiRun temp = arr[i];
       arr[i] = arr[len - 1 - i];
@@ -81,8 +81,7 @@ FriBidiStrIndex fribidi_reorder_runs (
   FriBidiStrIndex run_start = 0;
   FriBidiStrIndex run_index = 0;
 
- if
-    (len == 0)
+  if (len == 0)
     {
       goto out;
     }
@@ -90,13 +89,12 @@ FriBidiStrIndex fribidi_reorder_runs (
   assert (bidi_types);
   assert (embedding_levels);
 
-  {
-    /* L1. Reset the embedding levels of some chars:
-       4. any sequence of white space characters at the end of the line. */
-    for (i = len - 1; i >= 0 &&
-         FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (bidi_types[i]); i--)
-      embedding_levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
-  }
+  /* L1. Reset the embedding levels of some chars:
+     4. any sequence of white space characters at the end of the line. */
+  for (i = len - 1; i >= 0 &&
+       FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (bidi_types[i]); i--)
+     embedding_levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
+
   /* Find max_level of the line.  We don't reuse the paragraph
    * max_level, both for a cleaner API, and that the line max_level
    * may be far less than paragraph max_level. */
