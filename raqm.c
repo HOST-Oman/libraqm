@@ -512,6 +512,7 @@ static void
 harfbuzz_shape (FriBidiChar* unicode_str,
                 FriBidiStrIndex length,
                 hb_font_t* hb_font,
+                char** featurestr,
                 Run* run)
 {
     run->buffer = hb_buffer_create ();
@@ -536,7 +537,34 @@ harfbuzz_shape (FriBidiChar* unicode_str,
     }
 
     /* shaping current buffer */
-    hb_shape (hb_font, run->buffer, NULL, 0);
+    if (featurestr)
+    {
+        unsigned int count = 0;
+        char** p;
+        hb_feature_t* features = NULL;
+
+        for (p = featurestr; *p; p++)
+        {
+            count++;
+        }
+
+        features = (hb_feature_t *) malloc (sizeof (hb_feature_t) * count);
+
+        count = 0;
+        for (p = featurestr; *p; p++)
+        {
+            hb_bool_t success =  hb_feature_from_string (*p, -1, &features[count]);
+            if (success)
+            {
+                count++;
+            }
+        }
+        hb_shape_full (hb_font, run->buffer, features, count, NULL);
+    }
+    else
+    {
+        hb_shape (hb_font, run->buffer, NULL, 0);
+    }
 }
 
 /* convert index from UTF-32 to UTF-8 */
@@ -559,6 +587,7 @@ raqm_shape (const char* u8_str,
             int u8_size,
             FT_Face face,
             raqm_direction_t direction,
+            char **features,
             raqm_glyph_info_t** glyph_info)
 {
     FriBidiChar* u32_str;
@@ -572,7 +601,7 @@ raqm_shape (const char* u8_str,
     u32_str = (FriBidiChar*) raqm_calloc (sizeof (FriBidiChar), (size_t)(u8_size));
     u32_size = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, u8_str, u8_size, u32_str);
 
-    glyph_count = raqm_shape_u32 (u32_str, u32_size, face, direction, &info);
+    glyph_count = raqm_shape_u32 (u32_str, u32_size, face, direction, features, &info);
 
 #ifdef TESTING
     TEST ("\nUTF-32 clusters:");
@@ -608,6 +637,7 @@ raqm_shape_u32 (uint32_t* text,
                 int length,
                 FT_Face face,
                 raqm_direction_t direction,
+                char **features,
                 raqm_glyph_info_t** glyph_info)
 {
     int i = 0;
@@ -681,7 +711,7 @@ raqm_shape_u32 (uint32_t* text,
 
     for (i = 0; i < run_count; i++)
     {
-        harfbuzz_shape (text, length, hb_font, &runs[i]);
+        harfbuzz_shape (text, length, hb_font, features, &runs[i]);
         hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].buffer, &glyph_count);
         total_glyph_count += glyph_count;
     }
