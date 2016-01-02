@@ -11,7 +11,7 @@ WARNINGS = -W -Wall -Wextra -Wformat=2 -Wstrict-prototypes \
 
 EXTRA = $(shell pkg-config --atleast-version=0.19.8 fribidi && echo "-DHAVE_FRIBIDI_REORDER_RUNS")
 
-CFLAGS = $(shell pkg-config --cflags $(PAKAGES) | sed -e "s/-I/-isystem/g") $(WARNINGS) $(EXTRA) -DTESTING -g
+CFLAGS = $(shell pkg-config --cflags $(PAKAGES) | sed -e "s/-I/-isystem/g") $(WARNINGS) $(EXTRA) -DRAQM_TESTING -g
 LDLIBS = $(shell pkg-config --libs $(PAKAGES))
 
 OBJS = raqm-test.o raqm.o

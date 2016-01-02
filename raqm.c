@@ -26,11 +26,22 @@
 
 #include "raqm.h"
 
-#ifdef TESTING
-#define SCRIPT_TO_STRING(script) \
+/* For enabling debug mode */
+/*#define RAQM_DEBUG 1*/
+#ifdef RAQM_DEBUG
+#define RAQM_DBG(...) fprintf (stderr, __VA_ARGS__)
+#else
+#define RAQM_DBG(...)
+#endif
+
+#ifdef RAQM_TESTING
+# define RAQM_TEST(...) printf (__VA_ARGS__)
+# define SCRIPT_TO_STRING(script) \
     char buff[5]; \
     hb_tag_to_string (hb_script_to_iso15924_tag (script), buff); \
     buff[4] = '\0';
+#else
+# define RAQM_TEST(...)
 #endif
 
 /* for older fribidi versions */
@@ -216,7 +227,7 @@ stack_pop (Stack* stack)
 {
     if (stack->size == 0)
     {
-        DBG ("Stack is Empty\n");
+        RAQM_DBG ("Stack is Empty\n");
         return 1;
     }
     else
@@ -232,7 +243,7 @@ stack_top (Stack* stack)
 {
     if (stack->size == 0)
     {
-        DBG ("Stack is Empty\n");
+        RAQM_DBG ("Stack is Empty\n");
     }
 
     return stack->scripts[stack->size];
@@ -245,7 +256,7 @@ stack_push (Stack* stack,
 {
     if (stack->size == stack->capacity)
     {
-        DBG ("Stack is Full\n");
+        RAQM_DBG ("Stack is Full\n");
     }
     else
     {
@@ -310,16 +321,16 @@ itemize_by_script(int bidirun_count,
         scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), text[i]);
     }
 
-#ifdef TESTING
+#ifdef RAQM_TESTING
     if (runs)
     {
-        TEST ("Before script detection:\n");
+        RAQM_TEST ("Before script detection:\n");
         for (i = 0; i < length; ++i)
         {
             SCRIPT_TO_STRING (scripts[i]);
-            TEST ("script for ch[%d]\t%s\n", i, buff);
+            RAQM_TEST ("script for ch[%d]\t%s\n", i, buff);
         }
-        TEST ("\n");
+        RAQM_TEST ("\n");
     }
 #endif
 
@@ -382,26 +393,26 @@ itemize_by_script(int bidirun_count,
         }
     }
 
-#ifdef TESTING
+#ifdef RAQM_TESTING
     if (runs)
     {
-        TEST ("After script detection:\n");
+        RAQM_TEST ("After script detection:\n");
         for (i = 0; i < length; ++i)
         {
             SCRIPT_TO_STRING (scripts[i]);
-            TEST ("script for ch[%d]\t%s\n", i, buff);
+            RAQM_TEST ("script for ch[%d]\t%s\n", i, buff);
         }
-        TEST ("\n");
+        RAQM_TEST ("\n");
 
-        TEST ("Number of runs before script itemization: %d\n", bidirun_count);
-        TEST ("\n");
-        TEST ("Fribidi Runs:\n");
+        RAQM_TEST ("Number of runs before script itemization: %d\n", bidirun_count);
+        RAQM_TEST ("\n");
+        RAQM_TEST ("Fribidi Runs:\n");
         for (i = 0; i < bidirun_count; ++i)
         {
-            TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
+            RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
                   i, bidiruns[i].pos, bidiruns[i].len, bidiruns[i].level);
         }
-        TEST ("\n");
+        RAQM_TEST ("\n");
     }
 #endif
 
@@ -487,17 +498,17 @@ itemize_by_script(int bidirun_count,
         run_count++;
     }
 
-#ifdef TESTING
-    TEST ("Number of runs after script itemization: %d\n", run_count);
-    TEST ("\n");
-    TEST ("Final Runs:\n");
+#ifdef RAQM_TESTING
+    RAQM_TEST ("Number of runs after script itemization: %d\n", run_count);
+    RAQM_TEST ("\n");
+    RAQM_TEST ("Final Runs:\n");
     for (i = 0; i < run_count; ++i)
     {
         SCRIPT_TO_STRING (runs[i].script);
-        TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
+        RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
               i, runs[i].pos, runs[i].len, runs[i].level, buff);
     }
-    TEST ("\n");
+    RAQM_TEST ("\n");
 #endif
 
 out:
@@ -596,20 +607,20 @@ raqm_shape (const char* u8_str,
     unsigned int glyph_count;
     unsigned int i;
 
-    TEST ("Text is: %s\n", u8_str);
+    RAQM_TEST ("Text is: %s\n", u8_str);
 
     u32_str = (FriBidiChar*) raqm_calloc (sizeof (FriBidiChar), (size_t)(u8_size));
     u32_size = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, u8_str, u8_size, u32_str);
 
     glyph_count = raqm_shape_u32 (u32_str, u32_size, face, direction, features, &info);
 
-#ifdef TESTING
-    TEST ("\nUTF-32 clusters:");
+#ifdef RAQM_TESTING
+    RAQM_TEST ("\nUTF-32 clusters:");
     for (i = 0; i < glyph_count; i++)
     {
-        TEST (" %02d", info[i].cluster);
+        RAQM_TEST (" %02d", info[i].cluster);
     }
-    TEST ("\n");
+    RAQM_TEST ("\n");
 #endif
 
     for (i = 0; i < glyph_count; i++)
@@ -617,13 +628,13 @@ raqm_shape (const char* u8_str,
         info[i].cluster = u32_index_to_u8 (u32_str, info[i].cluster);
     }
 
-#ifdef TESTING
-    TEST ("UTF-8 clusters: ");
+#ifdef RAQM_TESTING
+    RAQM_TEST ("UTF-8 clusters: ");
     for (i = 0; i < glyph_count; i++)
     {
-        TEST (" %02d", info[i].cluster);
+        RAQM_TEST (" %02d", info[i].cluster);
     }
-    TEST ("\n");
+    RAQM_TEST ("\n");
 #endif
 
     raqm_free (u32_str);
@@ -673,17 +684,17 @@ raqm_shape_u32 (const uint32_t* text,
         par_type = FRIBIDI_PAR_LTR;
     }
 
-#ifdef TESTING
+#ifdef RAQM_TESTING
     switch (direction)
     {
         case RAQM_DIRECTION_RTL:
-            TEST ("Direction is: RTL\n\n");
+            RAQM_TEST ("Direction is: RTL\n\n");
             break;
         case RAQM_DIRECTION_LTR:
-            TEST ("Direction is: LTR\n\n");
+            RAQM_TEST ("Direction is: LTR\n\n");
             break;
         case RAQM_DIRECTION_DEFAULT:
-            TEST ("Direction is: DEFAULT\n\n");
+            RAQM_TEST ("Direction is: DEFAULT\n\n");
             break;
     }
 #endif
@@ -718,7 +729,7 @@ raqm_shape_u32 (const uint32_t* text,
 
     info = (raqm_glyph_info_t*) raqm_malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count));
 
-    TEST ("Glyph information:\n");
+    RAQM_TEST ("Glyph information:\n");
 
     for (i = 0; i < run_count; i++)
     {
@@ -733,7 +744,7 @@ raqm_shape_u32 (const uint32_t* text,
             info[index].y_offset = hb_glyph_position[j].y_offset;
             info[index].x_advance = hb_glyph_position[j].x_advance;
             info[index].cluster = hb_glyph_info[j].cluster;
-            TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
+            RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
                   info[index].index, info[index].x_offset,
                   info[index].y_offset, info[index].x_advance);
             index++;
