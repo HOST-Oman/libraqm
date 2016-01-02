@@ -292,7 +292,7 @@ get_pair_index (const FriBidiChar firbidi_ch)
 static int
 itemize_by_script(int bidirun_count,
                  FriBidiRun *bidiruns,
-                 uint32_t* text,
+                 const uint32_t* text,
                  int length,
                  Run *runs)
 {
@@ -509,10 +509,10 @@ out:
 
 /* Does the shaping for each run buffer */
 static void
-harfbuzz_shape (FriBidiChar* unicode_str,
+harfbuzz_shape (const FriBidiChar* unicode_str,
                 FriBidiStrIndex length,
                 hb_font_t* hb_font,
-                char** featurestr,
+                const char** featurestr,
                 Run* run)
 {
     run->buffer = hb_buffer_create ();
@@ -540,7 +540,7 @@ harfbuzz_shape (FriBidiChar* unicode_str,
     if (featurestr)
     {
         unsigned int count = 0;
-        char** p;
+        const char** p;
         hb_feature_t* features = NULL;
 
         for (p = featurestr; *p; p++)
@@ -585,9 +585,9 @@ u32_index_to_u8 (FriBidiChar* unicode,
 unsigned
 raqm_shape (const char* u8_str,
             int u8_size,
-            FT_Face face,
+            const FT_Face face,
             raqm_direction_t direction,
-            char **features,
+            const char **features,
             raqm_glyph_info_t** glyph_info)
 {
     FriBidiChar* u32_str;
@@ -633,11 +633,11 @@ raqm_shape (const char* u8_str,
 
 /* Takes a utf-32 input text and does the reordering and shaping */
 unsigned
-raqm_shape_u32 (uint32_t* text,
+raqm_shape_u32 (const uint32_t* text,
                 int length,
-                FT_Face face,
+                const FT_Face face,
                 raqm_direction_t direction,
-                char **features,
+                const char **features,
                 raqm_glyph_info_t** glyph_info)
 {
     int i = 0;
