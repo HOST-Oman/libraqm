@@ -582,7 +582,7 @@ u32_index_to_u8 (FriBidiChar* unicode,
 }
 
 /* Takes the input text and does the reordering and shaping */
-unsigned
+unsigned int
 raqm_shape (const char* u8_str,
             int u8_size,
             const FT_Face face,
@@ -593,8 +593,8 @@ raqm_shape (const char* u8_str,
     FriBidiChar* u32_str;
     FriBidiStrIndex u32_size;
     raqm_glyph_info_t* info;
-    unsigned glyph_count;
-    unsigned i;
+    unsigned int glyph_count;
+    unsigned int i;
 
     TEST ("Text is: %s\n", u8_str);
 
@@ -632,7 +632,7 @@ raqm_shape (const char* u8_str,
 }
 
 /* Takes a utf-32 input text and does the reordering and shaping */
-unsigned
+unsigned int
 raqm_shape_u32 (const uint32_t* text,
                 int length,
                 const FT_Face face,

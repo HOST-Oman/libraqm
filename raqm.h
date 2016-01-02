@@ -60,11 +60,11 @@
 /* Output glyph */
 typedef struct
 {
-    unsigned index;    /* Glyph index */
-    int x_offset;      /* Horizontal glyph offset */
-    int x_advance;     /* Horizontal glyph advance width */
-    int y_offset;      /* Vertical glyph offset */
-    uint32_t cluster;  /* Index of original character in input text */
+    unsigned int index; /* Glyph index */
+    int x_offset;       /* Horizontal glyph offset */
+    int x_advance;      /* Horizontal glyph advance width */
+    int y_offset;       /* Vertical glyph offset */
+    uint32_t cluster;   /* Index of original character in input text */
 } raqm_glyph_info_t;
 
 /* Base paragraph direction */
@@ -84,20 +84,22 @@ typedef enum
  *
  * Returns: number of glyphs.
  */
-unsigned raqm_shape     (const char* text,               /* input text, UTF-8 encoded */
-                         int length,                     /* length of text array  */
-                         const FT_Face face,             /* font to use for shaping */
-                         raqm_direction_t direction,     /* base paragraph direction */
-                         const char **features,          /* a NULL-terminated array of font feature strings */
-                         raqm_glyph_info_t** glyph_info  /* output glyph info, should be freed by the client */
-                         );
+unsigned int
+raqm_shape     (const char* text,               /* input text, UTF-8 encoded */
+                int length,                     /* length of text array  */
+                const FT_Face face,             /* font to use for shaping */
+                raqm_direction_t direction,     /* base paragraph direction */
+                const char **features,          /* a NULL-terminated array of font feature strings */
+                raqm_glyph_info_t** glyph_info  /* output glyph info, should be freed by the client */
+               );
 
-unsigned raqm_shape_u32 (const uint32_t* text,           /* input text, UTF-32 encoded */
-                         int length,                     /* length of text array */
-                         const FT_Face face,             /* font to use for shaping */
-                         raqm_direction_t direction,     /* base paragraph direction */
-                         const char **features,          /* a NULL-terminated array of font feature strings */
-                         raqm_glyph_info_t** glyph_info  /* output glyph info, should be freed by the client */
-                         );
+unsigned int
+raqm_shape_u32 (const uint32_t* text,           /* input text, UTF-32 encoded */
+                int length,                     /* length of text array */
+                const FT_Face face,             /* font to use for shaping */
+                raqm_direction_t direction,     /* base paragraph direction */
+                const char **features,          /* a NULL-terminated array of font feature strings */
+                raqm_glyph_info_t** glyph_info  /* output glyph info, should be freed by the client */
+               );
 
 #endif /* _RAQM_H_ */
