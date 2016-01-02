@@ -512,7 +512,7 @@ static void
 harfbuzz_shape (const FriBidiChar* unicode_str,
                 FriBidiStrIndex length,
                 hb_font_t* hb_font,
-                const char** featurestr,
+                const char** featurelist,
                 Run* run)
 {
     run->buffer = hb_buffer_create ();
@@ -537,13 +537,13 @@ harfbuzz_shape (const FriBidiChar* unicode_str,
     }
 
     /* shaping current buffer */
-    if (featurestr)
+    if (featurelist)
     {
         unsigned int count = 0;
         const char** p;
         hb_feature_t* features = NULL;
 
-        for (p = featurestr; *p; p++)
+        for (p = featurelist; *p; p++)
         {
             count++;
         }
@@ -551,7 +551,7 @@ harfbuzz_shape (const FriBidiChar* unicode_str,
         features = (hb_feature_t *) malloc (sizeof (hb_feature_t) * count);
 
         count = 0;
-        for (p = featurestr; *p; p++)
+        for (p = featurelist; *p; p++)
         {
             hb_bool_t success =  hb_feature_from_string (*p, -1, &features[count]);
             if (success)
