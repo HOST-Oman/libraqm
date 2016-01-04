@@ -24,41 +24,52 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
+#include <glib.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include "raqm.h"
 
+static gint max_tokens = 50;
+static gchar* direction = NULL;
+static gchar* text = NULL;
+static gchar* font_features = NULL;
+static gchar** args = NULL;
+static GOptionEntry entries[] =
+{
+    { "text", 0, 0, G_OPTION_ARG_STRING, &text, "The text to be displayed", "TEXT" },
+    { "direction", 0, 0, G_OPTION_ARG_STRING, &direction, "The text direction", "DIR" },
+    { "font-features", 0, 0, G_OPTION_ARG_STRING, &font_features, "The font features ", "FEATURES" },
+    { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, "Remaining arguments", "ARGS" },
+    { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
+};
+
 int
 main (int argc, char* argv[])
 {
-    const char* fontfile;
-    const char* direction = "default";
-    const char* text;
     unsigned glyph_count;
     raqm_glyph_info_t* info;
     raqm_direction_t raqm_direction;
     FT_Library ft_library;
     FT_Face face;
     FT_Error ft_error;
+    gchar** features = NULL;
+    GError* error = NULL;
+    GOptionContext* context;
 
-    if ((argc != 3) && (argc != 4))
+    setlocale (LC_ALL, "");
+    context = g_option_context_new ("- Test libraqm");
+    g_option_context_add_main_entries (context, entries, NULL);
+
+    if (!g_option_context_parse (context, &argc, &argv, &error))
     {
-        printf ("Usage:\n%s DIRECTION FONT_FILE TEXT\n%s FONT_FILE TEXT\n", argv[0], argv[0]);
+        g_print ("Option parsing failed: %s\n", error->message);
         return 1;
     }
-
-    fontfile = (argc == 3) ? argv[1] : argv[2];
-
-    text = (argc == 3) ? argv[2] : argv[3];
-    if (strlen(text) == 0)
+    if (text == NULL)
     {
-        printf ("TEXT length is 0.\n");
+        g_print ("Text is missing.\n %s", g_option_context_get_help (context, TRUE, NULL));
         return 1;
-    }
-
-    if (argc == 4)
-    {
-        direction = argv[1];
     }
 
     /* Initialize FreeType and create FreeType font face. */
@@ -69,7 +80,7 @@ main (int argc, char* argv[])
         return 1;
     }
 
-    ft_error = FT_New_Face (ft_library, fontfile, 0, &face);
+    ft_error = FT_New_Face (ft_library, args[0], 0, &face);
     if (ft_error)
     {
         printf ("FT_New_Face() failed.\n");
@@ -83,25 +94,29 @@ main (int argc, char* argv[])
         return 1;
     }
 
-    if (strcmp(direction, "-rtl") == 0 )
+    raqm_direction = RAQM_DIRECTION_DEFAULT;
+    if (direction)
     {
-        raqm_direction = RAQM_DIRECTION_RTL;
+        if (strcmp(direction, "rtl") == 0)
+        {
+            raqm_direction = RAQM_DIRECTION_RTL;
+        }
+        else if (strcmp(direction, "ltr") == 0)
+        {
+            raqm_direction = RAQM_DIRECTION_LTR;
+        }
     }
-    else if (strcmp(direction, "-ltr") == 0 )
+    if (font_features)
     {
-        raqm_direction = RAQM_DIRECTION_LTR;
+        features = g_strsplit (font_features, ",", max_tokens);
     }
-    else
-    {
-        raqm_direction = RAQM_DIRECTION_DEFAULT;
-    }
-
-    glyph_count = raqm_shape (text, (int) strlen (text), face, raqm_direction, NULL, &info);
+    glyph_count = raqm_shape (text, (int) strlen (text), face, raqm_direction, (const char **) (features), &info);
     (void) glyph_count;
 
-    raqm_free(info);
-    FT_Done_Face(face);
-    FT_Done_FreeType(ft_library);
+    g_option_context_free (context);
+    raqm_free (info);
+    FT_Done_Face (face);
+    FT_Done_FreeType (ft_library);
 
     return 0;
 }

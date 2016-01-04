@@ -1,4 +1,4 @@
-PAKAGES = freetype2 harfbuzz fribidi
+PAKAGES = freetype2 harfbuzz fribidi glib-2.0
 
 WARNINGS = -W -Wall -Wextra -Wformat=2 -Wstrict-prototypes \
            -Wimplicit-function-declaration -Wredundant-decls \
