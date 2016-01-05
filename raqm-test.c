@@ -40,7 +40,7 @@ static GOptionEntry entries[] =
     { "text", 0, 0, G_OPTION_ARG_STRING, &text, "The text to be displayed", "TEXT" },
     { "direction", 0, 0, G_OPTION_ARG_STRING, &direction, "The text direction", "DIR" },
     { "font-features", 0, 0, G_OPTION_ARG_STRING, &font_features, "The font features ", "FEATURES" },
-    { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, "Remaining arguments", "ARGS" },
+    { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, "Remaining arguments", "FONTFILE" },
     { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
 };
 
@@ -66,9 +66,10 @@ main (int argc, char* argv[])
         g_print ("Option parsing failed: %s\n", error->message);
         return 1;
     }
-    if (text == NULL)
+
+    if (text == NULL || args == NULL)
     {
-        g_print ("Text is missing.\n %s", g_option_context_get_help (context, TRUE, NULL));
+        g_print ("Text or font is missing.\n\n%s", g_option_context_get_help (context, TRUE, NULL));
         return 1;
     }
 
