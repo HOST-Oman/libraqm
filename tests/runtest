@@ -24,6 +24,7 @@ do
 		echo "FAIL"
 		echo "The diff is:"
 		echo "$result"
+		exit 1
 	fi
 
 	rm -f $expected $output
