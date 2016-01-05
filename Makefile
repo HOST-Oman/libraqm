@@ -7,7 +7,8 @@ WARNINGS = -W -Wall -Wextra -Wformat=2 -Wstrict-prototypes \
            -Wpointer-arith -Wreturn-type -Wsign-compare \
            -Wmultichar -Wformat-nonliteral -Wuninitialized \
            -Wformat-security -pedantic \
-           -Wno-variadic-macros
+           -Wno-variadic-macros \
+	   -Werror
 
 EXTRA = $(shell pkg-config --atleast-version=0.19.8 fribidi && echo "-DHAVE_FRIBIDI_REORDER_RUNS")
 
