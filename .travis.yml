@@ -8,24 +8,24 @@ os:
 language: c
 
 compiler:
-    - gcc
-    - clang
+  - gcc
+  - clang
 
 env:
   global:
     - CFLAGS=-Werror
 
 before_install:
-    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
-    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y libharfbuzz-dev libfribidi-dev; fi
-    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi;
-    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install harfbuzz fribidi; fi;
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y libharfbuzz-dev libfribidi-dev; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi;
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install harfbuzz fribidi; fi;
 
 script:
-    - make
-    - make check
+  - make
+  - make check
 
 notifications:
-    email:
-        recipients:
-            - host-oman@googlegroups.com
+  email:
+    recipients:
+      - host-oman@googlegroups.com
