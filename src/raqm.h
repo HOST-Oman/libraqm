@@ -27,6 +27,10 @@
 #ifndef _RAQM_H_
 #define _RAQM_H_
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdint.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
