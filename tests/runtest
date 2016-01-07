@@ -1,9 +1,11 @@
-#!/usr/bin/env bash
+testtool=$builddir/raqm-test$EXEEXT
 
-testtool=$1
-tests=$2
+if test $# = 0; then
+	set /dev/stdin
+fi
 
-for filename in $tests
+fails=0
+for filename in "$@"
 do
 	echo -ne "Testing $filename...\t"
 
@@ -14,18 +16,22 @@ do
 	tail -n +4 $filename > $expected
 
 	output=$(mktemp output.XXXXXX)
-	$testtool --text="$text" $opts $font > $output
+	$testtool --text="$text" $opts $srcdir/$font > $output
 
 	result=$(diff -u $expected $output)
-	if test "$result" = ""
+	if test "x$result" != "x"
 	then
-		echo "PASS"
-	else
-		echo "FAIL"
+		fails=$((fails+1))
 		echo "The diff is:"
 		echo "$result"
-		exit 1
 	fi
 
 	rm -f $expected $output
 done
+
+if test $fails != 0; then
+	echo "$fails tests failed."
+	exit 1
+else
+	echo "All tests passed."
+fi
