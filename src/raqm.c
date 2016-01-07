@@ -24,8 +24,16 @@
  *
  */
 
+#include <assert.h>
 #include <string.h>
 #include "raqm.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wundef"
+#include <fribidi.h>
+#pragma GCC diagnostic pop
+#include <hb.h>
+#include <hb-ft.h>
 
 /* For enabling debug mode */
 /*#define RAQM_DEBUG 1*/
@@ -74,6 +82,7 @@ static void reverse_run (FriBidiRun *arr, const FriBidiStrIndex len)
 }
 
 /* Seperates and reorders runs via fribidi using bidi algorithm*/
+static
 FriBidiStrIndex fribidi_reorder_runs (
   /* input */
   const FriBidiCharType *bidi_types,
@@ -313,7 +322,7 @@ itemize_by_script(int bidirun_count,
     int run_count = 0;
     int last_script_index = -1;
     int last_set_index = -1;
-    hb_script_t last_script_value;
+    hb_script_t last_script_value = HB_SCRIPT_INVALID;
     hb_script_t* scripts = NULL;
     Stack* script_stack = NULL;
 
@@ -692,6 +701,9 @@ raqm_shape_u32 (const uint32_t* text,
             break;
         case RAQM_DIRECTION_TTB:
             RAQM_TEST ("Direction is: TTB\n\n");
+            break;
+        default:
+            RAQM_TEST ("Direction is: DEFAULT\n\n");
             break;
     }
 #endif

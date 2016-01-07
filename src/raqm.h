@@ -27,11 +27,9 @@
 #ifndef _RAQM_H_
 #define _RAQM_H_
 
+#include <stdint.h>
 #include <ft2build.h>
-#include <fribidi.h>
-#include <hb.h>
-#include <hb-ft.h>
-#include <assert.h>
+#include FT_FREETYPE_H
 
 #ifndef raqm_free
 # define raqm_free(X) free(X)

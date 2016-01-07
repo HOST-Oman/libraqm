@@ -14,6 +14,7 @@ raqm_test_CPPFLAGS = \
     $(FREETYPE_CFLAGS) \
     $(HARFBUZZ_CFLAGS) \
     $(FRIBIDI_CFLAGS) \
+    $(WARN_CFLAGS) \
     $(NULL)
 
 raqm_test_LDADD = \
@@ -22,6 +23,7 @@ raqm_test_LDADD = \
     $(FREETYPE_LIBS) \
     $(HARFBUZZ_LIBS) \
     $(FRIBIDI_LIBS) \
+    $(WARN_LDLAGS)
     $(NULL)
 
 TEST_FILES = \
