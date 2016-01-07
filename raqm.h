@@ -49,6 +49,7 @@ typedef struct
     unsigned int index; /* Glyph index */
     int x_offset;       /* Horizontal glyph offset */
     int x_advance;      /* Horizontal glyph advance width */
+    int y_advance;      /* Vertical glyph advance width */
     int y_offset;       /* Vertical glyph offset */
     uint32_t cluster;   /* Index of original character in input text */
 } raqm_glyph_info_t;
@@ -58,7 +59,8 @@ typedef enum
 {
     RAQM_DIRECTION_DEFAULT,  /* Automatic detection */
     RAQM_DIRECTION_RTL,      /* Right-to-left paragraph */
-    RAQM_DIRECTION_LTR       /* Left-to-right paragraph */
+    RAQM_DIRECTION_LTR,      /* Left-to-right paragraph */
+    RAQM_DIRECTION_TTB       /* Simple vertical top-to-bottom paragraph */
 } raqm_direction_t;
 
 /* raqm_shape - apply bidi algorithm and shape text.

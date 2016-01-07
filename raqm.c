@@ -24,6 +24,7 @@
  *
  */
 
+#include <string.h>
 #include "raqm.h"
 
 /* For enabling debug mode */
@@ -196,6 +197,7 @@ typedef struct
     FriBidiCharType type;
     FriBidiLevel level;
 
+    hb_direction_t direction;
     hb_buffer_t* buffer;
     hb_script_t script;
 } Run;
@@ -538,14 +540,7 @@ harfbuzz_shape (const FriBidiChar* unicode_str,
     hb_buffer_set_language (run->buffer, hb_language_get_default ());
 
     /* setting direction of current buffer */
-    if (FRIBIDI_LEVEL_IS_RTL (run->level))
-    {
-        hb_buffer_set_direction (run->buffer, HB_DIRECTION_RTL);
-    }
-    else
-    {
-        hb_buffer_set_direction (run->buffer, HB_DIRECTION_LTR);
-    }
+    hb_buffer_set_direction (run->buffer, run->direction);
 
     /* shaping current buffer */
     if (featurelist)
@@ -672,7 +667,6 @@ raqm_shape_u32 (const uint32_t* text,
 
     types = (FriBidiCharType*) raqm_malloc (sizeof (FriBidiCharType) * (size_t)(length));
     levels = (FriBidiLevel*) raqm_malloc (sizeof (FriBidiLevel) * (size_t)(length));
-    fribidi_get_bidi_types (text, length, types);
 
     par_type = FRIBIDI_PAR_ON;
     if (direction == RAQM_DIRECTION_RTL)
@@ -696,11 +690,25 @@ raqm_shape_u32 (const uint32_t* text,
         case RAQM_DIRECTION_DEFAULT:
             RAQM_TEST ("Direction is: DEFAULT\n\n");
             break;
+        case RAQM_DIRECTION_TTB:
+            RAQM_TEST ("Direction is: TTB\n\n");
+            break;
     }
 #endif
 
-    max_level = fribidi_get_par_embedding_levels (types, length, &par_type, levels);
-    if (max_level <= 0)
+    if (direction == RAQM_DIRECTION_TTB)
+    {
+        max_level = 0;
+        memset(types, FRIBIDI_TYPE_LTR, (size_t)length);
+        memset(levels, 0, (size_t)length);
+    }
+    else
+    {
+        fribidi_get_bidi_types (text, length, types);
+        max_level = fribidi_get_par_embedding_levels (types, length, &par_type, levels);
+    }
+
+    if (max_level < 0)
         goto out;
 
     /* to get number of bidi runs */
@@ -722,6 +730,16 @@ raqm_shape_u32 (const uint32_t* text,
 
     for (i = 0; i < run_count; i++)
     {
+        /* setting direction of current buffer */
+        runs[i].direction = HB_DIRECTION_LTR;
+        if (direction == RAQM_DIRECTION_TTB)
+        {
+            runs[i].direction = HB_DIRECTION_TTB;
+        }
+        else if (FRIBIDI_LEVEL_IS_RTL (runs[i].level))
+        {
+            runs[i].direction = HB_DIRECTION_RTL;
+        }
         harfbuzz_shape (text, length, hb_font, features, &runs[i]);
         hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].buffer, &glyph_count);
         total_glyph_count += glyph_count;
@@ -743,6 +761,7 @@ raqm_shape_u32 (const uint32_t* text,
             info[index].x_offset = hb_glyph_position[j].x_offset;
             info[index].y_offset = hb_glyph_position[j].y_offset;
             info[index].x_advance = hb_glyph_position[j].x_advance;
+            info[index].y_advance = hb_glyph_position[j].y_advance;
             info[index].cluster = hb_glyph_info[j].cluster;
             RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
                   info[index].index, info[index].x_offset,
