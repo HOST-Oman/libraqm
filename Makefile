@@ -16,12 +16,13 @@ CFLAGS = $(shell pkg-config --cflags $(PAKAGES) | sed -e "s/-I/-isystem/g") $(WA
 LDLIBS = $(shell pkg-config --libs $(PAKAGES))
 
 SRC = src
-OBJS = raqm-test.o $(SRC)/raqm.o
+TEST = tests
+OBJS = $(TEST)/raqm-test.o $(SRC)/raqm.o
 
-BIN = raqm-test
+BIN = $(TEST)/raqm-test
 RUNTEST = tests/runtest
 UPDATETEST = tests/updatetest
-TESTS = $(wildcard tests/*.test)
+TESTS = $(wildcard $(TEST)/*.test)
 
 all: $(BIN)
 
