@@ -15,7 +15,8 @@ EXTRA = $(shell pkg-config --atleast-version=0.19.8 fribidi && echo "-DHAVE_FRIB
 CFLAGS = $(shell pkg-config --cflags $(PAKAGES) | sed -e "s/-I/-isystem/g") $(WARNINGS) $(EXTRA) -DRAQM_TESTING -g
 LDLIBS = $(shell pkg-config --libs $(PAKAGES))
 
-OBJS = raqm-test.o raqm.o
+SRC = src
+OBJS = raqm-test.o $(SRC)/raqm.o
 
 BIN = raqm-test
 RUNTEST = tests/runtest
@@ -24,8 +25,8 @@ TESTS = $(wildcard tests/*.test)
 
 all: $(BIN)
 
-%.o: %.c raqm.h
-	$(CC) -c $< $(CFLAGS) -o $@
+%.o: %.c $(SRC)/raqm.h
+	$(CC) -c $< -I$(SRC) $(CFLAGS) -o $@
 
 $(BIN): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDLIBS)
