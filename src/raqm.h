@@ -31,6 +31,7 @@
 #include "config.h"
 #endif
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -58,6 +59,9 @@ void
 raqm_add_text (raqm_t   *rq,
                uint32_t *text,
                size_t    len);
+
+bool
+raqm_layout (raqm_t *rq);
 
 /* Old API */
 

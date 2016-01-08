@@ -160,6 +160,28 @@ raqm_add_text (raqm_t   *rq,
     rq->text[i] = text[i];
 }
 
+/**
+ * raqm_layout:
+ * @rq: a #raqm_t.
+ *
+ * Run the text layout process on @rq. This is the main Raqm function where the
+ * Unicode Bidirectional Text algorithm will be applied to the text in @rq,
+ * text shaping, and any other part of the layout process.
+ *
+ * Return value:
+ * %true if the layout process was successful, %false otherwise.
+ *
+ * Since: 0.1
+ */
+bool
+raqm_layout (raqm_t *rq)
+{
+  if (rq == NULL || rq->text_len == 0)
+    return false;
+
+  return true;
+}
+
 /* for older fribidi versions */
 #ifndef HAVE_FRIBIDI_REORDER_RUNS
 typedef struct _FriBidiRunStruct FriBidiRun;
