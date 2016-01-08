@@ -6,6 +6,8 @@ check_LTLIBRARIES = libraqm-test.la
 libraqm_la_SOURCES = \
     raqm.c \
     raqm.h \
+    reorder_runs.c \
+    reorder_runs.h \
     $(NULL)
 
 include_HEADERS = \
