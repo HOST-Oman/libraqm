@@ -57,6 +57,39 @@
 # define RAQM_TEST(...)
 #endif
 
+struct _raqm {
+  int ref_count;
+};
+
+raqm_t *
+raqm_create (void)
+{
+  raqm_t *rq;
+
+  rq = malloc (sizeof (raqm_t));
+  rq->ref_count = 1;
+
+  return rq;
+}
+
+raqm_t *
+raqm_reference (raqm_t *rq)
+{
+  if (rq != NULL)
+    rq->ref_count++;
+
+  return rq;
+}
+
+void
+raqm_destroy (raqm_t *rq)
+{
+  if (rq == NULL || --rq->ref_count != 0)
+    return;
+
+  free (rq);
+}
+
 /* for older fribidi versions */
 #ifndef HAVE_FRIBIDI_REORDER_RUNS
 typedef struct _FriBidiRunStruct FriBidiRun;
