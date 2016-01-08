@@ -45,46 +45,12 @@
  */
 typedef struct _raqm raqm_t;
 
-/**
- * raqm_create:
- *
- * Creates a new #raqm_t.
- *
- * Return value:
- * a newly allocated #raqm_t with a reference count of 1. The initial reference
- * count should be released with raqm_destroy() when you are done using the
- * #raqm_t.
- *
- * Since: 0.1
- */
 raqm_t *
 raqm_create (void);
 
-/**
- * raqm_reference:
- * @rq: a #raqm_t.
- *
- * Increases the reference count on @rq by one. This prevents @rq from being
- * destroyed until a matching call to raqm_destroy() is made.
- *
- * Return value:
- * The referenced #raqm_t.
- *
- * Since: 0.1
- */
 raqm_t *
 raqm_reference (raqm_t *rq);
 
-/**
- * raqm_destroy:
- * @rq: a #raqm_t.
- *
- * Decreases the reference count on @rq by one. If the result is zero, then @rq
- * and all associated resources are freed.
- * See cairo_reference().
- *
- * Since: 0.1
- */
 void
 raqm_destroy (raqm_t *rq);
 
