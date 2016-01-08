@@ -54,6 +54,10 @@ raqm_reference (raqm_t *rq);
 void
 raqm_destroy (raqm_t *rq);
 
+void
+raqm_add_text (raqm_t   *rq,
+               uint32_t *text,
+               size_t    len);
 
 /* Old API */
 

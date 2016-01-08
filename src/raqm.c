@@ -59,12 +59,16 @@
 
 struct _raqm {
   int ref_count;
+
+  uint32_t *text;
+  size_t text_len;
 };
 
 /**
  * raqm_create:
  *
- * Creates a new #raqm_t.
+ * Creates a new #raqm_t with all its internal states initialized to their
+ * defaults.
  *
  * Return value:
  * a newly allocated #raqm_t with a reference count of 1. The initial reference
@@ -80,6 +84,9 @@ raqm_create (void)
 
   rq = malloc (sizeof (raqm_t));
   rq->ref_count = 1;
+
+  rq->text = NULL;
+  rq->text_len = 0;
 
   return rq;
 }
@@ -121,7 +128,36 @@ raqm_destroy (raqm_t *rq)
   if (rq == NULL || --rq->ref_count != 0)
     return;
 
+  free (rq->text);
   free (rq);
+}
+
+/**
+ * raqm_add_text:
+ * @rq: a #raqm_t.
+ * @text: a UTF-32 encoded text string.
+ * @len: the length of @text.
+ *
+ * Adds @text to @rq to be used for layout. It must be a valid UTF-32 text, any
+ * invalid character will be replaced with U+FFFD. The text should typically
+ * represent a full paragraph, since doing the layout of chunks of text
+ * separately can give improper output.
+ *
+ * Since: 0.1
+ */
+void
+raqm_add_text (raqm_t   *rq,
+               uint32_t *text,
+               size_t    len)
+{
+  if (rq == NULL)
+    return;
+
+  rq->text_len = len;
+  rq->text = malloc (sizeof (uint32_t) * len);
+
+  for (size_t i = 0; i < len; i++)
+    rq->text[i] = text[i];
 }
 
 /* for older fribidi versions */
