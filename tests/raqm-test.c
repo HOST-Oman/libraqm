@@ -119,7 +119,7 @@ main (int argc, char* argv[])
     (void) glyph_count;
 
     g_option_context_free (context);
-    raqm_free (info);
+    free (info);
     FT_Done_Face (face);
     FT_Done_FreeType (ft_library);
 

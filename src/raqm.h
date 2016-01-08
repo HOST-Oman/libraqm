@@ -35,16 +35,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#ifndef raqm_free
-# define raqm_free(X) free(X)
-#endif
-#ifndef raqm_malloc
-# define raqm_malloc(X) malloc(X)
-#endif
-#ifndef raqm_calloc
-# define raqm_calloc(X, Y) calloc(X, Y)
-#endif
-
 /* Output glyph */
 typedef struct
 {
