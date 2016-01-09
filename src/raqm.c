@@ -59,6 +59,8 @@ struct _raqm {
 
   uint32_t *text;
   size_t text_len;
+
+  raqm_direction_t base_dir;
 };
 
 /**
@@ -84,6 +86,8 @@ raqm_create (void)
 
   rq->text = NULL;
   rq->text_len = 0;
+
+  rq->base_dir = RAQM_DIRECTION_DEFAULT;
 
   return rq;
 }
@@ -155,6 +159,43 @@ raqm_add_text (raqm_t   *rq,
 
   for (size_t i = 0; i < len; i++)
     rq->text[i] = text[i];
+}
+
+/**
+ * raqm_set_par_direction:
+ * @rq: a #raqm_t.
+ * @dir: the direction of the paragraph.
+ *
+ * Sets the paragraph direction, also known as block direction in CSS. For
+ * horizontal text, this controls the overall direction in the Unicode
+ * Bidirectional Algorithm, so when the text is mainly right-to-left (with or
+ * without some left-to-right) text, then the base direction should be set to
+ * #RAQM_DIRECTION_RTL and vice versa.
+ *
+ * The default is #RAQM_DIRECTION_DEFAULT, which determines the paragraph
+ * direction based on the first character with strong bidi type (see [rule
+ * P2](http://unicode.org/reports/tr9/#P2) in Unicode Bidirectional Algorithm),
+ * which can be good enough for many cases but has problems when a mainly
+ * right-to-left paragraph starts with a left-to-right character and vice versa
+ * as the detected paragraph direction will be the wrong one, or when text does
+ * not contain any characters with string bidi types (e.g. only punctuation or
+ * numbers) as this will default to left-to-right paragraph direction.
+ *
+ * For vertical, top-to-bottom text, #RAQM_DIRECTION_TTB should be used. Raqm,
+ * however, provides limited vertical text support and does not handle rotated
+ * horizontal text in vertical text, instead everything is treated as vertical
+ * text.
+ *
+ * Since: 0.1
+ */
+void
+raqm_set_par_direction (raqm_t          *rq,
+                        raqm_direction_t dir)
+{
+  if (rq == NULL)
+    return;
+
+  rq->base_dir = dir;
 }
 
 /**

@@ -46,6 +46,25 @@
  */
 typedef struct _raqm raqm_t;
 
+/**
+ * raqm_direction_t:
+ * @RAQM_DIRECTION_DEFAULT: Detect paragraph direction automatically.
+ * @RAQM_DIRECTION_RTL: Paragraph is mainly right-to-left text.
+ * @RAQM_DIRECTION_LTR: Paragraph is mainly left-to-right text.
+ * @RAQM_DIRECTION_TTB: Paragraph is mainly vertical top-to-bottom text.
+ *
+ * Base paragraph direction, see raqm_set_par_direction().
+ *
+ * Since: 0.1
+ */
+typedef enum
+{
+    RAQM_DIRECTION_DEFAULT,
+    RAQM_DIRECTION_RTL,
+    RAQM_DIRECTION_LTR,
+    RAQM_DIRECTION_TTB
+} raqm_direction_t;
+
 raqm_t *
 raqm_create (void);
 
@@ -59,6 +78,10 @@ void
 raqm_add_text (raqm_t   *rq,
                uint32_t *text,
                size_t    len);
+
+void
+raqm_set_par_direction (raqm_t          *rq,
+                        raqm_direction_t dir);
 
 bool
 raqm_layout (raqm_t *rq);
@@ -75,15 +98,6 @@ typedef struct
     int y_offset;       /* Vertical glyph offset */
     uint32_t cluster;   /* Index of original character in input text */
 } raqm_glyph_info_t;
-
-/* Base paragraph direction */
-typedef enum
-{
-    RAQM_DIRECTION_DEFAULT,  /* Automatic detection */
-    RAQM_DIRECTION_RTL,      /* Right-to-left paragraph */
-    RAQM_DIRECTION_LTR,      /* Left-to-right paragraph */
-    RAQM_DIRECTION_TTB       /* Simple vertical top-to-bottom paragraph */
-} raqm_direction_t;
 
 /* raqm_shape - apply bidi algorithm and shape text.
  *
