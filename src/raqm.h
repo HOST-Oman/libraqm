@@ -75,9 +75,9 @@ void
 raqm_destroy (raqm_t *rq);
 
 void
-raqm_add_text (raqm_t   *rq,
-               uint32_t *text,
-               size_t    len);
+raqm_add_text (raqm_t         *rq,
+               const uint32_t *text,
+               size_t          len);
 
 void
 raqm_set_par_direction (raqm_t          *rq,

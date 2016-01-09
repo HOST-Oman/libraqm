@@ -54,6 +54,8 @@
 # define RAQM_TEST(...)
 #endif
 
+typedef struct _raqm_run raqm_run_t;
+
 struct _raqm {
   int ref_count;
 
@@ -61,6 +63,22 @@ struct _raqm {
   size_t text_len;
 
   raqm_direction_t base_dir;
+
+  raqm_run_t *runs;
+};
+
+struct _raqm_run
+{
+  FriBidiStrIndex pos;
+  FriBidiStrIndex len;
+  FriBidiCharType type;
+  FriBidiLevel level;
+
+  hb_direction_t direction;
+  hb_script_t script;
+  hb_buffer_t *buffer;
+
+  raqm_run_t *next;
 };
 
 /**
@@ -89,6 +107,8 @@ raqm_create (void)
 
   rq->base_dir = RAQM_DIRECTION_DEFAULT;
 
+  rq->runs = NULL;
+
   return rq;
 }
 
@@ -113,6 +133,18 @@ raqm_reference (raqm_t *rq)
   return rq;
 }
 
+static void
+_raqm_free_runs (raqm_t *rq)
+{
+  raqm_run_t *runs = rq->runs;
+  while (runs)
+  {
+    raqm_run_t *run = runs;
+    runs = runs->next;
+    free (run);
+  }
+}
+
 /**
  * raqm_destroy:
  * @rq: a #raqm_t.
@@ -130,6 +162,7 @@ raqm_destroy (raqm_t *rq)
     return;
 
   free (rq->text);
+  _raqm_free_runs (rq);
   free (rq);
 }
 
@@ -147,9 +180,9 @@ raqm_destroy (raqm_t *rq)
  * Since: 0.1
  */
 void
-raqm_add_text (raqm_t   *rq,
-               uint32_t *text,
-               size_t    len)
+raqm_add_text (raqm_t         *rq,
+               const uint32_t *text,
+               size_t          len)
 {
   if (rq == NULL)
     return;
@@ -198,6 +231,9 @@ raqm_set_par_direction (raqm_t          *rq,
   rq->base_dir = dir;
 }
 
+static bool
+_raqm_itemize_bidi (raqm_t *rq);
+
 /**
  * raqm_layout:
  * @rq: a #raqm_t.
@@ -217,7 +253,106 @@ raqm_layout (raqm_t *rq)
   if (rq == NULL || rq->text_len == 0)
     return false;
 
+  if (!_raqm_itemize_bidi (rq))
+    return false;
+
   return true;
+}
+
+static bool
+_raqm_itemize_bidi (raqm_t *rq)
+{
+  FriBidiParType par_type = FRIBIDI_PAR_ON;
+  FriBidiCharType *types = NULL;
+  FriBidiLevel *levels = NULL;
+  FriBidiRun *runs = NULL;
+  raqm_run_t *last;
+  int max_level;
+  int run_count;
+  bool ok = true;
+
+#ifdef RAQM_TESTING
+  switch (rq->base_dir)
+  {
+    case RAQM_DIRECTION_RTL:
+      RAQM_TEST ("Direction is: RTL\n\n");
+      break;
+    case RAQM_DIRECTION_LTR:
+      RAQM_TEST ("Direction is: LTR\n\n");
+      break;
+    case RAQM_DIRECTION_TTB:
+      RAQM_TEST ("Direction is: TTB\n\n");
+      break;
+    case RAQM_DIRECTION_DEFAULT:
+    default:
+      RAQM_TEST ("Direction is: DEFAULT\n\n");
+      break;
+  }
+#endif
+
+  if (rq->base_dir == RAQM_DIRECTION_RTL)
+    par_type = FRIBIDI_PAR_RTL;
+  else if (rq->base_dir == RAQM_DIRECTION_LTR)
+    par_type = FRIBIDI_PAR_LTR;
+
+  types = malloc (sizeof (FriBidiCharType) * rq->text_len);
+  levels = malloc (sizeof (FriBidiLevel) * rq->text_len);
+
+  if (rq->base_dir == RAQM_DIRECTION_TTB)
+  {
+    /* Treat every thing as LTR in vertical text */
+    max_level = 0;
+    memset (types, FRIBIDI_TYPE_LTR, rq->text_len);
+    memset (levels, 0, rq->text_len);
+  }
+  else
+  {
+    fribidi_get_bidi_types (rq->text, rq->text_len, types);
+    max_level = fribidi_get_par_embedding_levels (types, rq->text_len, &par_type, levels);
+  }
+
+  if (max_level < 0)
+  {
+    ok = false;
+    goto out;
+  }
+
+  /* Get the number of bidi runs */
+  run_count = fribidi_reorder_runs (types, rq->text_len, par_type, levels, NULL);
+
+  /* Populate bidi runs array */
+  runs = malloc (sizeof (FriBidiRun) * (size_t)run_count);
+  run_count = fribidi_reorder_runs (types, rq->text_len, par_type, levels, runs);
+
+  last = rq->runs;
+  for (int i = 0; i < run_count; i++)
+  {
+    raqm_run_t *run = malloc (sizeof (raqm_run_t));
+    run->pos = runs[i].pos;
+    run->len = runs[i].len;
+    run->type = runs[i].type;
+    run->level = runs[i].level;
+
+    run->direction = HB_DIRECTION_INVALID;
+    run->script = HB_SCRIPT_INVALID;
+    run->buffer = NULL;
+
+    if (last != NULL)
+      last->next = run;
+    run->prev = last;
+    run->next = NULL;
+    last = run;
+
+    if (rq->runs == NULL)
+      rq->runs = run;
+  }
+
+out:
+  free (levels);
+  free (types);
+  free (runs);
+
+  return ok;
 }
 
 /* Stack to handle script detection */
@@ -250,17 +385,6 @@ static const FriBidiChar paired_chars[] =
     0x3018, 0x3019,
     0x301a, 0x301b
 };
-
-typedef struct
-{
-    FriBidiStrIndex pos, len;
-    FriBidiCharType type;
-    FriBidiLevel level;
-
-    hb_direction_t direction;
-    hb_buffer_t* buffer;
-    hb_script_t script;
-} Run;
 
 /* Stack handeling functions */
 static Stack*
@@ -367,7 +491,7 @@ itemize_by_script(int bidirun_count,
                  FriBidiRun *bidiruns,
                  const uint32_t* text,
                  int length,
-                 Run *runs)
+                 raqm_run_t *runs)
 {
     int i;
     int run_count = 0;
@@ -586,7 +710,7 @@ harfbuzz_shape (const FriBidiChar* unicode_str,
                 FriBidiStrIndex length,
                 hb_font_t* hb_font,
                 const char** featurelist,
-                Run* run)
+                raqm_run_t* run)
 {
     run->buffer = hb_buffer_create ();
 
@@ -713,77 +837,43 @@ raqm_shape_u32 (const uint32_t* text,
     unsigned int total_glyph_count = 0;
     unsigned int glyph_count;
     unsigned int postion_length;
-    int max_level;
 
     hb_font_t* hb_font = NULL;
     hb_glyph_info_t* hb_glyph_info = NULL;
     hb_glyph_position_t* hb_glyph_position = NULL;
-    FriBidiParType par_type;
     FriBidiRun* bidiruns = NULL;
-    FriBidiCharType* types = NULL;
-    FriBidiLevel* levels = NULL;
-    Run* runs = NULL;
+    raqm_run_t* runs = NULL;
     raqm_glyph_info_t* info = NULL;
+    raqm_t *rq;
 
-    types = (FriBidiCharType*) malloc (sizeof (FriBidiCharType) * (size_t)(length));
-    levels = (FriBidiLevel*) malloc (sizeof (FriBidiLevel) * (size_t)(length));
+    rq = raqm_create ();
+    raqm_add_text (rq, text, length);
+    raqm_set_par_direction (rq, direction);
 
-    par_type = FRIBIDI_PAR_ON;
-    if (direction == RAQM_DIRECTION_RTL)
-    {
-        par_type = FRIBIDI_PAR_RTL;
-    }
-    else if (direction == RAQM_DIRECTION_LTR)
-    {
-        par_type = FRIBIDI_PAR_LTR;
-    }
+    if (!raqm_layout (rq))
+      goto out;
 
-#ifdef RAQM_TESTING
-    switch (direction)
+    bidirun_count = 0;
+    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     {
-        case RAQM_DIRECTION_RTL:
-            RAQM_TEST ("Direction is: RTL\n\n");
-            break;
-        case RAQM_DIRECTION_LTR:
-            RAQM_TEST ("Direction is: LTR\n\n");
-            break;
-        case RAQM_DIRECTION_DEFAULT:
-            RAQM_TEST ("Direction is: DEFAULT\n\n");
-            break;
-        case RAQM_DIRECTION_TTB:
-            RAQM_TEST ("Direction is: TTB\n\n");
-            break;
-        default:
-            RAQM_TEST ("Direction is: DEFAULT\n\n");
-            break;
-    }
-#endif
-
-    if (direction == RAQM_DIRECTION_TTB)
-    {
-        max_level = 0;
-        memset(types, FRIBIDI_TYPE_LTR, (size_t)length);
-        memset(levels, 0, (size_t)length);
-    }
-    else
-    {
-        fribidi_get_bidi_types (text, length, types);
-        max_level = fribidi_get_par_embedding_levels (types, length, &par_type, levels);
+      bidirun_count++;
     }
 
-    if (max_level < 0)
-        goto out;
-
-    /* to get number of bidi runs */
-    bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, NULL);
     bidiruns = (FriBidiRun*) malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
 
-    /* to populate bidi run array */
-    bidirun_count = fribidi_reorder_runs (types, length, par_type, levels, bidiruns);
+    bidirun_count = 0;
+    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+    {
+      bidiruns[bidirun_count].pos = run->pos;
+      bidiruns[bidirun_count].len = run->len;
+      bidiruns[bidirun_count].type = run->type;
+      bidiruns[bidirun_count].level = run->level;
+      bidirun_count++;
+    }
 
     /* to get number of runs after script seperation */
     run_count = itemize_by_script (bidirun_count, bidiruns, text, length, NULL);
-    runs = (Run*) malloc (sizeof (Run) * (size_t)(run_count));
+    runs = malloc (sizeof (raqm_run_t) * (size_t)run_count);
 
     /* to populate runs_scripts array */
     itemize_by_script (bidirun_count, bidiruns, text, length, runs);
@@ -839,10 +929,9 @@ out:
     *glyph_info = info;
 
     hb_font_destroy (hb_font);
-    free (levels);
-    free (types);
     free (bidiruns);
     free (runs);
+    raqm_destroy (rq);
 
     return total_glyph_count;
 }
