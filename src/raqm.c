@@ -486,25 +486,19 @@ get_pair_index (const FriBidiChar firbidi_ch)
 #define STACK_IS_NOT_EMPTY(script) (! STACK_IS_EMPTY(script))
 #define IS_OPEN(pair_index)        (((pair_index) & 1) == 0)
 
-/* Detecting script for each character in the input string, if the character
+/* Resolve the script for each character in the input string, if the character
  * script is common or inherited it takes the script of the character before it
  * except paired characters which we try to make them use the same script. We
  * then split the BiDi runs, if necessary, on script boundaries.
  */
-static bool
-_raqm_itemize_script (raqm_t *rq)
+static hb_script_t *
+_raqm_resolve_scripts (raqm_t *rq)
 {
+  hb_script_t* scripts = NULL;
   int last_script_index = -1;
   int last_set_index = -1;
   hb_script_t last_script_value = HB_SCRIPT_INVALID;
-  hb_script_t* scripts = NULL;
-  Stack* script_stack = NULL;
-  size_t run_count;
-  raqm_run_t *temp_runs;
-  raqm_run_t *last;
-#ifdef RAQM_TESTING
-  size_t run_index;
-#endif
+  Stack* stack = NULL;
 
   scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) rq->text_len);
   for (size_t i = 0; i < rq->text_len; ++i)
@@ -520,7 +514,7 @@ _raqm_itemize_script (raqm_t *rq)
   RAQM_TEST ("\n");
 #endif
 
-  script_stack = stack_new ((size_t) rq->text_len);
+  stack = stack_new ((size_t) rq->text_len);
   for (int i = 0; i < (int) rq->text_len; ++i)
   {
     if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
@@ -532,19 +526,19 @@ _raqm_itemize_script (raqm_t *rq)
         {
           scripts[i] = last_script_value;
           last_set_index = i;
-          stack_push (script_stack, scripts[i], pair_index);
+          stack_push (stack, scripts[i], pair_index);
         }
         else
         {    /* is a close paired character */
           int pi = pair_index & ~1; /* find matching opening (by getting the last even index for currnt odd index)*/
-          while (STACK_IS_NOT_EMPTY (script_stack) &&
-                 script_stack->pair_index[script_stack->size] != pi)
+          while (STACK_IS_NOT_EMPTY (stack) &&
+                 stack->pair_index[stack->size] != pi)
           {
-            stack_pop (script_stack);
+            stack_pop (stack);
           }
-          if (STACK_IS_NOT_EMPTY (script_stack))
+          if (STACK_IS_NOT_EMPTY (stack))
           {
-            scripts[i] = stack_top (script_stack);
+            scripts[i] = stack_top (stack);
             last_script_value = scripts[i];
             last_set_index = i;
           }
@@ -587,7 +581,27 @@ _raqm_itemize_script (raqm_t *rq)
     RAQM_TEST ("script for ch[%ld]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
+#endif
 
+  stack_free (stack);
+
+  return scripts;
+}
+
+static bool
+_raqm_itemize_script (raqm_t *rq)
+{
+  hb_script_t* scripts = NULL;
+  size_t run_count;
+  raqm_run_t *temp_runs;
+  raqm_run_t *last;
+#ifdef RAQM_TESTING
+  size_t run_index;
+#endif
+
+  scripts = _raqm_resolve_scripts (rq);
+
+#ifdef RAQM_TESTING
   run_index = 0;
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     run_index++;
@@ -715,7 +729,6 @@ _raqm_itemize_script (raqm_t *rq)
   RAQM_TEST ("\n");
 #endif
 
-  stack_free (script_stack);
   free (scripts);
   free (temp_runs);
 
