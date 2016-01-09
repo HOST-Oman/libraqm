@@ -234,6 +234,9 @@ raqm_set_par_direction (raqm_t          *rq,
 static bool
 _raqm_itemize_bidi (raqm_t *rq);
 
+static bool
+_raqm_itemize_script (raqm_t *rq);
+
 /**
  * raqm_layout:
  * @rq: a #raqm_t.
@@ -254,6 +257,9 @@ raqm_layout (raqm_t *rq)
     return false;
 
   if (!_raqm_itemize_bidi (rq))
+    return false;
+
+  if (!_raqm_itemize_script (rq))
     return false;
 
   return true;
@@ -339,7 +345,6 @@ _raqm_itemize_bidi (raqm_t *rq)
 
     if (last != NULL)
       last->next = run;
-    run->prev = last;
     run->next = NULL;
     last = run;
 
@@ -486,46 +491,43 @@ get_pair_index (const FriBidiChar firbidi_ch)
  * except paired characters which we try to make them use the same script. We
  * then split the BiDi runs, if necessary, on script boundaries.
  */
-static int
-itemize_by_script(int bidirun_count,
-                 FriBidiRun *bidiruns,
-                 const uint32_t* text,
-                 int length,
-                 raqm_run_t *runs)
+static bool
+_raqm_itemize_script (raqm_t *rq)
 {
-    int i;
-    int run_count = 0;
     int last_script_index = -1;
     int last_set_index = -1;
     hb_script_t last_script_value = HB_SCRIPT_INVALID;
     hb_script_t* scripts = NULL;
     Stack* script_stack = NULL;
+  size_t run_count;
+  raqm_run_t *temp_runs;
+  raqm_run_t *last;
+#ifdef RAQM_TESTING
+  size_t run_index;
+#endif
 
-    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) length);
-    for (i = 0; i < length; ++i)
+    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) rq->text_len);
+    for (size_t i = 0; i < rq->text_len; ++i)
     {
-        scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), text[i]);
+        scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), rq->text[i]);
     }
 
 #ifdef RAQM_TESTING
-    if (runs)
-    {
-        RAQM_TEST ("Before script detection:\n");
-        for (i = 0; i < length; ++i)
-        {
-            SCRIPT_TO_STRING (scripts[i]);
-            RAQM_TEST ("script for ch[%d]\t%s\n", i, buff);
-        }
-        RAQM_TEST ("\n");
-    }
+  RAQM_TEST ("Before script detection:\n");
+  for (size_t i = 0; i < rq->text_len; ++i)
+  {
+    SCRIPT_TO_STRING (scripts[i]);
+    RAQM_TEST ("script for ch[%ld]\t%s\n", i, buff);
+  }
+  RAQM_TEST ("\n");
 #endif
 
-    script_stack = stack_new ((size_t) length);
-    for (i = 0; i < length; ++i)
+    script_stack = stack_new ((size_t) rq->text_len);
+    for (int i = 0; i < (int) rq->text_len; ++i)
     {
         if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
         {
-            int pair_index = get_pair_index (text[i]);
+            int pair_index = get_pair_index (rq->text[i]);
             if (pair_index >= 0)
             {    /* is a paired character */
                 if (IS_OPEN (pair_index))
@@ -580,38 +582,37 @@ itemize_by_script(int bidirun_count,
     }
 
 #ifdef RAQM_TESTING
-    if (runs)
-    {
-        RAQM_TEST ("After script detection:\n");
-        for (i = 0; i < length; ++i)
-        {
-            SCRIPT_TO_STRING (scripts[i]);
-            RAQM_TEST ("script for ch[%d]\t%s\n", i, buff);
-        }
-        RAQM_TEST ("\n");
+  RAQM_TEST ("After script detection:\n");
+  for (size_t i = 0; i < rq->text_len; ++i)
+  {
+    SCRIPT_TO_STRING (scripts[i]);
+    RAQM_TEST ("script for ch[%ld]\t%s\n", i, buff);
+  }
+  RAQM_TEST ("\n");
 
-        RAQM_TEST ("Number of runs before script itemization: %d\n", bidirun_count);
-        RAQM_TEST ("\n");
-        RAQM_TEST ("Fribidi Runs:\n");
-        for (i = 0; i < bidirun_count; ++i)
-        {
-            RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
-                  i, bidiruns[i].pos, bidiruns[i].len, bidiruns[i].level);
-        }
-        RAQM_TEST ("\n");
-    }
+  run_index = 0;
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+    run_index++;
+  RAQM_TEST ("Number of runs before script itemization: %ld\n\n", run_index);
+
+  run_index = 0;
+  RAQM_TEST ("Fribidi Runs:\n");
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    RAQM_TEST ("run[%ld]:\t start: %d\tlength: %d\tlevel: %d\n",
+               run_index++, run->pos, run->len, run->level);
+  }
+  RAQM_TEST ("\n");
 #endif
 
-
-    /* To get number of runs after script seperation */
-    for (i = 0; i < bidirun_count; i++)
+  /* TODO: rewrite the following code to not need the temp_runs array */
+    run_count = 0;
+    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     {
-        int j;
-        FriBidiRun run = bidiruns[i];
-        hb_script_t last_script = scripts[run.pos];
+        hb_script_t last_script = scripts[run->pos];
         run_count++;
-        for (j = 0; j < run.len; j++) {
-            hb_script_t script = scripts[run.pos + j];
+        for (int j = 0; j < run->len; j++) {
+            hb_script_t script = scripts[run->pos + j];
             if (script != last_script)
             {
                 run_count++;
@@ -620,88 +621,108 @@ itemize_by_script(int bidirun_count,
         }
     }
 
-    if (runs == NULL)
-    {
-        goto out;
-    }
-
-    run_count = 0;
-
-    /* By iterating through bidiruns, any detection of different scripts in the same run
+    /* By iterating through bidi runs, any detection of different scripts in the same run
      * will split the run so that each run contains one script. Runs with odd levels but
      * different scripts will need to be reordered to appear in the correct visual order */
-    for (i = 0; i < bidirun_count; i++)
+    temp_runs = malloc (sizeof (raqm_run_t) * run_count);
+    run_count = 0;
+    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     {
         int j;
-        FriBidiRun bidirun = bidiruns[i];
+        temp_runs[run_count].level = run->level;
+        temp_runs[run_count].len = 0;
 
-        runs[run_count].level = bidirun.level;
-        runs[run_count].len = 0;
-
-        if (!FRIBIDI_LEVEL_IS_RTL (bidirun.level))
+        if (!FRIBIDI_LEVEL_IS_RTL (run->level))
         {
-            runs[run_count].pos = bidirun.pos;
-            runs[run_count].script = scripts[bidirun.pos];
-            for (j = 0; j < bidirun.len; j++)
+            temp_runs[run_count].pos = run->pos;
+            temp_runs[run_count].script = scripts[run->pos];
+            for (j = 0; j < run->len; j++)
             {
-                hb_script_t script = scripts[bidirun.pos + j];
-                if (script == runs[run_count].script)
+                hb_script_t script = scripts[run->pos + j];
+                if (script == temp_runs[run_count].script)
                 {
-                    runs[run_count].len++;
+                    temp_runs[run_count].len++;
                 }
                 else
                 {
                     run_count++;
-                    runs[run_count].pos = bidirun.pos + j;
-                    runs[run_count].level = bidirun.level;
-                    runs[run_count].script = script;
-                    runs[run_count].len = 1;
+                    temp_runs[run_count].pos = run->pos + j;
+                    temp_runs[run_count].level = run->level;
+                    temp_runs[run_count].script = script;
+                    temp_runs[run_count].len = 1;
                 }
             }
         }
         else
         {
-            runs[run_count].pos = bidirun.pos + bidirun.len -1;
-            runs[run_count].script = scripts[bidirun.pos + bidirun.len - 1];
-            for (j = bidirun.len - 1; j >= 0; j--)
+            temp_runs[run_count].pos = run->pos + run->len -1;
+            temp_runs[run_count].script = scripts[run->pos + run->len - 1];
+            for (j = run->len - 1; j >= 0; j--)
             {
-                hb_script_t script = scripts[bidirun.pos + j];
-                if (script == runs[run_count].script)
+                hb_script_t script = scripts[run->pos + j];
+                if (script == temp_runs[run_count].script)
                 {
-                    runs[run_count].len++;
-                    runs[run_count].pos = bidirun.pos + j;
+                    temp_runs[run_count].len++;
+                    temp_runs[run_count].pos = run->pos + j;
                 }
                 else
                 {
                     run_count++;
-                    runs[run_count].pos = bidirun.pos + j;
-                    runs[run_count].level = bidirun.level;
-                    runs[run_count].script = script;
-                    runs[run_count].len = 1;
+                    temp_runs[run_count].pos = run->pos + j;
+                    temp_runs[run_count].level = run->level;
+                    temp_runs[run_count].script = script;
+                    temp_runs[run_count].len = 1;
                 }
             }
         }
         run_count++;
     }
 
+  _raqm_free_runs (rq);
+  rq->runs = NULL;
+  last = rq->runs;
+  for (size_t i = 0; i < run_count; i++)
+  {
+    raqm_run_t *run = malloc (sizeof (raqm_run_t));
+    run->pos = temp_runs[i].pos;
+    run->len = temp_runs[i].len;
+    run->type = temp_runs[i].type;
+    run->level = temp_runs[i].level;
+
+    run->direction = temp_runs[i].direction;
+    run->script = temp_runs[i].script;
+    run->buffer = temp_runs[i].buffer;
+
+    if (last != NULL)
+      last->next = run;
+    run->next = NULL;
+    last = run;
+
+    if (rq->runs == NULL)
+      rq->runs = run;
+  }
+
 #ifdef RAQM_TESTING
-    RAQM_TEST ("Number of runs after script itemization: %d\n", run_count);
-    RAQM_TEST ("\n");
-    RAQM_TEST ("Final Runs:\n");
-    for (i = 0; i < run_count; ++i)
-    {
-        SCRIPT_TO_STRING (runs[i].script);
-        RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
-              i, runs[i].pos, runs[i].len, runs[i].level, buff);
-    }
-    RAQM_TEST ("\n");
+  run_index = 0;
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+      run_index++;
+  RAQM_TEST ("Number of runs after script itemization: %ld\n\n", run_index);
+
+  run_index = 0;
+  RAQM_TEST ("Final Runs:\n");
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    SCRIPT_TO_STRING (run->script);
+    RAQM_TEST ("run[%ld]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
+               run_index++, run->pos, run->len, run->level, buff);
+  }
+  RAQM_TEST ("\n");
 #endif
 
-out:
-
-    stack_free(script_stack);
-    free (scripts);
-    return run_count;
+  stack_free (script_stack);
+  free (scripts);
+  free (temp_runs);
+  return true;
 }
 
 /* Does the shaping for each run buffer */
@@ -830,10 +851,7 @@ raqm_shape_u32 (const uint32_t* text,
                 const char **features,
                 raqm_glyph_info_t** glyph_info)
 {
-    int i = 0;
     unsigned int index = 0;
-    int run_count;
-    int bidirun_count;
     unsigned int total_glyph_count = 0;
     unsigned int glyph_count;
     unsigned int postion_length;
@@ -841,8 +859,6 @@ raqm_shape_u32 (const uint32_t* text,
     hb_font_t* hb_font = NULL;
     hb_glyph_info_t* hb_glyph_info = NULL;
     hb_glyph_position_t* hb_glyph_position = NULL;
-    FriBidiRun* bidiruns = NULL;
-    raqm_run_t* runs = NULL;
     raqm_glyph_info_t* info = NULL;
     raqm_t *rq;
 
@@ -853,48 +869,19 @@ raqm_shape_u32 (const uint32_t* text,
     if (!raqm_layout (rq))
       goto out;
 
-    bidirun_count = 0;
-    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-    {
-      bidirun_count++;
-    }
-
-    bidiruns = (FriBidiRun*) malloc (sizeof (FriBidiRun) * (size_t)(bidirun_count));
-
-    bidirun_count = 0;
-    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-    {
-      bidiruns[bidirun_count].pos = run->pos;
-      bidiruns[bidirun_count].len = run->len;
-      bidiruns[bidirun_count].type = run->type;
-      bidiruns[bidirun_count].level = run->level;
-      bidirun_count++;
-    }
-
-    /* to get number of runs after script seperation */
-    run_count = itemize_by_script (bidirun_count, bidiruns, text, length, NULL);
-    runs = malloc (sizeof (raqm_run_t) * (size_t)run_count);
-
-    /* to populate runs_scripts array */
-    itemize_by_script (bidirun_count, bidiruns, text, length, runs);
-
     /* harfbuzz shaping */
     hb_font = hb_ft_font_create (face, NULL);
 
-    for (i = 0; i < run_count; i++)
+    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     {
         /* setting direction of current buffer */
-        runs[i].direction = HB_DIRECTION_LTR;
+        run->direction = HB_DIRECTION_LTR;
         if (direction == RAQM_DIRECTION_TTB)
-        {
-            runs[i].direction = HB_DIRECTION_TTB;
-        }
-        else if (FRIBIDI_LEVEL_IS_RTL (runs[i].level))
-        {
-            runs[i].direction = HB_DIRECTION_RTL;
-        }
-        harfbuzz_shape (text, length, hb_font, features, &runs[i]);
-        hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].buffer, &glyph_count);
+            run->direction = HB_DIRECTION_TTB;
+        else if (FRIBIDI_LEVEL_IS_RTL (run->level))
+            run->direction = HB_DIRECTION_RTL;
+        harfbuzz_shape (text, length, hb_font, features, run);
+        hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &glyph_count);
         total_glyph_count += glyph_count;
     }
 
@@ -902,26 +889,25 @@ raqm_shape_u32 (const uint32_t* text,
 
     RAQM_TEST ("Glyph information:\n");
 
-    for (i = 0; i < run_count; i++)
+    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     {
-        unsigned int j;
-        hb_glyph_info = hb_buffer_get_glyph_infos (runs[i].buffer, &glyph_count);
-        hb_glyph_position = hb_buffer_get_glyph_positions (runs[i].buffer, &postion_length);
+        hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &glyph_count);
+        hb_glyph_position = hb_buffer_get_glyph_positions (run->buffer, &postion_length);
 
-        for (j = 0; j < glyph_count; j++)
+        for (size_t i = 0; i < glyph_count; i++)
         {
-            info[index].index = hb_glyph_info[j].codepoint;
-            info[index].x_offset = hb_glyph_position[j].x_offset;
-            info[index].y_offset = hb_glyph_position[j].y_offset;
-            info[index].x_advance = hb_glyph_position[j].x_advance;
-            info[index].y_advance = hb_glyph_position[j].y_advance;
-            info[index].cluster = hb_glyph_info[j].cluster;
+            info[index].index = hb_glyph_info[i].codepoint;
+            info[index].x_offset = hb_glyph_position[i].x_offset;
+            info[index].y_offset = hb_glyph_position[i].y_offset;
+            info[index].x_advance = hb_glyph_position[i].x_advance;
+            info[index].y_advance = hb_glyph_position[i].y_advance;
+            info[index].cluster = hb_glyph_info[i].cluster;
             RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
                   info[index].index, info[index].x_offset,
                   info[index].y_offset, info[index].x_advance);
             index++;
         }
-        hb_buffer_destroy (runs[i].buffer);
+        hb_buffer_destroy (run->buffer);
     }
 
 out:
@@ -929,8 +915,6 @@ out:
     *glyph_info = info;
 
     hb_font_destroy (hb_font);
-    free (bidiruns);
-    free (runs);
     raqm_destroy (rq);
 
     return total_glyph_count;
