@@ -494,11 +494,11 @@ get_pair_index (const FriBidiChar firbidi_ch)
 static bool
 _raqm_itemize_script (raqm_t *rq)
 {
-    int last_script_index = -1;
-    int last_set_index = -1;
-    hb_script_t last_script_value = HB_SCRIPT_INVALID;
-    hb_script_t* scripts = NULL;
-    Stack* script_stack = NULL;
+  int last_script_index = -1;
+  int last_set_index = -1;
+  hb_script_t last_script_value = HB_SCRIPT_INVALID;
+  hb_script_t* scripts = NULL;
+  Stack* script_stack = NULL;
   size_t run_count;
   raqm_run_t *temp_runs;
   raqm_run_t *last;
@@ -506,11 +506,9 @@ _raqm_itemize_script (raqm_t *rq)
   size_t run_index;
 #endif
 
-    scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) rq->text_len);
-    for (size_t i = 0; i < rq->text_len; ++i)
-    {
-        scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), rq->text[i]);
-    }
+  scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) rq->text_len);
+  for (size_t i = 0; i < rq->text_len; ++i)
+    scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), rq->text[i]);
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Before script detection:\n");
@@ -522,64 +520,64 @@ _raqm_itemize_script (raqm_t *rq)
   RAQM_TEST ("\n");
 #endif
 
-    script_stack = stack_new ((size_t) rq->text_len);
-    for (int i = 0; i < (int) rq->text_len; ++i)
+  script_stack = stack_new ((size_t) rq->text_len);
+  for (int i = 0; i < (int) rq->text_len; ++i)
+  {
+    if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
     {
-        if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
+      int pair_index = get_pair_index (rq->text[i]);
+      if (pair_index >= 0)
+      {    /* is a paired character */
+        if (IS_OPEN (pair_index))
         {
-            int pair_index = get_pair_index (rq->text[i]);
-            if (pair_index >= 0)
-            {    /* is a paired character */
-                if (IS_OPEN (pair_index))
-                {
-                    scripts[i] = last_script_value;
-                    last_set_index = i;
-                    stack_push (script_stack, scripts[i], pair_index);
-                }
-                else
-                {        /* is a close paired character */
-                    int pi = pair_index & ~1; /* find matching opening (by getting the last even index for currnt odd index)*/
-                    while (STACK_IS_NOT_EMPTY (script_stack) &&
-                           script_stack->pair_index[script_stack->size] != pi)
-                    {
-                        stack_pop (script_stack);
-                    }
-                    if (STACK_IS_NOT_EMPTY (script_stack))
-                    {
-                        scripts[i] = stack_top (script_stack);
-                        last_script_value = scripts[i];
-                        last_set_index = i;
-                    }
-                    else
-                    {
-                        scripts[i] = last_script_value;
-                        last_set_index = i;
-                    }
-                }
-            }
-            else
-            {
-                scripts[i] = last_script_value;
-                last_set_index = i;
-            }
-        }
-        else if (scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
-        {
-            scripts[i] = last_script_value;
-            last_set_index = i;
+          scripts[i] = last_script_value;
+          last_set_index = i;
+          stack_push (script_stack, scripts[i], pair_index);
         }
         else
-        {
-            int j;
-            for (j = last_set_index + 1; j < i; ++j)
-            {
-                scripts[j] = scripts[i];
-            }
+        {    /* is a close paired character */
+          int pi = pair_index & ~1; /* find matching opening (by getting the last even index for currnt odd index)*/
+          while (STACK_IS_NOT_EMPTY (script_stack) &&
+                 script_stack->pair_index[script_stack->size] != pi)
+          {
+            stack_pop (script_stack);
+          }
+          if (STACK_IS_NOT_EMPTY (script_stack))
+          {
+            scripts[i] = stack_top (script_stack);
             last_script_value = scripts[i];
-            last_script_index = i;
             last_set_index = i;
+          }
+          else
+          {
+            scripts[i] = last_script_value;
+            last_set_index = i;
+          }
         }
+      }
+      else
+      {
+        scripts[i] = last_script_value;
+        last_set_index = i;
+      }
     }
+    else if (scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
+    {
+      scripts[i] = last_script_value;
+      last_set_index = i;
+    }
+    else
+    {
+      int j;
+      for (j = last_set_index + 1; j < i; ++j)
+      {
+        scripts[j] = scripts[i];
+      }
+      last_script_value = scripts[i];
+      last_script_index = i;
+      last_set_index = i;
+    }
+  }
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("After script detection:\n");
@@ -606,77 +604,75 @@ _raqm_itemize_script (raqm_t *rq)
 #endif
 
   /* TODO: rewrite the following code to not need the temp_runs array */
-    run_count = 0;
-    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-    {
-        hb_script_t last_script = scripts[run->pos];
+  run_count = 0;
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    hb_script_t last_script = scripts[run->pos];
+    run_count++;
+    for (int j = 0; j < run->len; j++) {
+      hb_script_t script = scripts[run->pos + j];
+      if (script != last_script)
         run_count++;
-        for (int j = 0; j < run->len; j++) {
-            hb_script_t script = scripts[run->pos + j];
-            if (script != last_script)
-            {
-                run_count++;
-            }
-            last_script = script;
-        }
+      last_script = script;
     }
+  }
 
-    /* By iterating through bidi runs, any detection of different scripts in the same run
-     * will split the run so that each run contains one script. Runs with odd levels but
-     * different scripts will need to be reordered to appear in the correct visual order */
-    temp_runs = malloc (sizeof (raqm_run_t) * run_count);
-    run_count = 0;
-    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  /* By iterating through bidi runs, any detection of different scripts in the same run
+   * will split the run so that each run contains one script. Runs with odd levels but
+   * different scripts will need to be reordered to appear in the correct visual order */
+  temp_runs = malloc (sizeof (raqm_run_t) * run_count);
+  run_count = 0;
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    int j;
+    temp_runs[run_count].level = run->level;
+    temp_runs[run_count].len = 0;
+
+    if (!FRIBIDI_LEVEL_IS_RTL (run->level))
     {
-        int j;
-        temp_runs[run_count].level = run->level;
-        temp_runs[run_count].len = 0;
-
-        if (!FRIBIDI_LEVEL_IS_RTL (run->level))
+      temp_runs[run_count].pos = run->pos;
+      temp_runs[run_count].script = scripts[run->pos];
+      for (j = 0; j < run->len; j++)
+      {
+        hb_script_t script = scripts[run->pos + j];
+        if (script == temp_runs[run_count].script)
         {
-            temp_runs[run_count].pos = run->pos;
-            temp_runs[run_count].script = scripts[run->pos];
-            for (j = 0; j < run->len; j++)
-            {
-                hb_script_t script = scripts[run->pos + j];
-                if (script == temp_runs[run_count].script)
-                {
-                    temp_runs[run_count].len++;
-                }
-                else
-                {
-                    run_count++;
-                    temp_runs[run_count].pos = run->pos + j;
-                    temp_runs[run_count].level = run->level;
-                    temp_runs[run_count].script = script;
-                    temp_runs[run_count].len = 1;
-                }
-            }
+          temp_runs[run_count].len++;
         }
         else
         {
-            temp_runs[run_count].pos = run->pos + run->len -1;
-            temp_runs[run_count].script = scripts[run->pos + run->len - 1];
-            for (j = run->len - 1; j >= 0; j--)
-            {
-                hb_script_t script = scripts[run->pos + j];
-                if (script == temp_runs[run_count].script)
-                {
-                    temp_runs[run_count].len++;
-                    temp_runs[run_count].pos = run->pos + j;
-                }
-                else
-                {
-                    run_count++;
-                    temp_runs[run_count].pos = run->pos + j;
-                    temp_runs[run_count].level = run->level;
-                    temp_runs[run_count].script = script;
-                    temp_runs[run_count].len = 1;
-                }
-            }
+          run_count++;
+          temp_runs[run_count].pos = run->pos + j;
+          temp_runs[run_count].level = run->level;
+          temp_runs[run_count].script = script;
+          temp_runs[run_count].len = 1;
         }
-        run_count++;
+      }
     }
+    else
+    {
+      temp_runs[run_count].pos = run->pos + run->len -1;
+      temp_runs[run_count].script = scripts[run->pos + run->len - 1];
+      for (j = run->len - 1; j >= 0; j--)
+      {
+        hb_script_t script = scripts[run->pos + j];
+        if (script == temp_runs[run_count].script)
+        {
+          temp_runs[run_count].len++;
+          temp_runs[run_count].pos = run->pos + j;
+        }
+        else
+        {
+          run_count++;
+          temp_runs[run_count].pos = run->pos + j;
+          temp_runs[run_count].level = run->level;
+          temp_runs[run_count].script = script;
+          temp_runs[run_count].len = 1;
+        }
+      }
+    }
+    run_count++;
+  }
 
   _raqm_free_runs (rq);
   rq->runs = NULL;
@@ -705,7 +701,7 @@ _raqm_itemize_script (raqm_t *rq)
 #ifdef RAQM_TESTING
   run_index = 0;
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-      run_index++;
+    run_index++;
   RAQM_TEST ("Number of runs after script itemization: %ld\n\n", run_index);
 
   run_index = 0;
@@ -722,6 +718,7 @@ _raqm_itemize_script (raqm_t *rq)
   stack_free (script_stack);
   free (scripts);
   free (temp_runs);
+
   return true;
 }
 
