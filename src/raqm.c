@@ -54,6 +54,9 @@
 # define RAQM_TEST(...)
 #endif
 
+/* FIXME: fix multi-font support */
+/* #define RAQM_MULTI_FONT */
+
 typedef struct _raqm_run raqm_run_t;
 
 struct _raqm {
@@ -65,8 +68,14 @@ struct _raqm {
   raqm_direction_t base_dir;
 
   hb_script_t *scripts;
+#ifdef RAQM_MULTI_FONT
+  hb_font_t **fonts;
+#else
+  hb_font_t *font;
+#endif
 
   raqm_run_t *runs;
+
 };
 
 struct _raqm_run
@@ -76,6 +85,7 @@ struct _raqm_run
 
   hb_direction_t direction;
   hb_script_t script;
+  hb_font_t *font;
   hb_buffer_t *buffer;
 
   raqm_run_t *next;
@@ -108,6 +118,12 @@ raqm_create (void)
   rq->base_dir = RAQM_DIRECTION_DEFAULT;
 
   rq->scripts = NULL;
+
+#ifdef RAQM_MULTI_FONT
+  rq->fonts = NULL;
+#else
+  rq->font = NULL;
+#endif
 
   rq->runs = NULL;
 
@@ -147,6 +163,21 @@ _raqm_free_runs (raqm_t *rq)
   }
 }
 
+#ifdef RAQM_MULTI_FONT
+static void
+_raqm_free_fonts (raqm_t *rq)
+{
+  if (rq->fonts == NULL)
+    return;
+
+  for (size_t i = 0; i < rq->text_len; i++)
+  {
+    if (rq->fonts[i] != NULL)
+      hb_font_destroy (rq->fonts[i]);
+  }
+}
+#endif
+
 /**
  * raqm_destroy:
  * @rq: a #raqm_t.
@@ -165,6 +196,12 @@ raqm_destroy (raqm_t *rq)
 
   free (rq->text);
   free (rq->scripts);
+#ifdef RAQM_MULTI_FONT
+  _raqm_free_fonts (rq);
+  free (rq->fonts);
+#else
+  hb_font_destroy (rq->font);
+#endif
   _raqm_free_runs (rq);
   free (rq);
 }
@@ -232,6 +269,54 @@ raqm_set_par_direction (raqm_t          *rq,
     return;
 
   rq->base_dir = dir;
+}
+
+/**
+ * raqm_set_freetype_face:
+ * @rq: a #raqm_t.
+ * @face: an #FT_Face.
+ * @start: index of first character that should use @face.
+ * @len: number of characters using @face.
+ *
+ * Sets an #FT_Face to be used for @len-number of characters staring at @start.
+ *
+ * This method can be used repeatedly to set different faces for different
+ * parts of the text. It is the responsibility of the client to make sure that
+ * face ranges cover the whole text.
+ *
+ * Since: 0.1
+ */
+void
+raqm_set_freetype_face (raqm_t *rq,
+                        FT_Face face,
+                        size_t  start,
+                        size_t  len)
+{
+  if (rq == NULL || rq->text_len == 0 || start >= rq->text_len)
+    return;
+
+  if (start + len > rq->text_len)
+    len = rq->text_len - start;
+
+#ifdef RAQM_MULTI_FONT
+  if (rq->fonts == NULL)
+    rq->fonts = calloc (sizeof (intptr_t), rq->text_len);
+
+  for (size_t i = 0; i < len; i++)
+  {
+    if (rq->fonts[start + i] != NULL)
+      hb_font_destroy (rq->fonts[start + i]);
+    rq->fonts[start + i] = hb_ft_font_create_referenced (face);
+  }
+#else
+  if (rq->font != NULL)
+    hb_font_destroy (rq->font);
+#ifdef HAVE_HB_FT_FONT_CREATE_REFERENCED
+  rq->font = hb_ft_font_create_referenced (face);
+#else
+  rq->font = hb_ft_font_create (face, NULL);
+#endif /* HAVE_HB_FT_FONT_CREATE_REFERENCED */
+#endif /* RAQM_MULTI_FONT */
 }
 
 static bool
@@ -820,6 +905,8 @@ raqm_shape_u32 (const uint32_t* text,
     rq = raqm_create ();
     raqm_add_text (rq, text, length);
     raqm_set_par_direction (rq, direction);
+    raqm_set_freetype_face (rq, face, 0, length);
+    raqm_set_freetype_face (rq, face, 0, length);
 
     if (!raqm_layout (rq))
       goto out;

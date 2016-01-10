@@ -24,7 +24,14 @@ AX_PKG_CHECK_MODULES(HARFBUZZ, [], harfbuzz)
 AX_PKG_CHECK_MODULES(FRIBIDI, [], fribidi)
 PKG_CHECK_MODULES(GLIB, glib-2.0, have_glib=true, have_glib=false)
 
-AC_CHECK_FUNC(fribidi_reorder_runs, AC_DEFINE([HAVE_FRIBIDI_REORDER_RUNS], 1, [Have fribidi_reorder_runs]), [])
+_save_libs="$LIBS"
+_save_cflags="$CFLAGS"
+LIBS="$LIBS $HARFBUZZ_LIBS $FRIBIDI_LIBS"
+CFLAGS="$CFLAGS $HARFBUZZ_CFLAGS $FRIBIDI_CFLAGS"
+AC_CHECK_FUNC(fribidi_reorder_runs)
+AC_CHECK_FUNC(hb_ft_font_create_referenced)
+LIBS="$_save_libs"
+CFLAGS="$_save_cflags"
 
 AM_CONDITIONAL(HAVE_GLIB, $have_glib)
 

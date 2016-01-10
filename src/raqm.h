@@ -83,6 +83,12 @@ void
 raqm_set_par_direction (raqm_t          *rq,
                         raqm_direction_t dir);
 
+void
+raqm_set_freetype_face (raqm_t *rq,
+                        FT_Face face,
+                        size_t  start,
+                        size_t  len);
+
 bool
 raqm_layout (raqm_t *rq);
 
