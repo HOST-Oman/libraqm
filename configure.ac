@@ -10,10 +10,11 @@ AM_SILENT_RULES([yes])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4])
 
+AC_PROG_CC
+AC_PROG_CC_C99
+
 # Enable compiler warnings
 AX_COMPILER_FLAGS
-
-AC_PROG_CC
 
 LT_INIT
 
