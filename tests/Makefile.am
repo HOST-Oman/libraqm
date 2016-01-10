@@ -30,25 +30,25 @@ TEST_FILES = \
     features-arabic.test \
     features-kerning.test \
     features-ligature.test \
+    scripts-backward.test \
+    scripts-backward-ltr.test \
+    scripts-backward-rtl.test \
     xyoffset.test \
     test1.test \
     test2.test \
     test3.test \
     test4.test \
     test5.test \
-    test6.test \
     test1_LTR.test \
     test2_LTR.test \
     test3_LTR.test \
     test4_LTR.test \
     test5_LTR.test \
-    test6_LTR.test \
     test1_RTL.test \
     test2_RTL.test \
     test3_RTL.test \
     test4_RTL.test \
     test5_RTL.test \
-    test6_RTL.test \
     $(NULL)
 
 if HAVE_GLIB
