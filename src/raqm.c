@@ -64,6 +64,8 @@ struct _raqm {
 
   raqm_direction_t base_dir;
 
+  hb_script_t *scripts;
+
   raqm_run_t *runs;
 };
 
@@ -106,6 +108,8 @@ raqm_create (void)
   rq->text_len = 0;
 
   rq->base_dir = RAQM_DIRECTION_DEFAULT;
+
+  rq->scripts = NULL;
 
   rq->runs = NULL;
 
@@ -162,6 +166,7 @@ raqm_destroy (raqm_t *rq)
     return;
 
   free (rq->text);
+  free (rq->scripts);
   _raqm_free_runs (rq);
   free (rq);
 }
@@ -232,10 +237,7 @@ raqm_set_par_direction (raqm_t          *rq,
 }
 
 static bool
-_raqm_itemize_bidi (raqm_t *rq);
-
-static bool
-_raqm_itemize_script (raqm_t *rq);
+_raqm_itemize (raqm_t *rq);
 
 /**
  * raqm_layout:
@@ -256,17 +258,17 @@ raqm_layout (raqm_t *rq)
   if (rq == NULL || rq->text_len == 0)
     return false;
 
-  if (!_raqm_itemize_bidi (rq))
-    return false;
-
-  if (!_raqm_itemize_script (rq))
+  if (!_raqm_itemize (rq))
     return false;
 
   return true;
 }
 
 static bool
-_raqm_itemize_bidi (raqm_t *rq)
+_raqm_resolve_scripts (raqm_t *rq);
+
+static bool
+_raqm_itemize (raqm_t *rq)
 {
   FriBidiParType par_type = FRIBIDI_PAR_ON;
   FriBidiCharType *types = NULL;
@@ -330,27 +332,104 @@ _raqm_itemize_bidi (raqm_t *rq)
   runs = malloc (sizeof (FriBidiRun) * (size_t)run_count);
   run_count = fribidi_reorder_runs (types, rq->text_len, par_type, levels, runs);
 
-  last = rq->runs;
+  if (!_raqm_resolve_scripts (rq))
+  {
+    ok = false;
+    goto out;
+  }
+
+#ifdef RAQM_TESTING
+  RAQM_TEST ("Number of runs before script itemization: %d\n\n", run_count);
+
+  RAQM_TEST ("Fribidi Runs:\n");
   for (int i = 0; i < run_count; i++)
   {
-    raqm_run_t *run = malloc (sizeof (raqm_run_t));
-    run->pos = runs[i].pos;
-    run->len = runs[i].len;
-    run->type = runs[i].type;
-    run->level = runs[i].level;
+    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
+               i, runs[i].pos, runs[i].len, runs[i].level);
+  }
+  RAQM_TEST ("\n");
+#endif
 
-    run->direction = HB_DIRECTION_INVALID;
-    run->script = HB_SCRIPT_INVALID;
-    run->buffer = NULL;
-
-    if (last != NULL)
-      last->next = run;
-    run->next = NULL;
-    last = run;
+  last = NULL;
+  for (int i = 0; i < run_count; i++)
+  {
+    raqm_run_t *run = calloc (1, sizeof (raqm_run_t));
 
     if (rq->runs == NULL)
       rq->runs = run;
+
+    if (last != NULL)
+      last->next = run;
+
+    run->level = runs[i].level;
+
+    if (FRIBIDI_LEVEL_IS_RTL (run->level))
+    {
+      run->pos = runs[i].pos + runs[i].len - 1;
+      run->script = rq->scripts[run->pos];
+      for (int j = runs[i].len - 1; j >= 0; j--)
+      {
+        hb_script_t script = rq->scripts[runs[i].pos + j];
+        if (script != run->script)
+        {
+          raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
+          newrun->pos = runs[i].pos + j;
+          newrun->len = 1;
+          newrun->level = runs[i].level;
+          newrun->script = script;
+          run->next = newrun;
+          run = newrun;
+        }
+        else
+        {
+          run->len++;
+          run->pos = runs[i].pos + j;
+        }
+      }
+    }
+    else
+    {
+      run->pos = runs[i].pos;
+      run->script = rq->scripts[run->pos];
+      for (int j = 0; j < runs[i].len; j++)
+      {
+        hb_script_t script = rq->scripts[runs[i].pos + j];
+        if (script != run->script)
+        {
+          raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
+          newrun->pos = runs[i].pos + j;
+          newrun->len = 1;
+          newrun->level = runs[i].level;
+          newrun->script = script;
+          run->next = newrun;
+          run = newrun;
+        }
+        else
+          run->len++;
+      }
+    }
+
+    last = run;
   }
+
+  last->next = NULL;
+
+#ifdef RAQM_TESTING
+  run_count = 0;
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+    run_count++;
+  RAQM_TEST ("Number of runs after script itemization: %d\n\n", run_count);
+
+  run_count = 0;
+  RAQM_TEST ("Final Runs:\n");
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    SCRIPT_TO_STRING (run->script);
+    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
+               run_count++, run->pos, run->len, run->level, buff);
+  }
+  RAQM_TEST ("\n");
+#endif
 
 out:
   free (levels);
@@ -491,24 +570,26 @@ get_pair_index (const FriBidiChar firbidi_ch)
  * except paired characters which we try to make them use the same script. We
  * then split the BiDi runs, if necessary, on script boundaries.
  */
-static hb_script_t *
+static bool
 _raqm_resolve_scripts (raqm_t *rq)
 {
-  hb_script_t* scripts = NULL;
   int last_script_index = -1;
   int last_set_index = -1;
   hb_script_t last_script_value = HB_SCRIPT_INVALID;
   Stack* stack = NULL;
 
-  scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) rq->text_len);
+  if (rq->scripts != NULL)
+    return true;
+
+  rq->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) rq->text_len);
   for (size_t i = 0; i < rq->text_len; ++i)
-    scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), rq->text[i]);
+    rq->scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), rq->text[i]);
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Before script detection:\n");
   for (size_t i = 0; i < rq->text_len; ++i)
   {
-    SCRIPT_TO_STRING (scripts[i]);
+    SCRIPT_TO_STRING (rq->scripts[i]);
     RAQM_TEST ("script for ch[%ld]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
@@ -517,16 +598,16 @@ _raqm_resolve_scripts (raqm_t *rq)
   stack = stack_new ((size_t) rq->text_len);
   for (int i = 0; i < (int) rq->text_len; ++i)
   {
-    if (scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
+    if (rq->scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
     {
       int pair_index = get_pair_index (rq->text[i]);
       if (pair_index >= 0)
       {    /* is a paired character */
         if (IS_OPEN (pair_index))
         {
-          scripts[i] = last_script_value;
+          rq->scripts[i] = last_script_value;
           last_set_index = i;
-          stack_push (stack, scripts[i], pair_index);
+          stack_push (stack, rq->scripts[i], pair_index);
         }
         else
         {    /* is a close paired character */
@@ -538,26 +619,26 @@ _raqm_resolve_scripts (raqm_t *rq)
           }
           if (STACK_IS_NOT_EMPTY (stack))
           {
-            scripts[i] = stack_top (stack);
-            last_script_value = scripts[i];
+            rq->scripts[i] = stack_top (stack);
+            last_script_value = rq->scripts[i];
             last_set_index = i;
           }
           else
           {
-            scripts[i] = last_script_value;
+            rq->scripts[i] = last_script_value;
             last_set_index = i;
           }
         }
       }
       else
       {
-        scripts[i] = last_script_value;
+        rq->scripts[i] = last_script_value;
         last_set_index = i;
       }
     }
-    else if (scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
+    else if (rq->scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
     {
-      scripts[i] = last_script_value;
+      rq->scripts[i] = last_script_value;
       last_set_index = i;
     }
     else
@@ -565,9 +646,9 @@ _raqm_resolve_scripts (raqm_t *rq)
       int j;
       for (j = last_set_index + 1; j < i; ++j)
       {
-        scripts[j] = scripts[i];
+        rq->scripts[j] = rq->scripts[i];
       }
-      last_script_value = scripts[i];
+      last_script_value = rq->scripts[i];
       last_script_index = i;
       last_set_index = i;
     }
@@ -577,160 +658,13 @@ _raqm_resolve_scripts (raqm_t *rq)
   RAQM_TEST ("After script detection:\n");
   for (size_t i = 0; i < rq->text_len; ++i)
   {
-    SCRIPT_TO_STRING (scripts[i]);
+    SCRIPT_TO_STRING (rq->scripts[i]);
     RAQM_TEST ("script for ch[%ld]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
 #endif
 
   stack_free (stack);
-
-  return scripts;
-}
-
-static bool
-_raqm_itemize_script (raqm_t *rq)
-{
-  hb_script_t* scripts = NULL;
-  size_t run_count;
-  raqm_run_t *temp_runs;
-  raqm_run_t *last;
-#ifdef RAQM_TESTING
-  size_t run_index;
-#endif
-
-  scripts = _raqm_resolve_scripts (rq);
-
-#ifdef RAQM_TESTING
-  run_index = 0;
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-    run_index++;
-  RAQM_TEST ("Number of runs before script itemization: %ld\n\n", run_index);
-
-  run_index = 0;
-  RAQM_TEST ("Fribidi Runs:\n");
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-  {
-    RAQM_TEST ("run[%ld]:\t start: %d\tlength: %d\tlevel: %d\n",
-               run_index++, run->pos, run->len, run->level);
-  }
-  RAQM_TEST ("\n");
-#endif
-
-  /* TODO: rewrite the following code to not need the temp_runs array */
-  run_count = 0;
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-  {
-    hb_script_t last_script = scripts[run->pos];
-    run_count++;
-    for (int j = 0; j < run->len; j++) {
-      hb_script_t script = scripts[run->pos + j];
-      if (script != last_script)
-        run_count++;
-      last_script = script;
-    }
-  }
-
-  /* By iterating through bidi runs, any detection of different scripts in the same run
-   * will split the run so that each run contains one script. Runs with odd levels but
-   * different scripts will need to be reordered to appear in the correct visual order */
-  temp_runs = malloc (sizeof (raqm_run_t) * run_count);
-  run_count = 0;
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-  {
-    int j;
-    temp_runs[run_count].level = run->level;
-    temp_runs[run_count].len = 0;
-
-    if (!FRIBIDI_LEVEL_IS_RTL (run->level))
-    {
-      temp_runs[run_count].pos = run->pos;
-      temp_runs[run_count].script = scripts[run->pos];
-      for (j = 0; j < run->len; j++)
-      {
-        hb_script_t script = scripts[run->pos + j];
-        if (script == temp_runs[run_count].script)
-        {
-          temp_runs[run_count].len++;
-        }
-        else
-        {
-          run_count++;
-          temp_runs[run_count].pos = run->pos + j;
-          temp_runs[run_count].level = run->level;
-          temp_runs[run_count].script = script;
-          temp_runs[run_count].len = 1;
-        }
-      }
-    }
-    else
-    {
-      temp_runs[run_count].pos = run->pos + run->len -1;
-      temp_runs[run_count].script = scripts[run->pos + run->len - 1];
-      for (j = run->len - 1; j >= 0; j--)
-      {
-        hb_script_t script = scripts[run->pos + j];
-        if (script == temp_runs[run_count].script)
-        {
-          temp_runs[run_count].len++;
-          temp_runs[run_count].pos = run->pos + j;
-        }
-        else
-        {
-          run_count++;
-          temp_runs[run_count].pos = run->pos + j;
-          temp_runs[run_count].level = run->level;
-          temp_runs[run_count].script = script;
-          temp_runs[run_count].len = 1;
-        }
-      }
-    }
-    run_count++;
-  }
-
-  _raqm_free_runs (rq);
-  rq->runs = NULL;
-  last = rq->runs;
-  for (size_t i = 0; i < run_count; i++)
-  {
-    raqm_run_t *run = malloc (sizeof (raqm_run_t));
-    run->pos = temp_runs[i].pos;
-    run->len = temp_runs[i].len;
-    run->type = temp_runs[i].type;
-    run->level = temp_runs[i].level;
-
-    run->direction = temp_runs[i].direction;
-    run->script = temp_runs[i].script;
-    run->buffer = temp_runs[i].buffer;
-
-    if (last != NULL)
-      last->next = run;
-    run->next = NULL;
-    last = run;
-
-    if (rq->runs == NULL)
-      rq->runs = run;
-  }
-
-#ifdef RAQM_TESTING
-  run_index = 0;
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-    run_index++;
-  RAQM_TEST ("Number of runs after script itemization: %ld\n\n", run_index);
-
-  run_index = 0;
-  RAQM_TEST ("Final Runs:\n");
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-  {
-    SCRIPT_TO_STRING (run->script);
-    RAQM_TEST ("run[%ld]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
-               run_index++, run->pos, run->len, run->level, buff);
-  }
-  RAQM_TEST ("\n");
-#endif
-
-  free (scripts);
-  free (temp_runs);
 
   return true;
 }
