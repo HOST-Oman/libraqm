@@ -14,6 +14,6 @@ do
 	echo "$font" >> $filename
 	echo "$text" >> $filename
 	echo "$opts" >> $filename
-	$testtool $opts $font "$text" >> $filename
+	$testtool --text="$text" $opts $font >> $filename
 
 done

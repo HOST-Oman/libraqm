@@ -33,6 +33,9 @@ TEST_FILES = \
     scripts-backward.test \
     scripts-backward-ltr.test \
     scripts-backward-rtl.test \
+    scripts-forward.test \
+    scripts-forward-ltr.test \
+    scripts-forward-rtl.test \
     xyoffset.test \
     test1.test \
     test2.test \
