@@ -73,8 +73,6 @@ struct _raqm_run
 {
   FriBidiStrIndex pos;
   FriBidiStrIndex len;
-  FriBidiCharType type;
-  FriBidiLevel level;
 
   hb_direction_t direction;
   hb_script_t script;
@@ -267,6 +265,19 @@ raqm_layout (raqm_t *rq)
 static bool
 _raqm_resolve_scripts (raqm_t *rq);
 
+static hb_direction_t
+_raqm_hb_dir (raqm_t *rq, FriBidiLevel level)
+{
+  hb_direction_t dir = HB_DIRECTION_LTR;
+
+  if (rq->base_dir == RAQM_DIRECTION_TTB)
+      dir = HB_DIRECTION_TTB;
+  else if (FRIBIDI_LEVEL_IS_RTL (level))
+      dir = HB_DIRECTION_RTL;
+
+  return dir;
+}
+
 static bool
 _raqm_itemize (raqm_t *rq)
 {
@@ -361,9 +372,9 @@ _raqm_itemize (raqm_t *rq)
     if (last != NULL)
       last->next = run;
 
-    run->level = runs[i].level;
+    run->direction = _raqm_hb_dir (rq, runs[i].level);
 
-    if (FRIBIDI_LEVEL_IS_RTL (run->level))
+    if (HB_DIRECTION_IS_BACKWARD (run->direction))
     {
       run->pos = runs[i].pos + runs[i].len - 1;
       run->script = rq->scripts[run->pos];
@@ -375,7 +386,7 @@ _raqm_itemize (raqm_t *rq)
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
-          newrun->level = runs[i].level;
+          newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = script;
           run->next = newrun;
           run = newrun;
@@ -399,7 +410,7 @@ _raqm_itemize (raqm_t *rq)
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
-          newrun->level = runs[i].level;
+          newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = script;
           run->next = newrun;
           run = newrun;
@@ -425,8 +436,8 @@ _raqm_itemize (raqm_t *rq)
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
     SCRIPT_TO_STRING (run->script);
-    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\tscript: %s\n",
-               run_count++, run->pos, run->len, run->level, buff);
+    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\n",
+               run_count++, run->pos, run->len, hb_direction_to_string (run->direction), buff);
   }
   RAQM_TEST ("\n");
 #endif
@@ -818,12 +829,6 @@ raqm_shape_u32 (const uint32_t* text,
 
     for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     {
-        /* setting direction of current buffer */
-        run->direction = HB_DIRECTION_LTR;
-        if (direction == RAQM_DIRECTION_TTB)
-            run->direction = HB_DIRECTION_TTB;
-        else if (FRIBIDI_LEVEL_IS_RTL (run->level))
-            run->direction = HB_DIRECTION_RTL;
         harfbuzz_shape (text, length, hb_font, features, run);
         hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &glyph_count);
         total_glyph_count += glyph_count;

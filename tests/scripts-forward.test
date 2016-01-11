@@ -48,11 +48,11 @@ run[0]:	 start: 0	length: 16	level: 0
 Number of runs after script itemization: 5
 
 Final Runs:
-run[0]:	 start: 0	length: 6	level: 0	script: Latn
-run[1]:	 start: 6	length: 3	level: 0	script: Grek
-run[2]:	 start: 9	length: 2	level: 0	script: Latn
-run[3]:	 start: 11	length: 1	level: 0	script: Grek
-run[4]:	 start: 12	length: 4	level: 0	script: Cyrl
+run[0]:	 start: 0	length: 6	direction: ltr	script: Latn
+run[1]:	 start: 6	length: 3	direction: ltr	script: Grek
+run[2]:	 start: 9	length: 2	direction: ltr	script: Latn
+run[3]:	 start: 11	length: 1	direction: ltr	script: Grek
+run[4]:	 start: 12	length: 4	direction: ltr	script: Cyrl
 
 Glyph information:
 glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229

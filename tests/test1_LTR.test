@@ -56,11 +56,11 @@ run[2]:	 start: 15	length: 4	level: 1
 Number of runs after script itemization: 5
 
 Final Runs:
-run[0]:	 start: 0	length: 4	level: 1	script: Arab
-run[1]:	 start: 4	length: 1	level: 0	script: Arab
-run[2]:	 start: 5	length: 8	level: 0	script: Latn
-run[3]:	 start: 13	length: 2	level: 0	script: Arab
-run[4]:	 start: 15	length: 4	level: 1	script: Arab
+run[0]:	 start: 0	length: 4	direction: rtl	script: Arab
+run[1]:	 start: 4	length: 1	direction: ltr	script: Arab
+run[2]:	 start: 5	length: 8	direction: ltr	script: Latn
+run[3]:	 start: 13	length: 2	direction: ltr	script: Arab
+run[4]:	 start: 15	length: 4	direction: rtl	script: Arab
 
 Glyph information:
 glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 975

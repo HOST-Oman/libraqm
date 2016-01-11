@@ -46,7 +46,7 @@ run[0]:	 start: 0	length: 15	level: 0
 Number of runs after script itemization: 1
 
 Final Runs:
-run[0]:	 start: 0	length: 15	level: 0	script: Latn
+run[0]:	 start: 0	length: 15	direction: ltr	script: Latn
 
 Glyph information:
 glyph [73]	x_offset: 0	y_offset: 0	x_advance: 616

@@ -88,15 +88,15 @@ run[2]:	 start: 30	length: 5	level: 1
 Number of runs after script itemization: 9
 
 Final Runs:
-run[0]:	 start: 16	length: 2	level: 1	script: Arab
-run[1]:	 start: 12	length: 4	level: 1	script: Hebr
-run[2]:	 start: 9	length: 3	level: 1	script: Arab
-run[3]:	 start: 4	length: 5	level: 1	script: Hebr
-run[4]:	 start: 0	length: 4	level: 1	script: Arab
-run[5]:	 start: 18	length: 2	level: 0	script: Arab
-run[6]:	 start: 20	length: 8	level: 0	script: Latn
-run[7]:	 start: 28	length: 2	level: 0	script: Arab
-run[8]:	 start: 30	length: 5	level: 1	script: Arab
+run[0]:	 start: 16	length: 2	direction: rtl	script: Arab
+run[1]:	 start: 12	length: 4	direction: rtl	script: Hebr
+run[2]:	 start: 9	length: 3	direction: rtl	script: Arab
+run[3]:	 start: 4	length: 5	direction: rtl	script: Hebr
+run[4]:	 start: 0	length: 4	direction: rtl	script: Arab
+run[5]:	 start: 18	length: 2	direction: ltr	script: Arab
+run[6]:	 start: 20	length: 8	direction: ltr	script: Latn
+run[7]:	 start: 28	length: 2	direction: ltr	script: Arab
+run[8]:	 start: 30	length: 5	direction: rtl	script: Arab
 
 Glyph information:
 glyph [49]	x_offset: 0	y_offset: 0	x_advance: 1363

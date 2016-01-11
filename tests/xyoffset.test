@@ -22,7 +22,7 @@ run[0]:	 start: 0	length: 3	level: 1
 Number of runs after script itemization: 1
 
 Final Runs:
-run[0]:	 start: 0	length: 3	level: 1	script: Arab
+run[0]:	 start: 0	length: 3	direction: rtl	script: Arab
 
 Glyph information:
 glyph [4]	x_offset: 783	y_offset: 50	x_advance: 0
