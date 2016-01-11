@@ -8,6 +8,10 @@ libraqm_la_SOURCES = \
     raqm.h \
     $(NULL)
 
+include_HEADERS = \
+    raqm.h \
+    $(NULL)
+
 libraqm_la_LIBADD = \
     $(FREETYPE_LIBS) \
     $(HARFBUZZ_LIBS) \
