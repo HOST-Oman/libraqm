@@ -28,6 +28,7 @@
 #include "config.h"
 #endif
 
+#include <assert.h>
 #include <string.h>
 
 #include <hb.h>
@@ -372,6 +373,9 @@ raqm_set_freetype_face (raqm_t *rq,
 static bool
 _raqm_itemize (raqm_t *rq);
 
+static bool
+_raqm_shape (raqm_t *rq);
+
 /**
  * raqm_layout:
  * @rq: a #raqm_t.
@@ -392,6 +396,9 @@ raqm_layout (raqm_t *rq)
     return false;
 
   if (!_raqm_itemize (rq))
+    return false;
+
+  if (!_raqm_shape (rq))
     return false;
 
   return true;
@@ -815,57 +822,21 @@ _raqm_resolve_scripts (raqm_t *rq)
   return true;
 }
 
-/* Does the shaping for each run buffer */
-static void
-harfbuzz_shape (const FriBidiChar* unicode_str,
-                FriBidiStrIndex length,
-                hb_font_t* hb_font,
-                const char** featurelist,
-                raqm_run_t* run)
+static bool
+_raqm_shape (raqm_t *rq)
 {
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
     run->buffer = hb_buffer_create ();
 
-    /* adding text to current buffer */
-    hb_buffer_add_utf32 (run->buffer, unicode_str, length, (unsigned int)(run->pos), run->len);
-
-    /* setting script of current buffer */
+    hb_buffer_add_utf32 (run->buffer, rq->text, rq->text_len, run->pos, run->len);
     hb_buffer_set_script (run->buffer, run->script);
-
-    /* setting language of current buffer */
     hb_buffer_set_language (run->buffer, hb_language_get_default ());
-
-    /* setting direction of current buffer */
     hb_buffer_set_direction (run->buffer, run->direction);
+    hb_shape_full (rq->font, run->buffer, rq->features, rq->features_len, NULL);
+  }
 
-    /* shaping current buffer */
-    if (featurelist)
-    {
-        unsigned int count = 0;
-        const char** p;
-        hb_feature_t* features = NULL;
-
-        for (p = featurelist; *p; p++)
-        {
-            count++;
-        }
-
-        features = (hb_feature_t *) malloc (sizeof (hb_feature_t) * count);
-
-        count = 0;
-        for (p = featurelist; *p; p++)
-        {
-            hb_bool_t success =  hb_feature_from_string (*p, -1, &features[count]);
-            if (success)
-            {
-                count++;
-            }
-        }
-        hb_shape_full (hb_font, run->buffer, features, count, NULL);
-    }
-    else
-    {
-        hb_shape (hb_font, run->buffer, NULL, 0);
-    }
+  return true;
 }
 
 /* convert index from UTF-32 to UTF-8 */
@@ -941,12 +912,9 @@ raqm_shape_u32 (const uint32_t* text,
                 const char **features,
                 raqm_glyph_info_t** glyph_info)
 {
-    unsigned int index = 0;
-    unsigned int total_glyph_count = 0;
-    unsigned int glyph_count;
-    unsigned int postion_length;
+    unsigned int index;
+    unsigned int glyph_count = 0;
 
-    hb_font_t* hb_font = NULL;
     hb_glyph_info_t* hb_glyph_info = NULL;
     hb_glyph_position_t* hb_glyph_position = NULL;
     raqm_glyph_info_t* info = NULL;
@@ -958,29 +926,40 @@ raqm_shape_u32 (const uint32_t* text,
     raqm_set_freetype_face (rq, face, 0, length);
     raqm_set_freetype_face (rq, face, 0, length);
 
+    if (features)
+    {
+        size_t count = 0;
+        for (const char **p = features; *p; p++)
+            count++;
+        raqm_add_font_features (rq, features, count);
+    }
+
     if (!raqm_layout (rq))
       goto out;
 
-    /* harfbuzz shaping */
-    hb_font = hb_ft_font_create (face, NULL);
-
     for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     {
-        harfbuzz_shape (text, length, hb_font, features, run);
-        hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &glyph_count);
-        total_glyph_count += glyph_count;
+        unsigned int count;
+        hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &count);
+        glyph_count += count;
     }
 
-    info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (total_glyph_count));
+    info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (glyph_count));
 
     RAQM_TEST ("Glyph information:\n");
 
+    index = 0;
     for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     {
-        hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &glyph_count);
-        hb_glyph_position = hb_buffer_get_glyph_positions (run->buffer, &postion_length);
+        unsigned int count;
+        unsigned int postion_count;
 
-        for (size_t i = 0; i < glyph_count; i++)
+        hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &count);
+        hb_glyph_position = hb_buffer_get_glyph_positions (run->buffer, &postion_count);
+
+        assert (count == postion_count);
+
+        for (size_t i = 0; i < count; i++)
         {
             info[index].index = hb_glyph_info[i].codepoint;
             info[index].x_offset = hb_glyph_position[i].x_offset;
@@ -1000,8 +979,7 @@ out:
 
     *glyph_info = info;
 
-    hb_font_destroy (hb_font);
     raqm_destroy (rq);
 
-    return total_glyph_count;
+    return glyph_count;
 }
