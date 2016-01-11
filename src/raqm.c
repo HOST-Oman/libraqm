@@ -67,6 +67,9 @@ struct _raqm {
 
   raqm_direction_t base_dir;
 
+  hb_feature_t *features;
+  size_t features_len;
+
   hb_script_t *scripts;
 #ifdef RAQM_MULTI_FONT
   hb_font_t **fonts;
@@ -116,6 +119,9 @@ raqm_create (void)
   rq->text_len = 0;
 
   rq->base_dir = RAQM_DIRECTION_DEFAULT;
+
+  rq->features = NULL;
+  rq->features_len = 0;
 
   rq->scripts = NULL;
 
@@ -269,6 +275,50 @@ raqm_set_par_direction (raqm_t          *rq,
     return;
 
   rq->base_dir = dir;
+}
+
+/**
+ * raqm_add_font_features:
+ * @rq: a #raqm_t.
+ * @features: an array of %NULL-terminated font feature strings.
+ * @count: the number of elements in @features array.
+ *
+ * Sets the font features used by the #raqm_t during text layout. This is
+ * usually used to turn on optional font features that are not enabled by
+ * default, for example `dlig` or `ss01`, but can be also used to turn off
+ * default font features.
+ *
+ * @features is an array of strings each for controlling a single feature, in
+ * the syntax understood by hb_feature_from_string().
+ *
+ * This function can be called repeatedly, new features will be appended to th
+ * end of the features list and can potentially override previous features.
+ *
+ * Return value:
+ * Number of successfully parsed features.
+ *
+ * Since: 0.1
+ */
+size_t
+raqm_add_font_features (raqm_t      *rq,
+                        const char **features,
+                        size_t       count)
+{
+  size_t old_len = rq->features_len;
+
+  rq->features = realloc (rq->features,
+                          sizeof (hb_feature_t) * (rq->features_len + count));
+
+  for (size_t i = 0; i < count; i++)
+  {
+    hb_bool_t ok;
+    ok = hb_feature_from_string (features[i], -1,
+                                 &rq->features[rq->features_len]);
+    if (ok)
+      rq->features_len++;
+  }
+
+  return rq->features_len - old_len;
 }
 
 /**
