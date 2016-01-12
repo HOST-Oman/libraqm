@@ -218,7 +218,7 @@ raqm_destroy (raqm_t *rq)
 }
 
 /**
- * raqm_add_text:
+ * raqm_set_text:
  * @rq: a #raqm_t.
  * @text: a UTF-32 encoded text string.
  * @len: the length of @text.
@@ -231,12 +231,14 @@ raqm_destroy (raqm_t *rq)
  * Since: 0.1
  */
 void
-raqm_add_text (raqm_t         *rq,
+raqm_set_text (raqm_t         *rq,
                const uint32_t *text,
                size_t          len)
 {
   if (rq == NULL)
     return;
+
+  free (rq->text);
 
   rq->text_len = len;
   rq->text = malloc (sizeof (uint32_t) * len);
@@ -997,7 +999,7 @@ raqm_shape_u32 (const uint32_t* text,
     raqm_t *rq;
 
     rq = raqm_create ();
-    raqm_add_text (rq, text, length);
+    raqm_set_text (rq, text, length);
     raqm_set_par_direction (rq, direction);
     raqm_set_freetype_face (rq, face, 0, length);
     raqm_set_freetype_face (rq, face, 0, length);
