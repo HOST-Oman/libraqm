@@ -732,7 +732,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   if (rq->scripts != NULL)
     return true;
 
-  rq->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * (size_t) rq->text_len);
+  rq->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * rq->text_len);
   for (size_t i = 0; i < rq->text_len; ++i)
     rq->scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), rq->text[i]);
 
@@ -746,23 +746,27 @@ _raqm_resolve_scripts (raqm_t *rq)
   RAQM_TEST ("\n");
 #endif
 
-  stack = stack_new ((size_t) rq->text_len);
-  for (int i = 0; i < (int) rq->text_len; ++i)
+  stack = stack_new (rq->text_len);
+  for (int i = 0; i < (int) rq->text_len; i++)
   {
     if (rq->scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
     {
       int pair_index = get_pair_index (rq->text[i]);
       if (pair_index >= 0)
-      {    /* is a paired character */
+      {
         if (IS_OPEN (pair_index))
         {
+          /* is a paired character */
           rq->scripts[i] = last_script_value;
           last_set_index = i;
           stack_push (stack, rq->scripts[i], pair_index);
         }
         else
-        {    /* is a close paired character */
-          int pi = pair_index & ~1; /* find matching opening (by getting the last even index for currnt odd index)*/
+        {
+          /* is a close paired character */
+          /* find matching opening (by getting the last even index for current
+           * odd index)*/
+          int pi = pair_index & ~1;
           while (STACK_IS_NOT_EMPTY (stack) &&
                  stack->pair_index[stack->size] != pi)
           {
@@ -794,11 +798,8 @@ _raqm_resolve_scripts (raqm_t *rq)
     }
     else
     {
-      int j;
-      for (j = last_set_index + 1; j < i; ++j)
-      {
+      for (int j = last_set_index + 1; j < i; ++j)
         rq->scripts[j] = rq->scripts[i];
-      }
       last_script_value = rq->scripts[i];
       last_script_index = i;
       last_set_index = i;
