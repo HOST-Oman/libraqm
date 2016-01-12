@@ -327,7 +327,13 @@ raqm_add_font_feature (raqm_t     *rq,
 #ifdef HAVE_HB_FT_FONT_CREATE_REFERENCED
 # define HB_FT_FONT_CREATE(a) hb_ft_font_create_referenced (a)
 #else
-# define HB_FT_FONT_CREATE(a) hb_ft_font_create (a, NULL)
+static hb_font_t *
+_raqm_hb_ft_font_create_referenced (FT_Face face)
+{
+  FT_Reference_Face (face);
+  return hb_ft_font_create (face, (hb_destroy_func_t) FT_Done_Face);
+}
+# define HB_FT_FONT_CREATE(a) _raqm_hb_ft_font_create_referenced (a)
 #endif
 
 /**
