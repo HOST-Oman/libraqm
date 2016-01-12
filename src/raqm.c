@@ -895,28 +895,33 @@ _raqm_shape (raqm_t *rq)
   {
     run->buffer = hb_buffer_create ();
 
-    hb_buffer_add_utf32 (run->buffer, rq->text, rq->text_len, run->pos, run->len);
+    hb_buffer_add_utf32 (run->buffer, rq->text, rq->text_len,
+                         run->pos, run->len);
     hb_buffer_set_script (run->buffer, run->script);
     hb_buffer_set_language (run->buffer, hb_language_get_default ());
     hb_buffer_set_direction (run->buffer, run->direction);
-    hb_shape_full (rq->font, run->buffer, rq->features, rq->features_len, NULL);
+    hb_shape_full (rq->font, run->buffer, rq->features, rq->features_len,
+                   NULL);
   }
 
   return true;
 }
 
-/* convert index from UTF-32 to UTF-8 */
+/* Convert index from UTF-32 to UTF-8 */
 static uint32_t
-u32_index_to_u8 (FriBidiChar* unicode,
-                 uint32_t index)
+_raqm_utf32_to_utf8_index (FriBidiChar *unicode,
+                           uint32_t    index)
 {
-    FriBidiStrIndex length;
-    char* output = (char*) malloc ((size_t)((index * 4) + 1));
+  FriBidiStrIndex length;
+  char* output = malloc ((sizeof (uint32_t) * index) + 1);
 
-    length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8, unicode, (FriBidiStrIndex)(index), output);
+  length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8,
+                                       unicode,
+                                       index,
+                                       output);
+  free (output);
 
-    free (output);
-    return (uint32_t)(length);
+  return length;
 }
 
 /* Takes the input text and does the reordering and shaping */
@@ -952,7 +957,7 @@ raqm_shape (const char* u8_str,
 
     for (i = 0; i < glyph_count; i++)
     {
-        info[i].cluster = u32_index_to_u8 (u32_str, info[i].cluster);
+        info[i].cluster = _raqm_utf32_to_utf8_index (u32_str, info[i].cluster);
     }
 
 #ifdef RAQM_TESTING
