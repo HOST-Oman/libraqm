@@ -79,7 +79,7 @@ struct _raqm {
 #endif
 
   raqm_run_t *runs;
-
+  raqm_glyph_t *glyphs;
 };
 
 struct _raqm_run
@@ -133,6 +133,7 @@ raqm_create (void)
 #endif
 
   rq->runs = NULL;
+  rq->glyphs = NULL;
 
   return rq;
 }
@@ -166,6 +167,8 @@ _raqm_free_runs (raqm_t *rq)
   {
     raqm_run_t *run = runs;
     runs = runs->next;
+
+    hb_buffer_destroy (run->buffer);
     free (run);
   }
 }
@@ -210,6 +213,7 @@ raqm_destroy (raqm_t *rq)
   hb_font_destroy (rq->font);
 #endif
   _raqm_free_runs (rq);
+  free (rq->glyphs);
   free (rq);
 }
 
@@ -400,6 +404,72 @@ raqm_layout (raqm_t *rq)
     return false;
 
   return true;
+}
+
+/**
+ * raqm_get_glyphs:
+ * @rq: a #raqm_t.
+ * @length: (out): output array length.
+ *
+ * Gets the final result of Raqm layout process, an array of #raqm_glyph_t
+ * containing the glyph indices in the font, their positions and other possible
+ * information.
+ *
+ * Return value: (transfer none):
+ * An array of #raqm_glyph_t. This is owned by @rq and must not be freed.
+ *
+ * Since: 0.1
+ */
+raqm_glyph_t *
+raqm_get_glyphs (raqm_t *rq,
+                 size_t *length)
+{
+  size_t count = 0;
+
+  if (rq == NULL || length == NULL)
+    return NULL;
+
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+    count += hb_buffer_get_length (run->buffer);
+
+  *length = count;
+
+  if (rq->glyphs)
+    free (rq->glyphs);
+
+  rq->glyphs = malloc (sizeof (raqm_glyph_t) * count);
+
+  RAQM_TEST ("Glyph information:\n");
+
+  count = 0;
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    size_t len;
+    hb_glyph_info_t *info;
+    hb_glyph_position_t *position;
+
+    len = hb_buffer_get_length (run->buffer);
+    info = hb_buffer_get_glyph_infos (run->buffer, NULL);
+    position = hb_buffer_get_glyph_positions (run->buffer, NULL);
+
+    for (size_t i = 0; i < len; i++)
+    {
+      rq->glyphs[count + i].index = info[i].codepoint;
+      rq->glyphs[count + i].cluster = info[i].cluster;
+      rq->glyphs[count + i].x_advance = position[i].x_advance;
+      rq->glyphs[count + i].y_advance = position[i].y_advance;
+      rq->glyphs[count + i].x_offset = position[i].x_offset;
+      rq->glyphs[count + i].y_offset = position[i].y_offset;
+
+      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
+          rq->glyphs[count + i].index, rq->glyphs[count + i].x_offset,
+          rq->glyphs[count + i].y_offset, rq->glyphs[count + i].x_advance);
+    }
+
+    count += len;
+  }
+
+  return rq->glyphs;
 }
 
 static bool
@@ -909,14 +979,11 @@ raqm_shape_u32 (const uint32_t* text,
                 const FT_Face face,
                 raqm_direction_t direction,
                 const char **features,
-                raqm_glyph_info_t** glyph_info)
+                raqm_glyph_info_t **info)
 {
-    unsigned int index;
-    unsigned int glyph_count = 0;
+    size_t count = 0;
 
-    hb_glyph_info_t* hb_glyph_info = NULL;
-    hb_glyph_position_t* hb_glyph_position = NULL;
-    raqm_glyph_info_t* info = NULL;
+    raqm_glyph_t *glyphs = NULL;
     raqm_t *rq;
 
     rq = raqm_create ();
@@ -931,52 +998,15 @@ raqm_shape_u32 (const uint32_t* text,
             raqm_add_font_feature (rq, *p, -1);
     }
 
-    if (!raqm_layout (rq))
-      goto out;
-
-    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+    *info = NULL;
+    if (raqm_layout (rq))
     {
-        unsigned int count;
-        hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &count);
-        glyph_count += count;
+      glyphs = raqm_get_glyphs (rq, &count);
+      *info = malloc (sizeof (raqm_glyph_t) * count);
+      memcpy (*info, glyphs, sizeof (raqm_glyph_t) * count);
     }
-
-    info = (raqm_glyph_info_t*) malloc (sizeof (raqm_glyph_info_t) * (glyph_count));
-
-    RAQM_TEST ("Glyph information:\n");
-
-    index = 0;
-    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-    {
-        unsigned int count;
-        unsigned int postion_count;
-
-        hb_glyph_info = hb_buffer_get_glyph_infos (run->buffer, &count);
-        hb_glyph_position = hb_buffer_get_glyph_positions (run->buffer, &postion_count);
-
-        assert (count == postion_count);
-
-        for (size_t i = 0; i < count; i++)
-        {
-            info[index].index = hb_glyph_info[i].codepoint;
-            info[index].x_offset = hb_glyph_position[i].x_offset;
-            info[index].y_offset = hb_glyph_position[i].y_offset;
-            info[index].x_advance = hb_glyph_position[i].x_advance;
-            info[index].y_advance = hb_glyph_position[i].y_advance;
-            info[index].cluster = hb_glyph_info[i].cluster;
-            RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
-                  info[index].index, info[index].x_offset,
-                  info[index].y_offset, info[index].x_advance);
-            index++;
-        }
-        hb_buffer_destroy (run->buffer);
-    }
-
-out:
-
-    *glyph_info = info;
 
     raqm_destroy (rq);
 
-    return glyph_count;
+    return count;
 }

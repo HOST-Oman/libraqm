@@ -65,6 +65,27 @@ typedef enum
     RAQM_DIRECTION_TTB
 } raqm_direction_t;
 
+/**
+ * raqm_glyph_t:
+ * @index: the index of the glyph in the font file.
+ * @x_advance: the glyph advance width in horizontal text.
+ * @y_advance: the glyph advance width in vertical text.
+ * @x_offset: the horizontal movement of the glyph from the current point.
+ * @y_offset: the vertical movement of the glyph from the current point.
+ * @cluster: the index of original character in input text.
+ *
+ * The structure that holds information about output glyphs, returned from
+ * raqm_get_glyphs().
+ */
+typedef struct raqm_glyph_t {
+    unsigned int index;
+    int x_advance;
+    int y_advance;
+    int x_offset;
+    int y_offset;
+    uint32_t cluster;
+} raqm_glyph_t;
+
 raqm_t *
 raqm_create (void);
 
@@ -97,18 +118,13 @@ raqm_set_freetype_face (raqm_t *rq,
 bool
 raqm_layout (raqm_t *rq);
 
+raqm_glyph_t *
+raqm_get_glyphs (raqm_t *rq,
+                 size_t *length);
+
 /* Old API */
 
-/* Output glyph */
-typedef struct
-{
-    unsigned int index; /* Glyph index */
-    int x_offset;       /* Horizontal glyph offset */
-    int x_advance;      /* Horizontal glyph advance width */
-    int y_advance;      /* Vertical glyph advance width */
-    int y_offset;       /* Vertical glyph offset */
-    uint32_t cluster;   /* Index of original character in input text */
-} raqm_glyph_info_t;
+typedef raqm_glyph_t raqm_glyph_info_t;
 
 /* raqm_shape - apply bidi algorithm and shape text.
  *
