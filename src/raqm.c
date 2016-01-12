@@ -324,6 +324,12 @@ raqm_add_font_feature (raqm_t     *rq,
   return ok;
 }
 
+#ifdef HAVE_HB_FT_FONT_CREATE_REFERENCED
+# define HB_FT_FONT_CREATE(a) hb_ft_font_create_referenced (a)
+#else
+# define HB_FT_FONT_CREATE(a) hb_ft_font_create (a, NULL)
+#endif
+
 /**
  * raqm_set_freetype_face:
  * @rq: a #raqm_t.
@@ -359,17 +365,13 @@ raqm_set_freetype_face (raqm_t *rq,
   {
     if (rq->fonts[start + i] != NULL)
       hb_font_destroy (rq->fonts[start + i]);
-    rq->fonts[start + i] = hb_ft_font_create_referenced (face);
+    rq->fonts[start + i] = HB_FT_FONT_CREATE (face);
   }
 #else
   if (rq->font != NULL)
     hb_font_destroy (rq->font);
-#ifdef HAVE_HB_FT_FONT_CREATE_REFERENCED
-  rq->font = hb_ft_font_create_referenced (face);
-#else
-  rq->font = hb_ft_font_create (face, NULL);
-#endif /* HAVE_HB_FT_FONT_CREATE_REFERENCED */
-#endif /* RAQM_MULTI_FONT */
+  rq->font = HB_FT_FONT_CREATE (face);
+#endif
 }
 
 static bool
