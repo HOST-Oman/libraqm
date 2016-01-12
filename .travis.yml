@@ -13,14 +13,19 @@ compiler:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y libfreetype6-dev libharfbuzz-dev libfribidi-dev libglib2.0-dev; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      sudo apt-get install -y libfreetype6-dev libharfbuzz-dev libfribidi-dev libglib2.0-dev gtk-doc-tools;
+    fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi;
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install freetype harfbuzz fribidi glib; fi;
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      brew install freetype harfbuzz fribidi glib gtk-doc;
+      export XML_CATALOG_FILES="/usr/local/etc/xml/catalog";
+    fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" -a "${CC}" == "gcc" ]; then export CC=gcc-4.8; fi
 
 script:
-  - autoreconf -if
-  - ./configure
+  - ./autogen.sh
+  - ./configure --enable-gtk-doc
   - make
   - make check
 

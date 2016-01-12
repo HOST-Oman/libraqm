@@ -35,11 +35,15 @@ CFLAGS="$_save_cflags"
 
 AM_CONDITIONAL(HAVE_GLIB, $have_glib)
 
+GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
+
 AC_CONFIG_FILES([
     Makefile
     raqm.pc
     src/Makefile
     tests/Makefile
+    docs/Makefile
+    docs/version.xml
 ])
 
 AC_OUTPUT
