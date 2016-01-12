@@ -663,123 +663,119 @@ out:
 /* Stack to handle script detection */
 typedef struct
 {
-    size_t capacity;
-    size_t size;
-    int* pair_index;
-    hb_script_t* scripts;
-} Stack;
+  size_t       capacity;
+  size_t       size;
+  int         *pair_index;
+  hb_script_t *scripts;
+} raqm_stack_t;
 
 /* Special paired characters for script detection */
+static size_t paired_len = 34;
 static const FriBidiChar paired_chars[] =
 {
-    0x0028, 0x0029, /* ascii paired punctuation */
-    0x003c, 0x003e,
-    0x005b, 0x005d,
-    0x007b, 0x007d,
-    0x00ab, 0x00bb, /* guillemets */
-    0x2018, 0x2019, /* general punctuation */
-    0x201c, 0x201d,
-    0x2039, 0x203a,
-    0x3008, 0x3009, /* chinese paired punctuation */
-    0x300a, 0x300b,
-    0x300c, 0x300d,
-    0x300e, 0x300f,
-    0x3010, 0x3011,
-    0x3014, 0x3015,
-    0x3016, 0x3017,
-    0x3018, 0x3019,
-    0x301a, 0x301b
+  0x0028, 0x0029, /* ascii paired punctuation */
+  0x003c, 0x003e,
+  0x005b, 0x005d,
+  0x007b, 0x007d,
+  0x00ab, 0x00bb, /* guillemets */
+  0x2018, 0x2019, /* general punctuation */
+  0x201c, 0x201d,
+  0x2039, 0x203a,
+  0x3008, 0x3009, /* chinese paired punctuation */
+  0x300a, 0x300b,
+  0x300c, 0x300d,
+  0x300e, 0x300f,
+  0x3010, 0x3011,
+  0x3014, 0x3015,
+  0x3016, 0x3017,
+  0x3018, 0x3019,
+  0x301a, 0x301b
 };
 
-/* Stack handeling functions */
-static Stack*
-stack_new (size_t max)
+/* Stack handling functions */
+static raqm_stack_t *
+_raqm_stack_new (size_t max)
 {
-    Stack* stack;
-    stack = (Stack*) malloc (sizeof (Stack));
-    stack->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * max);
-    stack->pair_index = (int*) malloc (sizeof (int) * max);
-    stack->size = 0;
-    stack->capacity = max;
-    return stack;
+  raqm_stack_t *stack;
+  stack = malloc (sizeof (raqm_stack_t));
+  stack->scripts = malloc (sizeof (hb_script_t) * max);
+  stack->pair_index = malloc (sizeof (int) * max);
+  stack->size = 0;
+  stack->capacity = max;
+
+  return stack;
 }
 
 static void
-stack_free (Stack* stack)
+_raqm_stack_free (raqm_stack_t *stack)
 {
-    free (stack->scripts);
-    free (stack->pair_index);
-    free (stack);
-
+  free (stack->scripts);
+  free (stack->pair_index);
+  free (stack);
 }
 
-static int
-stack_pop (Stack* stack)
+static bool
+_raqm_stack_pop (raqm_stack_t *stack)
 {
-    if (stack->size == 0)
-    {
-        RAQM_DBG ("Stack is Empty\n");
-        return 1;
-    }
-    else
-    {
-        stack->size--;
-    }
+  if (stack->size == 0)
+  {
+    RAQM_DBG ("Stack is Empty\n");
+    return false;
+  }
 
-    return 0;
+  stack->size--;
+
+  return true;
 }
 
 static hb_script_t
-stack_top (Stack* stack)
+_raqm_stack_top (raqm_stack_t* stack)
 {
-    if (stack->size == 0)
-    {
-        RAQM_DBG ("Stack is Empty\n");
-    }
+  if (stack->size == 0)
+  {
+    RAQM_DBG ("Stack is Empty\n");
+    return HB_SCRIPT_INVALID; /* XXX: check this */
+  }
 
-    return stack->scripts[stack->size];
+  return stack->scripts[stack->size];
 }
 
-static void
-stack_push (Stack* stack,
+static bool
+_raqm_stack_push (raqm_stack_t      *stack,
             hb_script_t script,
-            int pi)
+            int         pi)
 {
-    if (stack->size == stack->capacity)
-    {
-        RAQM_DBG ("Stack is Full\n");
-    }
-    else
-    {
-        stack->size++;
-        stack->scripts[stack->size] = script;
-        stack->pair_index[stack->size] = pi;
-    }
+  if (stack->size == stack->capacity)
+  {
+    RAQM_DBG ("Stack is Full\n");
+    return false;
+  }
+
+  stack->size++;
+  stack->scripts[stack->size] = script;
+  stack->pair_index[stack->size] = pi;
+
+  return true;
 }
 
 static int
-get_pair_index (const FriBidiChar firbidi_ch)
+get_pair_index (const FriBidiChar ch)
 {
-    int lower = 0;
-    int upper = 33; /* paired characters array length */
-    while (lower <= upper)
-    {
-        int mid = (lower + upper) / 2;
-        if (firbidi_ch < paired_chars[mid])
-        {
-            upper = mid - 1;
-        }
-        else if (firbidi_ch > paired_chars[mid])
-        {
-            lower = mid + 1;
-        }
-        else
-        {
-            return mid;
-        }
-    }
+  int lower = 0;
+  int upper = paired_len - 1;
 
-    return -1;
+  while (lower <= upper)
+  {
+    int mid = (lower + upper) / 2;
+    if (ch < paired_chars[mid])
+      upper = mid - 1;
+    else if (ch > paired_chars[mid])
+      lower = mid + 1;
+    else
+      return mid;
+  }
+
+  return -1;
 }
 
 #define STACK_IS_EMPTY(script)     ((script)->size <= 0)
@@ -797,14 +793,15 @@ _raqm_resolve_scripts (raqm_t *rq)
   int last_script_index = -1;
   int last_set_index = -1;
   hb_script_t last_script_value = HB_SCRIPT_INVALID;
-  Stack* stack = NULL;
+  raqm_stack_t *stack = NULL;
 
   if (rq->scripts != NULL)
     return true;
 
   rq->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * rq->text_len);
   for (size_t i = 0; i < rq->text_len; ++i)
-    rq->scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (), rq->text[i]);
+    rq->scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (),
+                                        rq->text[i]);
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Before script detection:\n");
@@ -816,7 +813,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   RAQM_TEST ("\n");
 #endif
 
-  stack = stack_new (rq->text_len);
+  stack = _raqm_stack_new (rq->text_len);
   for (int i = 0; i < (int) rq->text_len; i++)
   {
     if (rq->scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
@@ -829,7 +826,7 @@ _raqm_resolve_scripts (raqm_t *rq)
           /* is a paired character */
           rq->scripts[i] = last_script_value;
           last_set_index = i;
-          stack_push (stack, rq->scripts[i], pair_index);
+          _raqm_stack_push (stack, rq->scripts[i], pair_index);
         }
         else
         {
@@ -840,11 +837,11 @@ _raqm_resolve_scripts (raqm_t *rq)
           while (STACK_IS_NOT_EMPTY (stack) &&
                  stack->pair_index[stack->size] != pi)
           {
-            stack_pop (stack);
+            _raqm_stack_pop (stack);
           }
           if (STACK_IS_NOT_EMPTY (stack))
           {
-            rq->scripts[i] = stack_top (stack);
+            rq->scripts[i] = _raqm_stack_top (stack);
             last_script_value = rq->scripts[i];
             last_set_index = i;
           }
@@ -886,7 +883,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   RAQM_TEST ("\n");
 #endif
 
-  stack_free (stack);
+  _raqm_stack_free (stack);
 
   return true;
 }
