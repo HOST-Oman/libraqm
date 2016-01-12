@@ -29,6 +29,11 @@ script:
   - make
   - make check
 
+after_success:
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$CC" == "gcc" -a "$TRAVIS_SECURE_ENV_VARS" == "true" ];
+      then bash .ci/deploy-docs.sh;
+    fi
+
 notifications:
   email:
     recipients:
