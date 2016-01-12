@@ -83,10 +83,10 @@ void
 raqm_set_par_direction (raqm_t          *rq,
                         raqm_direction_t dir);
 
-size_t
-raqm_add_font_features (raqm_t      *rq,
-                        const char **features,
-                        size_t       count);
+bool
+raqm_add_font_feature  (raqm_t     *rq,
+                        const char *feature,
+                        int         len);
 
 void
 raqm_set_freetype_face (raqm_t *rq,

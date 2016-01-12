@@ -279,47 +279,45 @@ raqm_set_par_direction (raqm_t          *rq,
 }
 
 /**
- * raqm_add_font_features:
+ * raqm_add_font_feature:
  * @rq: a #raqm_t.
- * @features: an array of %NULL-terminated font feature strings.
- * @count: the number of elements in @features array.
+ * @feature: a font feature string.
+ * @len: length of @feature, -1 for %NULL-terminated.
  *
- * Sets the font features used by the #raqm_t during text layout. This is
+ * Adds a font feature to be used by the #raqm_t during text layout. This is
  * usually used to turn on optional font features that are not enabled by
  * default, for example `dlig` or `ss01`, but can be also used to turn off
  * default font features.
  *
- * @features is an array of strings each for controlling a single feature, in
- * the syntax understood by hb_feature_from_string().
+ * @feature is string representing a single font feature, in the syntax
+ * understood by hb_feature_from_string().
  *
- * This function can be called repeatedly, new features will be appended to th
+ * This function can be called repeatedly, new features will be appended to the
  * end of the features list and can potentially override previous features.
  *
  * Return value:
- * Number of successfully parsed features.
+ * %true if parsing @feature succeeded, %false otherwise.
  *
  * Since: 0.1
  */
-size_t
-raqm_add_font_features (raqm_t      *rq,
-                        const char **features,
-                        size_t       count)
+bool
+raqm_add_font_feature (raqm_t     *rq,
+                       const char *feature,
+                       int         len)
 {
-  size_t old_len = rq->features_len;
+  hb_bool_t ok;
+  hb_feature_t fea;
 
-  rq->features = realloc (rq->features,
-                          sizeof (hb_feature_t) * (rq->features_len + count));
-
-  for (size_t i = 0; i < count; i++)
+  ok = hb_feature_from_string (feature, len, &fea);
+  if (ok)
   {
-    hb_bool_t ok;
-    ok = hb_feature_from_string (features[i], -1,
-                                 &rq->features[rq->features_len]);
-    if (ok)
-      rq->features_len++;
+    rq->features_len++;
+    rq->features = realloc (rq->features,
+                            sizeof (hb_feature_t) * (rq->features_len));
+    rq->features[rq->features_len - 1] = fea;
   }
 
-  return rq->features_len - old_len;
+  return ok;
 }
 
 /**
@@ -928,10 +926,8 @@ raqm_shape_u32 (const uint32_t* text,
 
     if (features)
     {
-        size_t count = 0;
-        for (const char **p = features; *p; p++)
-            count++;
-        raqm_add_font_features (rq, features, count);
+        for (const char **p = features; *p != NULL; p++)
+            raqm_add_font_feature (rq, *p, -1);
     }
 
     if (!raqm_layout (rq))
