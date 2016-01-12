@@ -37,6 +37,45 @@
 #include "raqm.h"
 #include "reorder_runs.h"
 
+/**
+ * SECTION:raqm
+ * @title: Raqm
+ * @short_description: A library for complex text layout
+ * @include: raqm.h
+ *
+ * Raqm is a light weight text layout library with strong emphasis on
+ * supporting languages and writing systems that require complex text layout.
+ *
+ * The main object in Raqm API is #raqm_t, it stores all the states of the
+ * input text, its properties, and the output of the layout process.
+ *
+ * To start, you create a #raqm_t object, add text and font(s) to it, run the
+ * layout process, and finally query about the output. For example:
+ *
+ * |[<!-- language="C" -->
+ * unit32_t     *text;
+ * size_t        len;
+ * FT_Face       face;
+ *
+ * raqm_t       *rq;
+ * raqm_glyph_t *glyphs;
+ * size_t        nglyph;
+ *
+ * text = … ;
+ * len = … ;
+ * face = … ;
+ *
+ * rq = raqm_create ();
+ * raqm_set_text (rq, text, len);
+ * raqm_set_freetype_face (rq, face, 0, len);
+ * if (raqm_layout (rq))
+ * {
+ *   glyphs = raqm_get_glyphs (rq, &nglyphs);
+ *   …
+ * }
+ * ]|
+ */
+
 /* For enabling debug mode */
 /*#define RAQM_DEBUG 1*/
 #ifdef RAQM_DEBUG
