@@ -29,6 +29,7 @@ AM_CONDITIONAL(HAVE_GLIB, $have_glib)
 
 AC_CONFIG_FILES([
     Makefile
+    raqm.pc
     src/Makefile
     tests/Makefile
 ])
