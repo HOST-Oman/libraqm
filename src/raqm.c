@@ -1039,52 +1039,40 @@ _raqm_u32_to_u8_index (FriBidiChar *unicode,
 
 /* Takes the input text and does the reordering and shaping */
 unsigned int
-raqm_shape (const char* u8_str,
-            int u8_size,
+raqm_shape (const char* text,
+            int length,
             const FT_Face face,
             raqm_direction_t direction,
             const char **features,
-            raqm_glyph_info_t** glyph_info)
+            raqm_glyph_info_t** info)
 {
-    FriBidiChar* u32_str;
-    FriBidiStrIndex u32_size;
-    raqm_glyph_info_t* info;
-    unsigned int glyph_count;
-    unsigned int i;
+    size_t count = 0;
 
-    RAQM_TEST ("Text is: %s\n", u8_str);
+    raqm_glyph_t *glyphs = NULL;
+    raqm_t *rq;
 
-    u32_str = (FriBidiChar*) calloc (sizeof (FriBidiChar), (size_t)(u8_size));
-    u32_size = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8, u8_str, u8_size, u32_str);
+    rq = raqm_create ();
+    raqm_set_text_utf8 (rq, text, length);
+    raqm_set_par_direction (rq, direction);
+    raqm_set_freetype_face (rq, face, 0, length);
 
-    glyph_count = raqm_shape_u32 (u32_str, u32_size, face, direction, features, &info);
-
-#ifdef RAQM_TESTING
-    RAQM_TEST ("\nUTF-32 clusters:");
-    for (i = 0; i < glyph_count; i++)
+    if (features)
     {
-        RAQM_TEST (" %02d", info[i].cluster);
-    }
-    RAQM_TEST ("\n");
-#endif
-
-    for (i = 0; i < glyph_count; i++)
-    {
-        info[i].cluster = _raqm_u32_to_u8_index (u32_str, info[i].cluster);
+        for (const char **p = features; *p != NULL; p++)
+            raqm_add_font_feature (rq, *p, -1);
     }
 
-#ifdef RAQM_TESTING
-    RAQM_TEST ("UTF-8 clusters: ");
-    for (i = 0; i < glyph_count; i++)
+    *info = NULL;
+    if (raqm_layout (rq))
     {
-        RAQM_TEST (" %02d", info[i].cluster);
+      glyphs = raqm_get_glyphs (rq, &count);
+      *info = malloc (sizeof (raqm_glyph_t) * count);
+      memcpy (*info, glyphs, sizeof (raqm_glyph_t) * count);
     }
-    RAQM_TEST ("\n");
-#endif
 
-    free (u32_str);
-    *glyph_info = info;
-    return glyph_count;
+    raqm_destroy (rq);
+
+    return count;
 }
 
 /* Takes a utf-32 input text and does the reordering and shaping */
