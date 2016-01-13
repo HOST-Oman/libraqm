@@ -653,7 +653,8 @@ _raqm_itemize (raqm_t *rq)
   else
   {
     fribidi_get_bidi_types (rq->text, rq->text_len, types);
-    max_level = fribidi_get_par_embedding_levels (types, rq->text_len, &par_type, levels);
+    max_level = fribidi_get_par_embedding_levels (types, rq->text_len,
+                                                  &par_type, levels);
   }
 
   if (max_level < 0)
@@ -663,11 +664,13 @@ _raqm_itemize (raqm_t *rq)
   }
 
   /* Get the number of bidi runs */
-  run_count = fribidi_reorder_runs (types, rq->text_len, par_type, levels, NULL);
+  run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
+                                    levels, NULL);
 
   /* Populate bidi runs array */
   runs = malloc (sizeof (FriBidiRun) * (size_t)run_count);
-  run_count = fribidi_reorder_runs (types, rq->text_len, par_type, levels, runs);
+  run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
+                                    levels, runs);
 
   if (!_raqm_resolve_scripts (rq))
   {
@@ -763,7 +766,8 @@ _raqm_itemize (raqm_t *rq)
   {
     SCRIPT_TO_STRING (run->script);
     RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\n",
-               run_count++, run->pos, run->len, hb_direction_to_string (run->direction), buff);
+               run_count++, run->pos, run->len,
+               hb_direction_to_string (run->direction), buff);
   }
   RAQM_TEST ("\n");
 #endif
