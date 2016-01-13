@@ -18,9 +18,9 @@ AC_PROG_CC
 LT_INIT
 
 PKG_PROG_PKG_CONFIG([0.20])
-PKG_CHECK_MODULES(FREETYPE, freetype2, [], [])
-PKG_CHECK_MODULES(HARFBUZZ, harfbuzz, [], [])
-PKG_CHECK_MODULES(FRIBIDI, fribidi, [], [])
+AX_PKG_CHECK_MODULES(FREETYPE, freetype2, [])
+AX_PKG_CHECK_MODULES(HARFBUZZ, [], harfbuzz)
+AX_PKG_CHECK_MODULES(FRIBIDI, [], fribidi)
 PKG_CHECK_MODULES(GLIB, glib-2.0, have_glib=true, have_glib=false)
 
 AC_CHECK_FUNC(fribidi_reorder_runs, AC_DEFINE([HAVE_FRIBIDI_REORDER_RUNS], 1, [Have fribidi_reorder_runs]), [])

@@ -4,6 +4,9 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src tests
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = @PACKAGE@.pc
+
 MAINTAINERCLEANFILES = \
     $(GITIGNORE_MAINTAINERCLEANFILES_TOPLEVEL) \
     $(GITIGNORE_MAINTAINERCLEANFILES_M4_LIBTOOL) \
@@ -11,5 +14,3 @@ MAINTAINERCLEANFILES = \
     $(NULL)
 
 -include $(top_srcdir)/git.mk
-pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = raqm.pc
