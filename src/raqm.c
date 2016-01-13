@@ -97,6 +97,11 @@
 /* FIXME: fix multi-font support */
 /* #define RAQM_MULTI_FONT */
 
+typedef enum {
+  RAQM_FLAG_NONE = 0,
+  RAQM_FLAG_UTF8 = 1 << 0
+} raqm_flags_t;
+
 typedef struct _raqm_run raqm_run_t;
 
 struct _raqm {
@@ -119,6 +124,8 @@ struct _raqm {
 
   raqm_run_t      *runs;
   raqm_glyph_t    *glyphs;
+
+  raqm_flags_t     flags;
 };
 
 struct _raqm_run {
@@ -172,6 +179,8 @@ raqm_create (void)
 
   rq->runs = NULL;
   rq->glyphs = NULL;
+
+  rq->flags = RAQM_FLAG_NONE;
 
   return rq;
 }
@@ -283,6 +292,41 @@ raqm_set_text (raqm_t         *rq,
 
   for (size_t i = 0; i < len; i++)
     rq->text[i] = text[i];
+}
+
+/**
+ * raqm_set_text_utf8:
+ * @rq: a #raqm_t.
+ * @text: a UTF-8 encoded text string.
+ * @len: the length of @text.
+ *
+ * Same as raqm_set_text(), but for text encoded in UTF-8 encoding.
+ *
+ * Since: 0.1
+ */
+void
+raqm_set_text_utf8 (raqm_t         *rq,
+                    const char     *text,
+                    size_t          len)
+{
+  uint32_t unicode[len];
+
+  if (rq == NULL)
+    return;
+
+  RAQM_TEST ("Text is: %s\n", text);
+
+  free (rq->text);
+
+  rq->flags |= RAQM_FLAG_UTF8;
+
+  rq->text_len = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
+                                             text, len, unicode);
+
+  rq->text = malloc (sizeof (uint32_t) * rq->text_len);
+
+  for (size_t i = 0; i < rq->text_len; i++)
+    rq->text[i] = unicode[i];
 }
 
 /**
@@ -454,6 +498,10 @@ raqm_layout (raqm_t *rq)
   return true;
 }
 
+static uint32_t
+_raqm_u32_to_u8_index (FriBidiChar *unicode,
+                       uint32_t     index);
+
 /**
  * raqm_get_glyphs:
  * @rq: a #raqm_t.
@@ -517,6 +565,26 @@ raqm_get_glyphs (raqm_t *rq,
     count += len;
   }
 
+  if (rq->flags & RAQM_FLAG_UTF8)
+  {
+#ifdef RAQM_TESTING
+    RAQM_TEST ("\nUTF-32 clusters:");
+    for (size_t i = 0; i < count; i++)
+      RAQM_TEST (" %02d", rq->glyphs[i].cluster);
+    RAQM_TEST ("\n");
+#endif
+
+    for (size_t i = 0; i < count; i++)
+      rq->glyphs[i].cluster = _raqm_u32_to_u8_index (rq->text,
+                                                     rq->glyphs[i].cluster);
+
+#ifdef RAQM_TESTING
+    RAQM_TEST ("UTF-8 clusters: ");
+    for (size_t i = 0; i < count; i++)
+      RAQM_TEST (" %02d", rq->glyphs[i].cluster);
+    RAQM_TEST ("\n");
+#endif
+  }
   return rq->glyphs;
 }
 
@@ -956,18 +1024,16 @@ _raqm_shape (raqm_t *rq)
 
 /* Convert index from UTF-32 to UTF-8 */
 static uint32_t
-_raqm_utf32_to_utf8_index (FriBidiChar *unicode,
-                           uint32_t    index)
+_raqm_u32_to_u8_index (FriBidiChar *unicode,
+                       uint32_t     index)
 {
   FriBidiStrIndex length;
-  char* output = malloc ((sizeof (uint32_t) * index) + 1);
+  char output[(sizeof (uint32_t) * index) + 1];
 
   length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8,
                                        unicode,
                                        index,
                                        output);
-  free (output);
-
   return length;
 }
 
@@ -1004,7 +1070,7 @@ raqm_shape (const char* u8_str,
 
     for (i = 0; i < glyph_count; i++)
     {
-        info[i].cluster = _raqm_utf32_to_utf8_index (u32_str, info[i].cluster);
+        info[i].cluster = _raqm_u32_to_u8_index (u32_str, info[i].cluster);
     }
 
 #ifdef RAQM_TESTING

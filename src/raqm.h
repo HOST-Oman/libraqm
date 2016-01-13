@@ -101,6 +101,11 @@ raqm_set_text (raqm_t         *rq,
                size_t          len);
 
 void
+raqm_set_text_utf8 (raqm_t     *rq,
+                    const char *text,
+                    size_t      len);
+
+void
 raqm_set_par_direction (raqm_t          *rq,
                         raqm_direction_t dir);
 
