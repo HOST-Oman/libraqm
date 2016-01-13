@@ -100,38 +100,37 @@
 typedef struct _raqm_run raqm_run_t;
 
 struct _raqm {
-  int ref_count;
+  int              ref_count;
 
-  uint32_t *text;
-  size_t text_len;
+  uint32_t        *text;
+  size_t           text_len;
 
   raqm_direction_t base_dir;
 
-  hb_feature_t *features;
-  size_t features_len;
+  hb_feature_t    *features;
+  size_t           features_len;
 
-  hb_script_t *scripts;
+  hb_script_t     *scripts;
 #ifdef RAQM_MULTI_FONT
-  hb_font_t **fonts;
+  hb_font_t      **fonts;
 #else
-  hb_font_t *font;
+  hb_font_t       *font;
 #endif
 
-  raqm_run_t *runs;
-  raqm_glyph_t *glyphs;
+  raqm_run_t      *runs;
+  raqm_glyph_t    *glyphs;
 };
 
-struct _raqm_run
-{
+struct _raqm_run {
   FriBidiStrIndex pos;
   FriBidiStrIndex len;
 
   hb_direction_t direction;
-  hb_script_t script;
-  hb_font_t *font;
-  hb_buffer_t *buffer;
+  hb_script_t    script;
+  hb_font_t     *font;
+  hb_buffer_t   *buffer;
 
-  raqm_run_t *next;
+  raqm_run_t    *next;
 };
 
 /**
@@ -710,8 +709,7 @@ out:
 }
 
 /* Stack to handle script detection */
-typedef struct
-{
+typedef struct {
   size_t       capacity;
   size_t       size;
   int         *pair_index;
