@@ -77,19 +77,19 @@ main (int argc, char *argv[])
 
   if (FT_Init_FreeType (&library))
   {
-    printf ("FT_Init_FreeType() failed.\n");
+    fprintf (stderr, "FT_Init_FreeType() failed.\n");
     return 1;
   }
 
   if (FT_New_Face (library, args[0], 0, &face))
   {
-    printf ("FT_New_Face() failed.\n");
+    fprintf (stderr, "FT_New_Face() failed.\n");
     return 1;
   }
 
   if (FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0))
   {
-    printf ("FT_Set_Char_Size() failed.\n");
+    fprintf (stderr, "FT_Set_Char_Size() failed.\n");
     return 1;
   }
 
@@ -114,7 +114,7 @@ main (int argc, char *argv[])
 
   if (!raqm_layout (rq))
   {
-    printf ("raqm_layout() failed.\n");
+    fprintf (stderr, "raqm_layout() failed.\n");
     return 1;
   }
 
