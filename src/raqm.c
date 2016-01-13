@@ -288,9 +288,9 @@ raqm_set_text (raqm_t         *rq,
   free (rq->text);
 
   rq->text_len = len;
-  rq->text = malloc (sizeof (uint32_t) * len);
+  rq->text = malloc (sizeof (uint32_t) * rq->text_len);
 
-  for (size_t i = 0; i < len; i++)
+  for (size_t i = 0; i < rq->text_len; i++)
     rq->text[i] = text[i];
 }
 
