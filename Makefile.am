@@ -11,3 +11,5 @@ MAINTAINERCLEANFILES = \
     $(NULL)
 
 -include $(top_srcdir)/git.mk
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = raqm.pc
