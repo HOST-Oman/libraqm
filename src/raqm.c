@@ -122,8 +122,8 @@ struct _raqm {
 };
 
 struct _raqm_run {
-  FriBidiStrIndex pos;
-  FriBidiStrIndex len;
+  int            pos;
+  int            len;
 
   hb_direction_t direction;
   hb_script_t    script;
