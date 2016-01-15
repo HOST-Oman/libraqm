@@ -608,8 +608,8 @@ static bool
 _raqm_itemize (raqm_t *rq)
 {
   FriBidiParType par_type = FRIBIDI_PAR_ON;
-  FriBidiCharType *types = NULL;
-  FriBidiLevel *levels = NULL;
+  FriBidiCharType types[rq->text_len];
+  FriBidiLevel levels[rq->text_len];
   FriBidiRun *runs = NULL;
   raqm_run_t *last;
   int max_level;
@@ -640,9 +640,6 @@ _raqm_itemize (raqm_t *rq)
   else if (rq->base_dir == RAQM_DIRECTION_LTR)
     par_type = FRIBIDI_PAR_LTR;
 
-  types = malloc (sizeof (FriBidiCharType) * rq->text_len);
-  levels = malloc (sizeof (FriBidiLevel) * rq->text_len);
-
   if (rq->base_dir == RAQM_DIRECTION_TTB)
   {
     /* Treat every thing as LTR in vertical text */
@@ -658,10 +655,10 @@ _raqm_itemize (raqm_t *rq)
   }
 
   if (max_level < 0)
-  {
-    ok = false;
-    goto out;
-  }
+    return false;
+
+  if (!_raqm_resolve_scripts (rq))
+    return false;
 
   /* Get the number of bidi runs */
   run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
@@ -671,12 +668,6 @@ _raqm_itemize (raqm_t *rq)
   runs = malloc (sizeof (FriBidiRun) * (size_t)run_count);
   run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
                                     levels, runs);
-
-  if (!_raqm_resolve_scripts (rq))
-  {
-    ok = false;
-    goto out;
-  }
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Number of runs before script itemization: %d\n\n", run_count);
@@ -772,9 +763,6 @@ _raqm_itemize (raqm_t *rq)
   RAQM_TEST ("\n");
 #endif
 
-out:
-  free (levels);
-  free (types);
   free (runs);
 
   return ok;
