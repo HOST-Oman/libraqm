@@ -369,7 +369,7 @@ raqm_set_par_direction (raqm_t          *rq,
 /**
  * raqm_add_font_feature:
  * @rq: a #raqm_t.
- * @feature: a font feature string.
+ * @feature: (transfer none): a font feature string.
  * @len: length of @feature, -1 for %NULL-terminated.
  *
  * Adds a font feature to be used by the #raqm_t during text layout. This is
