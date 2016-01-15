@@ -289,9 +289,7 @@ raqm_set_text (raqm_t         *rq,
 
   rq->text_len = len;
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
-
-  for (size_t i = 0; i < rq->text_len; i++)
-    rq->text[i] = text[i];
+  memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
 }
 
 /**
@@ -324,9 +322,7 @@ raqm_set_text_utf8 (raqm_t         *rq,
                                              text, len, unicode);
 
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
-
-  for (size_t i = 0; i < rq->text_len; i++)
-    rq->text[i] = unicode[i];
+  memcpy (rq->text, unicode, sizeof (uint32_t) * rq->text_len);
 }
 
 /**
