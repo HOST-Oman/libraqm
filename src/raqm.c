@@ -282,7 +282,7 @@ raqm_set_text (raqm_t         *rq,
                const uint32_t *text,
                size_t          len)
 {
-  if (rq == NULL)
+  if (rq == NULL || text == NULL || len == 0)
     return;
 
   free (rq->text);
@@ -309,7 +309,7 @@ raqm_set_text_utf8 (raqm_t         *rq,
 {
   uint32_t unicode[len];
 
-  if (rq == NULL)
+  if (rq == NULL || text == NULL || len == 0)
     return;
 
   RAQM_TEST ("Text is: %s\n", text);
@@ -391,6 +391,9 @@ raqm_add_font_feature (raqm_t     *rq,
 {
   hb_bool_t ok;
   hb_feature_t fea;
+
+  if (rq == NULL)
+    return false;
 
   ok = hb_feature_from_string (feature, len, &fea);
   if (ok)
