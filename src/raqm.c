@@ -200,7 +200,7 @@ raqm_create (void)
 raqm_t *
 raqm_reference (raqm_t *rq)
 {
-  if (rq != NULL)
+  if (rq)
     rq->ref_count++;
 
   return rq;
@@ -224,12 +224,12 @@ _raqm_free_runs (raqm_t *rq)
 static void
 _raqm_free_fonts (raqm_t *rq)
 {
-  if (rq->fonts == NULL)
+  if (!rq->fonts)
     return;
 
   for (size_t i = 0; i < rq->text_len; i++)
   {
-    if (rq->fonts[i] != NULL)
+    if (rq->fonts[i])
       hb_font_destroy (rq->fonts[i]);
   }
 }
@@ -248,7 +248,7 @@ _raqm_free_fonts (raqm_t *rq)
 void
 raqm_destroy (raqm_t *rq)
 {
-  if (rq == NULL || --rq->ref_count != 0)
+  if (!rq || --rq->ref_count != 0)
     return;
 
   free (rq->text);
@@ -285,7 +285,7 @@ raqm_set_text (raqm_t         *rq,
                const uint32_t *text,
                size_t          len)
 {
-  if (rq == NULL || text == NULL || len == 0)
+  if (!rq || !text || !len)
     return false;
 
   free (rq->text);
@@ -318,7 +318,7 @@ raqm_set_text_utf8 (raqm_t         *rq,
   uint32_t unicode[len];
   size_t ulen;
 
-  if (rq == NULL || text == NULL || len == 0)
+  if (!rq || !text || !len)
     return false;
 
   RAQM_TEST ("Text is: %s\n", text);
@@ -365,7 +365,7 @@ bool
 raqm_set_par_direction (raqm_t          *rq,
                         raqm_direction_t dir)
 {
-  if (rq == NULL)
+  if (!rq)
     return false;
 
   rq->base_dir = dir;
@@ -403,7 +403,7 @@ raqm_add_font_feature (raqm_t     *rq,
   hb_bool_t ok;
   hb_feature_t fea;
 
-  if (rq == NULL)
+  if (!rq)
     return false;
 
   ok = hb_feature_from_string (feature, len, &fea);
@@ -479,24 +479,24 @@ raqm_set_freetype_face_range (raqm_t *rq,
                               size_t  start,
                               size_t  len)
 {
-  if (rq == NULL || rq->text_len == 0 || start >= rq->text_len)
+  if (!rq || !rq->text_len || start >= rq->text_len)
     return false;
 
   if (start + len > rq->text_len)
     return false;
 
 #ifdef RAQM_MULTI_FONT
-  if (rq->fonts == NULL)
+  if (!rq->fonts)
     rq->fonts = calloc (sizeof (intptr_t), rq->text_len);
 
   for (size_t i = 0; i < len; i++)
   {
-    if (rq->fonts[start + i] != NULL)
+    if (rq->fonts[start + i])
       hb_font_destroy (rq->fonts[start + i]);
     rq->fonts[start + i] = HB_FT_FONT_CREATE (face);
   }
 #else
-  if (rq->font != NULL)
+  if (rq->font)
     hb_font_destroy (rq->font);
   rq->font = HB_FT_FONT_CREATE (face);
 #endif
@@ -526,7 +526,7 @@ _raqm_shape (raqm_t *rq);
 bool
 raqm_layout (raqm_t *rq)
 {
-  if (rq == NULL || rq->text_len == 0 || rq->font == NULL)
+  if (!rq || !rq->text_len || !rq->font)
     return false;
 
   if (!_raqm_itemize (rq))
@@ -563,7 +563,7 @@ raqm_get_glyphs (raqm_t *rq,
 {
   size_t count = 0;
 
-  if (rq == NULL || length == NULL)
+  if (!rq || !length)
   {
     *length = 0;
     return NULL;
@@ -730,10 +730,10 @@ _raqm_itemize (raqm_t *rq)
   {
     raqm_run_t *run = calloc (1, sizeof (raqm_run_t));
 
-    if (rq->runs == NULL)
+    if (!rq->runs)
       rq->runs = run;
 
-    if (last != NULL)
+    if (last)
       last->next = run;
 
     run->direction = _raqm_hb_dir (rq, runs[i].level);
@@ -868,7 +868,7 @@ _raqm_stack_free (raqm_stack_t *stack)
 static bool
 _raqm_stack_pop (raqm_stack_t *stack)
 {
-  if (stack->size == 0)
+  if (!stack->size)
   {
     RAQM_DBG ("Stack is Empty\n");
     return false;
@@ -882,7 +882,7 @@ _raqm_stack_pop (raqm_stack_t *stack)
 static hb_script_t
 _raqm_stack_top (raqm_stack_t* stack)
 {
-  if (stack->size == 0)
+  if (!stack->size)
   {
     RAQM_DBG ("Stack is Empty\n");
     return HB_SCRIPT_INVALID; /* XXX: check this */
@@ -946,7 +946,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   hb_script_t last_script_value = HB_SCRIPT_INVALID;
   raqm_stack_t *stack = NULL;
 
-  if (rq->scripts != NULL)
+  if (rq->scripts)
     return true;
 
   rq->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * rq->text_len);
