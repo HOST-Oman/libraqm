@@ -147,9 +147,9 @@ struct _raqm_run {
  * defaults.
  *
  * Return value:
- * a newly allocated #raqm_t with a reference count of 1. The initial reference
+ * A newly allocated #raqm_t with a reference count of 1. The initial reference
  * count should be released with raqm_destroy() when you are done using the
- * #raqm_t.
+ * #raqm_t. Returns %NULL in case of error.
  *
  * Since: 0.1
  */
@@ -159,6 +159,9 @@ raqm_create (void)
   raqm_t *rq;
 
   rq = malloc (sizeof (raqm_t));
+  if (!rq)
+    return NULL;
+
   rq->ref_count = 1;
 
   rq->text = NULL;
@@ -292,6 +295,8 @@ raqm_set_text (raqm_t         *rq,
 
   rq->text_len = len;
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
+  if (!rq->text)
+    return NULL;
   memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
 
   return true;
@@ -412,6 +417,9 @@ raqm_add_font_feature (raqm_t     *rq,
     rq->features_len++;
     rq->features = realloc (rq->features,
                             sizeof (hb_feature_t) * (rq->features_len));
+    if (!rq->features)
+      return false;
+
     rq->features[rq->features_len - 1] = fea;
   }
 
@@ -488,6 +496,8 @@ raqm_set_freetype_face_range (raqm_t *rq,
 #ifdef RAQM_MULTI_FONT
   if (!rq->fonts)
     rq->fonts = calloc (sizeof (intptr_t), rq->text_len);
+  if (!rq->fonts)
+    return NULL;
 
   for (size_t i = 0; i < len; i++)
   {
@@ -578,6 +588,11 @@ raqm_get_glyphs (raqm_t *rq,
     free (rq->glyphs);
 
   rq->glyphs = malloc (sizeof (raqm_glyph_t) * count);
+  if (!rq->glyphs)
+  {
+    *length = 0;
+    return NULL;
+  }
 
   RAQM_TEST ("Glyph information:\n");
 
@@ -710,6 +725,9 @@ _raqm_itemize (raqm_t *rq)
 
   /* Populate bidi runs array */
   runs = malloc (sizeof (FriBidiRun) * (size_t)run_count);
+  if (!runs)
+    return false;
+
   run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
                                     levels, runs);
 
@@ -729,6 +747,8 @@ _raqm_itemize (raqm_t *rq)
   for (int i = 0; i < run_count; i++)
   {
     raqm_run_t *run = calloc (1, sizeof (raqm_run_t));
+    if (!run)
+      return NULL;
 
     if (!rq->runs)
       rq->runs = run;
@@ -748,6 +768,8 @@ _raqm_itemize (raqm_t *rq)
         if (script != run->script)
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
+          if (!newrun)
+            return NULL;
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
@@ -772,6 +794,8 @@ _raqm_itemize (raqm_t *rq)
         if (script != run->script)
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
+          if (!newrun)
+            return NULL;
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
@@ -785,9 +809,8 @@ _raqm_itemize (raqm_t *rq)
     }
 
     last = run;
+    last->next = NULL;
   }
-
-  last->next = NULL;
 
 #ifdef RAQM_TESTING
   run_count = 0;
@@ -849,8 +872,17 @@ _raqm_stack_new (size_t max)
 {
   raqm_stack_t *stack;
   stack = malloc (sizeof (raqm_stack_t));
+  if (!stack)
+    return NULL;
+
   stack->scripts = malloc (sizeof (hb_script_t) * max);
+  if (!stack->scripts)
+    return NULL;
+
   stack->pair_index = malloc (sizeof (int) * max);
+  if (!stack->pair_index)
+    return NULL;
+
   stack->size = 0;
   stack->capacity = max;
 
@@ -950,6 +982,9 @@ _raqm_resolve_scripts (raqm_t *rq)
     return true;
 
   rq->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * rq->text_len);
+  if (!rq->scripts)
+    return false;
+
   for (size_t i = 0; i < rq->text_len; ++i)
     rq->scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (),
                                         rq->text[i]);
@@ -965,6 +1000,9 @@ _raqm_resolve_scripts (raqm_t *rq)
 #endif
 
   stack = _raqm_stack_new (rq->text_len);
+  if (!stack)
+    return false;
+
   for (int i = 0; i < (int) rq->text_len; i++)
   {
     if (rq->scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
