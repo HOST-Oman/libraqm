@@ -521,8 +521,8 @@ raqm_layout (raqm_t *rq)
 }
 
 static uint32_t
-_raqm_u32_to_u8_index (FriBidiChar *unicode,
-                       uint32_t     index);
+_raqm_u32_to_u8_index (raqm_t   *rq,
+                       uint32_t  index);
 
 /**
  * raqm_get_glyphs:
@@ -597,7 +597,7 @@ raqm_get_glyphs (raqm_t *rq,
 #endif
 
     for (size_t i = 0; i < count; i++)
-      rq->glyphs[i].cluster = _raqm_u32_to_u8_index (rq->text,
+      rq->glyphs[i].cluster = _raqm_u32_to_u8_index (rq,
                                                      rq->glyphs[i].cluster);
 
 #ifdef RAQM_TESTING
@@ -1038,14 +1038,14 @@ _raqm_shape (raqm_t *rq)
 
 /* Convert index from UTF-32 to UTF-8 */
 static uint32_t
-_raqm_u32_to_u8_index (FriBidiChar *unicode,
-                       uint32_t     index)
+_raqm_u32_to_u8_index (raqm_t   *rq,
+                       uint32_t  index)
 {
   FriBidiStrIndex length;
   char output[(sizeof (uint32_t) * index) + 1];
 
   length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8,
-                                       unicode,
+                                       rq->text,
                                        index,
                                        output);
   return length;
