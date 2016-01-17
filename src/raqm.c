@@ -1084,7 +1084,6 @@ raqm_shape_u32 (const uint32_t* text,
     raqm_set_text (rq, text, length);
     raqm_set_par_direction (rq, direction);
     raqm_set_freetype_face (rq, face, 0, length);
-    raqm_set_freetype_face (rq, face, 0, length);
 
     if (features)
     {
