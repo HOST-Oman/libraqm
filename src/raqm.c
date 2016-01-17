@@ -866,35 +866,41 @@ static const FriBidiChar paired_chars[] =
   0x301a, 0x301b
 };
 
-/* Stack handling functions */
-static raqm_stack_t *
-_raqm_stack_new (size_t max)
-{
-  raqm_stack_t *stack;
-  stack = malloc (sizeof (raqm_stack_t));
-  if (!stack)
-    return NULL;
-
-  stack->scripts = malloc (sizeof (hb_script_t) * max);
-  if (!stack->scripts)
-    return NULL;
-
-  stack->pair_index = malloc (sizeof (int) * max);
-  if (!stack->pair_index)
-    return NULL;
-
-  stack->size = 0;
-  stack->capacity = max;
-
-  return stack;
-}
-
 static void
 _raqm_stack_free (raqm_stack_t *stack)
 {
   free (stack->scripts);
   free (stack->pair_index);
   free (stack);
+}
+
+/* Stack handling functions */
+static raqm_stack_t *
+_raqm_stack_new (size_t max)
+{
+  raqm_stack_t *stack;
+  stack = calloc (1, sizeof (raqm_stack_t));
+  if (!stack)
+    return NULL;
+
+  stack->scripts = malloc (sizeof (hb_script_t) * max);
+  if (!stack->scripts)
+  {
+    _raqm_stack_free (stack);
+    return NULL;
+  }
+
+  stack->pair_index = malloc (sizeof (int) * max);
+  if (!stack->pair_index)
+  {
+    _raqm_stack_free (stack);
+    return NULL;
+  }
+
+  stack->size = 0;
+  stack->capacity = max;
+
+  return stack;
 }
 
 static bool
