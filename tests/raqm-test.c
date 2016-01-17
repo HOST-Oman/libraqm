@@ -25,6 +25,7 @@
 #include "config.h"
 #endif
 
+#include <assert.h>
 #include <locale.h>
 #include <glib.h>
 
@@ -52,6 +53,7 @@ main (int argc, char *argv[])
   raqm_t *rq;
   raqm_glyph_t *glyphs;
   size_t count;
+  raqm_direction_t dir;
 
   GError *error = NULL;
   GOptionContext *context;
@@ -93,33 +95,29 @@ main (int argc, char *argv[])
     return 1;
   }
 
-  rq = raqm_create ();
-  raqm_set_text_utf8 (rq, text, strlen (text));
-  raqm_set_freetype_face (rq, face);
-
+  dir = RAQM_DIRECTION_DEFAULT;
   if (direction && strcmp(direction, "rtl") == 0)
-    raqm_set_par_direction (rq, RAQM_DIRECTION_RTL);
+    dir = RAQM_DIRECTION_RTL;
   else if (direction && strcmp(direction, "ltr") == 0)
-    raqm_set_par_direction (rq, RAQM_DIRECTION_LTR);
-  else
-    raqm_set_par_direction (rq, RAQM_DIRECTION_DEFAULT);
+    dir = RAQM_DIRECTION_LTR;
+
+  rq = raqm_create ();
+  assert (raqm_set_text_utf8 (rq, text, strlen (text)));
+  assert (raqm_set_freetype_face (rq, face));
+  assert (raqm_set_par_direction (rq, dir));
 
   if (features)
   {
     gchar **list = g_strsplit (features, ",", -1);
     for (gchar **p = list; p != NULL && *p != NULL; p++)
-      raqm_add_font_feature (rq, *p, -1);
+      assert (raqm_add_font_feature (rq, *p, -1));
     g_strfreev (list);
   }
 
-  if (!raqm_layout (rq))
-  {
-    fprintf (stderr, "raqm_layout() failed.\n");
-    return 1;
-  }
+  assert (raqm_layout (rq));
 
   glyphs = raqm_get_glyphs (rq, &count);
-  (void) glyphs;
+  assert (glyphs != NULL);
 
   raqm_destroy (rq);
   FT_Done_Face (face);

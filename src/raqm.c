@@ -275,21 +275,26 @@ raqm_destroy (raqm_t *rq)
  * represent a full paragraph, since doing the layout of chunks of text
  * separately can give improper output.
  *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
  * Since: 0.1
  */
-void
+bool
 raqm_set_text (raqm_t         *rq,
                const uint32_t *text,
                size_t          len)
 {
   if (rq == NULL || text == NULL || len == 0)
-    return;
+    return false;
 
   free (rq->text);
 
   rq->text_len = len;
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
   memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
+
+  return true;
 }
 
 /**
@@ -300,29 +305,30 @@ raqm_set_text (raqm_t         *rq,
  *
  * Same as raqm_set_text(), but for text encoded in UTF-8 encoding.
  *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
  * Since: 0.1
  */
-void
+bool
 raqm_set_text_utf8 (raqm_t         *rq,
                     const char     *text,
                     size_t          len)
 {
   uint32_t unicode[len];
+  size_t ulen;
 
   if (rq == NULL || text == NULL || len == 0)
-    return;
+    return false;
 
   RAQM_TEST ("Text is: %s\n", text);
 
-  free (rq->text);
-
   rq->flags |= RAQM_FLAG_UTF8;
 
-  rq->text_len = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
-                                             text, len, unicode);
+  ulen = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
+                                     text, len, unicode);
 
-  rq->text = malloc (sizeof (uint32_t) * rq->text_len);
-  memcpy (rq->text, unicode, sizeof (uint32_t) * rq->text_len);
+  return raqm_set_text (rq, unicode, ulen);
 }
 
 /**
@@ -350,16 +356,21 @@ raqm_set_text_utf8 (raqm_t         *rq,
  * horizontal text in vertical text, instead everything is treated as vertical
  * text.
  *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
  * Since: 0.1
  */
-void
+bool
 raqm_set_par_direction (raqm_t          *rq,
                         raqm_direction_t dir)
 {
   if (rq == NULL)
-    return;
+    return false;
 
   rq->base_dir = dir;
+
+  return true;
 }
 
 /**
@@ -428,16 +439,16 @@ _raqm_hb_ft_font_create_referenced (FT_Face face)
  *
  * See also raqm_set_freetype_face_range().
  *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
  * Since: 0.1
  */
-void
+bool
 raqm_set_freetype_face (raqm_t *rq,
                         FT_Face face)
 {
-  if (rq == NULL)
-    return;
-
-  raqm_set_freetype_face_range (rq, face, 0, rq->text_len);
+  return raqm_set_freetype_face_range (rq, face, 0, rq->text_len);
 }
 
 /**
@@ -457,19 +468,22 @@ raqm_set_freetype_face (raqm_t *rq,
  *
  * See also raqm_set_freetype_face().
  *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
  * Since: 0.1
  */
-void
+bool
 raqm_set_freetype_face_range (raqm_t *rq,
                               FT_Face face,
                               size_t  start,
                               size_t  len)
 {
   if (rq == NULL || rq->text_len == 0 || start >= rq->text_len)
-    return;
+    return false;
 
   if (start + len > rq->text_len)
-    return;
+    return false;
 
 #ifdef RAQM_MULTI_FONT
   if (rq->fonts == NULL)
@@ -486,6 +500,8 @@ raqm_set_freetype_face_range (raqm_t *rq,
     hb_font_destroy (rq->font);
   rq->font = HB_FT_FONT_CREATE (face);
 #endif
+
+  return true;
 }
 
 static bool
@@ -510,7 +526,7 @@ _raqm_shape (raqm_t *rq);
 bool
 raqm_layout (raqm_t *rq)
 {
-  if (rq == NULL || rq->text_len == 0)
+  if (rq == NULL || rq->text_len == 0 || rq->font == NULL)
     return false;
 
   if (!_raqm_itemize (rq))
@@ -536,7 +552,8 @@ _raqm_u32_to_u8_index (raqm_t   *rq,
  * information.
  *
  * Return value: (transfer none):
- * An array of #raqm_glyph_t. This is owned by @rq and must not be freed.
+ * An array of #raqm_glyph_t, or %NULL in case of error. This is owned by @rq
+ * and must not be freed.
  *
  * Since: 0.1
  */
@@ -547,7 +564,10 @@ raqm_get_glyphs (raqm_t *rq,
   size_t count = 0;
 
   if (rq == NULL || length == NULL)
+  {
+    *length = 0;
     return NULL;
+  }
 
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     count += hb_buffer_get_length (run->buffer);

@@ -95,17 +95,17 @@ raqm_reference (raqm_t *rq);
 void
 raqm_destroy (raqm_t *rq);
 
-void
+bool
 raqm_set_text (raqm_t         *rq,
                const uint32_t *text,
                size_t          len);
 
-void
+bool
 raqm_set_text_utf8 (raqm_t     *rq,
                     const char *text,
                     size_t      len);
 
-void
+bool
 raqm_set_par_direction (raqm_t          *rq,
                         raqm_direction_t dir);
 
@@ -114,11 +114,11 @@ raqm_add_font_feature  (raqm_t     *rq,
                         const char *feature,
                         int         len);
 
-void
+bool
 raqm_set_freetype_face (raqm_t *rq,
                         FT_Face face);
 
-void
+bool
 raqm_set_freetype_face_range (raqm_t *rq,
                               FT_Face face,
                               size_t  start,
