@@ -2,7 +2,7 @@
 
 set -o errexit -o nounset
 
-#if test "x$TRAVIS_BRANCH" != xmaster; then exit; fi
+if test "x$TRAVIS_BRANCH" != xmaster; then exit; fi
 
 DOCSDIR=build-docs
 REVISION=$(git rev-parse --short HEAD)
