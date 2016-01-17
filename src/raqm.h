@@ -131,35 +131,4 @@ raqm_glyph_t *
 raqm_get_glyphs (raqm_t *rq,
                  size_t *length);
 
-/* Old API */
-
-typedef raqm_glyph_t raqm_glyph_info_t;
-
-/* raqm_shape - apply bidi algorithm and shape text.
- *
- * This function reorders and shapes the text using FriBiDi and HarfBuzz.
- * It supports proper script detection for each character of the input string.
- * If the character script is common or inherited it takes the script of the
- * character before it except some special paired characters.
- *
- * Returns: number of glyphs.
- */
-unsigned int
-raqm_shape     (const char* text,               /* input text, UTF-8 encoded */
-                int length,                     /* length of text array  */
-                const FT_Face face,             /* font to use for shaping */
-                raqm_direction_t direction,     /* base paragraph direction */
-                const char **features,          /* a NULL-terminated array of font feature strings */
-                raqm_glyph_info_t** glyph_info  /* output glyph info, should be freed by the client */
-               );
-
-unsigned int
-raqm_shape_u32 (const uint32_t* text,           /* input text, UTF-32 encoded */
-                int length,                     /* length of text array */
-                const FT_Face face,             /* font to use for shaping */
-                raqm_direction_t direction,     /* base paragraph direction */
-                const char **features,          /* a NULL-terminated array of font feature strings */
-                raqm_glyph_info_t** glyph_info  /* output glyph info, should be freed by the client */
-               );
-
 #endif /* _RAQM_H_ */
