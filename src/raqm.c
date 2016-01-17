@@ -448,6 +448,8 @@ raqm_set_freetype_face (raqm_t *rq,
  * @len: number of characters using @face.
  *
  * Sets an #FT_Face to be used for @len-number of characters staring at @start.
+ * The @start and @len are UTF-32 character indices, regardless of the original
+ * text encoding.
  *
  * This method can be used repeatedly to set different faces for different
  * parts of the text. It is the responsibility of the client to make sure that
