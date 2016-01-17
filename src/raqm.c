@@ -573,7 +573,7 @@ raqm_get_glyphs (raqm_t *rq,
 {
   size_t count = 0;
 
-  if (!rq || !length)
+  if (!rq || !rq->runs || !length)
   {
     if (length)
       *length = 0;
