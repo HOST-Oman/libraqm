@@ -77,23 +77,9 @@ main (int argc, char *argv[])
     return 1;
   }
 
-  if (FT_Init_FreeType (&library))
-  {
-    fprintf (stderr, "FT_Init_FreeType() failed.\n");
-    return 1;
-  }
-
-  if (FT_New_Face (library, args[0], 0, &face))
-  {
-    fprintf (stderr, "FT_New_Face() failed.\n");
-    return 1;
-  }
-
-  if (FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0))
-  {
-    fprintf (stderr, "FT_Set_Char_Size() failed.\n");
-    return 1;
-  }
+  assert (!FT_Init_FreeType (&library));
+  assert (!FT_New_Face (library, args[0], 0, &face));
+  assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
 
   dir = RAQM_DIRECTION_DEFAULT;
   if (direction && strcmp(direction, "rtl") == 0)
