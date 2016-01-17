@@ -988,7 +988,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   if (rq->scripts)
     return true;
 
-  rq->scripts = (hb_script_t *) malloc (sizeof (hb_script_t) * rq->text_len);
+  rq->scripts = malloc (sizeof (hb_script_t) * rq->text_len);
   if (!rq->scripts)
     return false;
 
