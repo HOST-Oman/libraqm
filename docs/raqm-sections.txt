@@ -7,6 +7,7 @@ raqm_set_text
 raqm_set_text_utf8
 raqm_set_par_direction
 raqm_set_freetype_face
+raqm_set_freetype_face_range
 raqm_add_font_feature
 raqm_layout
 raqm_get_glyphs

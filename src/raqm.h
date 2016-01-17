@@ -116,9 +116,13 @@ raqm_add_font_feature  (raqm_t     *rq,
 
 void
 raqm_set_freetype_face (raqm_t *rq,
-                        FT_Face face,
-                        size_t  start,
-                        size_t  len);
+                        FT_Face face);
+
+void
+raqm_set_freetype_face_range (raqm_t *rq,
+                              FT_Face face,
+                              size_t  start,
+                              size_t  len);
 
 bool
 raqm_layout (raqm_t *rq);

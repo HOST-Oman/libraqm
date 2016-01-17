@@ -67,7 +67,7 @@
  *
  * rq = raqm_create ();
  * raqm_set_text (rq, text, len);
- * raqm_set_freetype_face (rq, face, 0, len);
+ * raqm_set_freetype_face (rq, face);
  * if (raqm_layout (rq))
  * {
  *   glyphs = raqm_get_glyphs (rq, &nglyphs);
@@ -423,6 +423,27 @@ _raqm_hb_ft_font_create_referenced (FT_Face face)
  * raqm_set_freetype_face:
  * @rq: a #raqm_t.
  * @face: an #FT_Face.
+ *
+ * Sets an #FT_Face to be used for all characters in @rq.
+ *
+ * See also raqm_set_freetype_face_range().
+ *
+ * Since: 0.1
+ */
+void
+raqm_set_freetype_face (raqm_t *rq,
+                        FT_Face face)
+{
+  if (rq == NULL)
+    return;
+
+  raqm_set_freetype_face_range (rq, face, 0, rq->text_len);
+}
+
+/**
+ * raqm_set_freetype_face_range:
+ * @rq: a #raqm_t.
+ * @face: an #FT_Face.
  * @start: index of first character that should use @face.
  * @len: number of characters using @face.
  *
@@ -432,13 +453,15 @@ _raqm_hb_ft_font_create_referenced (FT_Face face)
  * parts of the text. It is the responsibility of the client to make sure that
  * face ranges cover the whole text.
  *
+ * See also raqm_set_freetype_face().
+ *
  * Since: 0.1
  */
 void
-raqm_set_freetype_face (raqm_t *rq,
-                        FT_Face face,
-                        size_t  start,
-                        size_t  len)
+raqm_set_freetype_face_range (raqm_t *rq,
+                              FT_Face face,
+                              size_t  start,
+                              size_t  len)
 {
   if (rq == NULL || rq->text_len == 0 || start >= rq->text_len)
     return;
@@ -1045,7 +1068,7 @@ raqm_shape (const char* text,
     rq = raqm_create ();
     raqm_set_text_utf8 (rq, text, length);
     raqm_set_par_direction (rq, direction);
-    raqm_set_freetype_face (rq, face, 0, length);
+    raqm_set_freetype_face (rq, face);
 
     if (features)
     {
@@ -1083,7 +1106,7 @@ raqm_shape_u32 (const uint32_t* text,
     rq = raqm_create ();
     raqm_set_text (rq, text, length);
     raqm_set_par_direction (rq, direction);
-    raqm_set_freetype_face (rq, face, 0, length);
+    raqm_set_freetype_face (rq, face);
 
     if (features)
     {

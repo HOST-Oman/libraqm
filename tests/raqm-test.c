@@ -95,7 +95,7 @@ main (int argc, char *argv[])
 
   rq = raqm_create ();
   raqm_set_text_utf8 (rq, text, strlen (text));
-  raqm_set_freetype_face (rq, face, 0, strlen (text));
+  raqm_set_freetype_face (rq, face);
 
   if (direction && strcmp(direction, "rtl") == 0)
     raqm_set_par_direction (rq, RAQM_DIRECTION_RTL);
