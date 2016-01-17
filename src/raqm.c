@@ -469,7 +469,7 @@ raqm_set_freetype_face_range (raqm_t *rq,
     return;
 
   if (start + len > rq->text_len)
-    len = rq->text_len - start;
+    return;
 
 #ifdef RAQM_MULTI_FONT
   if (rq->fonts == NULL)
