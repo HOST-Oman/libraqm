@@ -912,7 +912,7 @@ _raqm_stack_pop (raqm_stack_t *stack)
 }
 
 static hb_script_t
-_raqm_stack_top (raqm_stack_t* stack)
+_raqm_stack_top (raqm_stack_t *stack)
 {
   if (!stack->size)
   {
@@ -981,7 +981,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   if (rq->scripts)
     return true;
 
-  rq->scripts = (hb_script_t*) malloc (sizeof (hb_script_t) * rq->text_len);
+  rq->scripts = (hb_script_t *) malloc (sizeof (hb_script_t) * rq->text_len);
   if (!rq->scripts)
     return false;
 
@@ -1021,7 +1021,7 @@ _raqm_resolve_scripts (raqm_t *rq)
         {
           /* is a close paired character */
           /* find matching opening (by getting the last even index for current
-           * odd index)*/
+           * odd index) */
           int pi = pair_index & ~1;
           while (STACK_IS_NOT_EMPTY (stack) &&
                  stack->pair_index[stack->size] != pi)
