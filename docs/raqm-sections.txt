@@ -14,8 +14,4 @@ raqm_get_glyphs
 raqm_t
 raqm_direction_t
 raqm_glyph_t
-<SUBSECTION Private>
-raqm_glyph_info_t
-raqm_shape
-raqm_shape_u32
 </SECTION>
