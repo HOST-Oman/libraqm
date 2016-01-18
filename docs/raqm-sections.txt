@@ -11,6 +11,8 @@ raqm_set_freetype_face_range
 raqm_add_font_feature
 raqm_layout
 raqm_get_glyphs
+raqm_index_to_position
+raqm_position_to_index
 raqm_t
 raqm_direction_t
 raqm_glyph_t

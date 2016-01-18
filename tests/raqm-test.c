@@ -36,6 +36,9 @@ static gchar *text = NULL;
 static gchar *features = NULL;
 static gchar *font = NULL;
 static gchar *fonts = NULL;
+static gint cluster = -1;
+static gint position = -1;
+static gchar **args = NULL;
 static GOptionEntry entries[] =
 {
   { "text", 0, 0, G_OPTION_ARG_STRING, &text, "The text to be displayed", "TEXT" },
@@ -43,6 +46,9 @@ static GOptionEntry entries[] =
   { "fonts", 0, 0, G_OPTION_ARG_STRING, &fonts, "Font files and ranges for multi-fonts: <fontfile1> start:length, ...", "FONTS" },
   { "direction", 0, 0, G_OPTION_ARG_STRING, &direction, "The text direction", "DIR" },
   { "font-features", 0, 0, G_OPTION_ARG_STRING, &features, "The font features ", "FEATURES" },
+  { "cluster", 0, 0, G_OPTION_ARG_INT, &cluster, "The glyph cluster ", "CLUSTER" },
+  { "position", 0, 0, G_OPTION_ARG_INT, &position, "The glyph position ", "POSITION" },
+  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, "Remaining arguments", "FONTFILE" },
   { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
 };
 
@@ -54,8 +60,9 @@ main (int argc, char *argv[])
 
   raqm_t *rq;
   raqm_glyph_t *glyphs;
-  size_t count;
+  size_t count, start_index, index;
   raqm_direction_t dir;
+  int x = 0, y = 0;
 
   GError *error = NULL;
   GOptionContext *context;
@@ -71,6 +78,8 @@ main (int argc, char *argv[])
   }
 
   g_option_context_free (context);
+
+  text = g_strcompress (text);
 
   if (text == NULL || (font == NULL && fonts == NULL))
   {
@@ -127,6 +136,15 @@ main (int argc, char *argv[])
 
   glyphs = raqm_get_glyphs (rq, &count);
   assert (glyphs != NULL);
+
+  if (cluster >= 0)
+  {
+    index = cluster;
+    assert (raqm_index_to_position (rq, &index, &x, &y));
+  }
+  
+  if (position)
+    assert (raqm_position_to_index (rq, position, 0, &start_index));
 
   raqm_destroy (rq);
   FT_Done_Face (face);

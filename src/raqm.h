@@ -138,4 +138,15 @@ raqm_get_glyphs (raqm_t *rq,
 }
 #endif
 
+bool
+raqm_index_to_position (raqm_t *rq,
+                        size_t *index,
+                        int *x,
+                        int *y);
+
+bool
+raqm_position_to_index (raqm_t *rq,
+                        int x,
+                        int y,
+                        size_t *index);
 #endif /* _RAQM_H_ */

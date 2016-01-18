@@ -54,6 +54,16 @@ TEST_FILES = \
     test3_RTL.test \
     test4_RTL.test \
     test5_RTL.test \
+    cursor_position1.test \
+    cursor_position2.test \
+    cursor_position3.test \
+    cursor_position4.test \
+    cursor_position_GB3.test \
+    cursor_position_GB4.test \
+    cursor_position_GB5.test \
+    cursor_position_GB8a.test \
+    cursor_position_GB9.test \
+    cursor_position_GB9a.test
     $(NULL)
 
 if HAVE_GLIB

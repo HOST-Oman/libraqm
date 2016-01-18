@@ -1,0 +1,64 @@
+fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
+ömán عُمان
+--cluster 1 --position 1000
+Text is: ömán عُمان
+Direction is: DEFAULT
+
+Before script detection:
+script for ch[0]	Latn
+script for ch[1]	Zinh
+script for ch[2]	Latn
+script for ch[3]	Latn
+script for ch[4]	Zinh
+script for ch[5]	Latn
+script for ch[6]	Zyyy
+script for ch[7]	Arab
+script for ch[8]	Zinh
+script for ch[9]	Arab
+script for ch[10]	Arab
+script for ch[11]	Arab
+
+After script detection:
+script for ch[0]	Latn
+script for ch[1]	Latn
+script for ch[2]	Latn
+script for ch[3]	Latn
+script for ch[4]	Latn
+script for ch[5]	Latn
+script for ch[6]	Latn
+script for ch[7]	Arab
+script for ch[8]	Arab
+script for ch[9]	Arab
+script for ch[10]	Arab
+script for ch[11]	Arab
+
+Number of runs before script itemization: 2
+
+Fribidi Runs:
+run[0]:	 start: 0	length: 7	level: 0
+run[1]:	 start: 7	length: 5	level: 1
+
+Number of runs after script itemization: 2
+
+Final Runs:
+run[0]:	 start: 0	length: 7	direction: ltr	script: Latn	font: Amiri
+run[1]:	 start: 7	length: 5	direction: rtl	script: Arab	font: Amiri
+
+Glyph information:
+glyph [183]	x_offset: 0	y_offset: 0	x_advance: 1018	font: Amiri
+glyph [80]	x_offset: 0	y_offset: 0	x_advance: 1580	font: Amiri
+glyph [162]	x_offset: 0	y_offset: 0	x_advance: 862	font: Amiri
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
+glyph [419]	x_offset: 0	y_offset: 0	x_advance: 1173	font: Amiri
+glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 470	font: Amiri
+glyph [4992]	x_offset: 0	y_offset: 0	x_advance: 444	font: Amiri
+glyph [428]	x_offset: -234	y_offset: 0	x_advance: 0	font: Amiri
+glyph [4959]	x_offset: 0	y_offset: 0	x_advance: 1005	font: Amiri
+
+UTF-32 clusters: 00 02 03 05 06 11 10 09 07 07
+UTF-8 clusters:  00 03 04 07 08 17 15 13 09 09
+
+The position is 1018 at index 0
+
+The start-index is 2  at position 1000 

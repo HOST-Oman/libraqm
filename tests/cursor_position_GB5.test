@@ -1,0 +1,55 @@
+fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
+omanoman
+--cluster 4 --position 5000
+Text is: omanoman
+Direction is: DEFAULT
+
+Before script detection:
+script for ch[0]	Latn
+script for ch[1]	Latn
+script for ch[2]	Latn
+script for ch[3]	Latn
+script for ch[4]	Zyyy
+script for ch[5]	Latn
+script for ch[6]	Latn
+script for ch[7]	Latn
+script for ch[8]	Latn
+
+After script detection:
+script for ch[0]	Latn
+script for ch[1]	Latn
+script for ch[2]	Latn
+script for ch[3]	Latn
+script for ch[4]	Latn
+script for ch[5]	Latn
+script for ch[6]	Latn
+script for ch[7]	Latn
+script for ch[8]	Latn
+
+Number of runs before script itemization: 1
+
+Fribidi Runs:
+run[0]:	 start: 0	length: 9	level: 0
+
+Number of runs after script itemization: 1
+
+Final Runs:
+run[0]:	 start: 0	length: 9	direction: ltr	script: Latn	font: Amiri
+
+Glyph information:
+glyph [82]	x_offset: 0	y_offset: 0	x_advance: 1018	font: Amiri
+glyph [80]	x_offset: 0	y_offset: 0	x_advance: 1580	font: Amiri
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	font: Amiri
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
+glyph [82]	x_offset: 0	y_offset: 0	x_advance: 1018	font: Amiri
+glyph [80]	x_offset: 0	y_offset: 0	x_advance: 1580	font: Amiri
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	font: Amiri
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	font: Amiri
+
+UTF-32 clusters: 00 01 02 03 04 05 06 07 08
+UTF-8 clusters:  00 01 02 03 04 06 07 08 09
+
+The position is 5272 at index 4
+
+The start-index is 5  at position 5000 

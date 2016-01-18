@@ -13,6 +13,7 @@ compiler:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      sudo add-apt-repository ppa:as-bahanta/raqm -y; # needed for latest version of FriBiDi
       sudo apt-get update -qq;
       sudo apt-get install -y libfreetype6-dev libharfbuzz-dev libfribidi-dev libglib2.0-dev gtk-doc-tools;
     fi

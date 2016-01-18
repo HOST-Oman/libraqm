@@ -173,9 +173,11 @@ struct _raqm {
   int              ref_count;
 
   uint32_t        *text;
+  char            *text_utf8;
   size_t           text_len;
 
   raqm_direction_t base_dir;
+  raqm_direction_t resolved_dir;
 
   hb_feature_t    *features;
   size_t           features_len;
@@ -227,9 +229,11 @@ raqm_create (void)
   rq->ref_count = 1;
 
   rq->text = NULL;
+  rq->text_utf8 = NULL;
   rq->text_len = 0;
 
   rq->base_dir = RAQM_DIRECTION_DEFAULT;
+  rq->resolved_dir = RAQM_DIRECTION_DEFAULT;
 
   rq->features = NULL;
   rq->features_len = 0;
@@ -386,6 +390,12 @@ raqm_set_text_utf8 (raqm_t         *rq,
   RAQM_TEST ("Text is: %s\n", text);
 
   rq->flags |= RAQM_FLAG_UTF8;
+
+  rq->text_utf8 = malloc (sizeof (char) * strlen (text));
+  if (!rq->text_utf8)
+    return false;
+
+  memcpy (rq->text_utf8, text, sizeof (char) * strlen (text));
 
   ulen = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
                                      text, len, unicode);
@@ -775,12 +785,18 @@ _raqm_itemize (raqm_t *rq)
     max_level = 0;
     memset (types, FRIBIDI_TYPE_LTR, rq->text_len);
     memset (levels, 0, rq->text_len);
+    rq->resolved_dir = RAQM_DIRECTION_LTR;
   }
   else
   {
     fribidi_get_bidi_types (rq->text, rq->text_len, types);
     max_level = fribidi_get_par_embedding_levels (types, rq->text_len,
                                                   &par_type, levels);
+
+   if (par_type == FRIBIDI_PAR_LTR)
+     rq->resolved_dir = RAQM_DIRECTION_LTR;
+   else
+     rq->resolved_dir = RAQM_DIRECTION_RTL;
   }
 
   if (max_level < 0)
@@ -1196,4 +1212,366 @@ _raqm_u32_to_u8_index (raqm_t   *rq,
                                        index,
                                        output);
   return length;
+}
+
+/* Convert index from UTF-8 to UTF-32 */
+static uint32_t
+_raqm_u8_to_u32_index (raqm_t   *rq,
+                       uint32_t  index)
+{
+  FriBidiStrIndex length;
+#ifdef _MSC_VER
+  uint32_t *output = _alloca ((sizeof (uint32_t) * index) + 1);
+#else
+  uint32_t output[(sizeof (uint32_t) * index) + 1];
+#endif
+
+  length = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
+                                       rq->text_utf8,
+                                       index,
+                                       output);
+  return length;
+}
+
+static bool
+_raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
+                                hb_codepoint_t r_char);
+
+static bool
+_raqm_in_hangul_syllable (hb_codepoint_t ch);
+
+/**
+ * raqm_index_to_position:
+ * @rq: a #raqm_t.
+ * @index: (inout): character index.
+ * @x: (out): output x position.
+ * @y: (out): output y position.
+ *
+ * Calculates the cursor position after the character at @index. If the character
+ * is right-to-left, then the cursor will be at the left of it, whereas if the
+ * character is left-to-right, then the cursor will be at the right of it.
+ *
+ * Return value:
+ * %true if the process was successful, %false otherwise.
+ *
+ * Since: 0.1
+ */
+bool
+raqm_index_to_position (raqm_t *rq,
+                        size_t *index,
+                        int *x,
+                        int *y)
+{
+  bool found = false;
+
+  /* We don't currently support multiline, so y is always 0 */
+  *y = 0;
+  *x = 0;
+
+  if (rq == NULL)
+    return false;
+
+  if (rq->flags & RAQM_FLAG_UTF8)
+    *index = _raqm_u8_to_u32_index (rq, *index);
+
+  if (*index >= rq->text_len)
+    return false;
+
+  RAQM_TEST ("\n");
+
+  while(*index < rq->text_len)
+  {
+    if (_raqm_allowed_grapheme_boundary(rq->text[*index], rq->text[*index+1]))
+      break;
+
+    ++*index;
+  }
+
+  for (raqm_run_t *run = rq->runs; run != NULL && !found; run = run->next)
+  {
+    size_t len;
+    hb_glyph_info_t *info;
+    hb_glyph_position_t *position;
+    len = hb_buffer_get_length (run->buffer);
+    info = hb_buffer_get_glyph_infos (run->buffer, NULL);
+    position = hb_buffer_get_glyph_positions (run->buffer, NULL);
+
+    for (size_t i = 0; i < len && !found; i++)
+    {
+      uint32_t curr_cluster = info[i].cluster;
+      uint32_t next_cluster = curr_cluster;
+      *x += position[i].x_advance;
+
+      if (run->direction == HB_DIRECTION_LTR)
+        for (size_t j = i + 1; j < len && next_cluster == curr_cluster; j++)
+          next_cluster = info[j].cluster;
+      else
+	for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
+	     j--)
+          next_cluster = info[j].cluster;
+
+      if (next_cluster == curr_cluster)
+        next_cluster = run->pos + run->len;
+
+      if (*index < next_cluster && *index >= curr_cluster)
+      {
+        if (run->direction == HB_DIRECTION_RTL)
+          *x -= position[i].x_advance;
+        *index = curr_cluster;
+        found = true;
+      }
+    }
+  }
+
+  if (rq->flags & RAQM_FLAG_UTF8)
+    *index = _raqm_u32_to_u8_index(rq, *index);
+  RAQM_TEST ("The position is %d at index %ld\n",*x ,*index);
+  return true;
+}
+
+/**
+ * raqm_position_to_index:
+ * @rq: a #raqm_t.
+ * @x: x position.
+ * @y: y position.
+ * @index: (out): output character index.
+ *
+ * Returns the @index of the character at @x and @y position within text.
+ * If the position is outside the text, the last character is chosen as
+ * @index.
+ *
+ * Return value:
+ * %true if the process was successful, %false in case of error.
+ *
+ * Since: 0.1
+ */
+bool
+raqm_position_to_index (raqm_t *rq,
+                        int x,
+                        int y,
+                        size_t *index)
+{
+  int delta_x = 0, current_x = 0;
+  (void)y;
+
+  if (rq == NULL)
+    return false;
+
+  if (x < 0) /* Get leftmost index */
+  {
+    if (rq->resolved_dir == RAQM_DIRECTION_RTL)
+      *index = rq->text_len;
+    else
+      *index = 0;
+    return true;
+  }
+
+  RAQM_TEST ("\n");
+
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    size_t len;
+    hb_glyph_info_t *info;
+    hb_glyph_position_t *position;
+    len = hb_buffer_get_length (run->buffer);
+    info = hb_buffer_get_glyph_infos (run->buffer, NULL);
+    position = hb_buffer_get_glyph_positions (run->buffer, NULL);
+ 
+    for (size_t i = 0; i < len; i++)
+    {
+      delta_x = position[i].x_advance;
+      if (x < (current_x + delta_x))
+      {
+        bool before = false;
+        if (run->direction == HB_DIRECTION_LTR)
+          before = (x < current_x + (delta_x / 2));
+        else
+          before = (x > current_x + (delta_x / 2));
+
+        if (before)
+          *index = info[i].cluster;
+        else
+        {
+          uint32_t curr_cluster = info[i].cluster;
+          uint32_t next_cluster = curr_cluster;
+          if (run->direction == HB_DIRECTION_LTR)
+            for (size_t j = i + 1; j < len && next_cluster == curr_cluster; j++)
+              next_cluster = info[j].cluster;
+          else
+	  for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
+		 j--)
+              next_cluster = info[j].cluster;
+
+          if (next_cluster == curr_cluster)
+            next_cluster = run->pos + run->len;
+
+          *index = next_cluster;
+        }
+        if (_raqm_allowed_grapheme_boundary(rq->text[*index],rq->text[*index+1]))
+        {
+          RAQM_TEST ("The start-index is %ld  at position %d \n", *index, x);
+            return true;
+        }
+
+        while (*index < (unsigned)run->pos + run->len)
+        {
+	  if (_raqm_allowed_grapheme_boundary(rq->text[*index],
+					      rq->text[*index+1]))
+          {
+            *index += 1;
+            break;
+          }
+          *index += 1;
+        }
+        RAQM_TEST ("The start-index is %ld  at position %d \n", *index, x);
+        return true;
+      }
+      else
+        current_x += delta_x;
+    }
+  }
+
+  /* Get rightmost index*/
+  if (rq->resolved_dir == RAQM_DIRECTION_RTL)
+    *index = 0;
+  else
+    *index = rq->text_len;
+
+  RAQM_TEST ("The start-index is %ld  at position %d \n", *index, x);
+
+  return true;
+}
+
+typedef enum
+{
+  RAQM_GRAPHEM_CR,
+  RAQM_GRAPHEM_LF,
+  RAQM_GRAPHEM_CONTROL,
+  RAQM_GRAPHEM_EXTEND,
+  RAQM_GRAPHEM_REGIONAL_INDICATOR,
+  RAQM_GRAPHEM_PREPEND,
+  RAQM_GRAPHEM_SPACING_MARK,
+  RAQM_GRAPHEM_HANGUL_SYLLABLE,
+  RAQM_GRAPHEM_OTHER
+} raqm_grapheme_t;
+
+static raqm_grapheme_t
+_raqm_get_grapheme_break (hb_codepoint_t ch,
+                          hb_unicode_general_category_t category);
+
+static bool
+_raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
+                                 hb_codepoint_t r_char)
+{
+  hb_unicode_general_category_t l_category;
+  hb_unicode_general_category_t r_category;
+  raqm_grapheme_t l_grapheme, r_grapheme;
+
+  l_category = hb_unicode_general_category (hb_unicode_funcs_get_default (),
+					    l_char);
+  r_category = hb_unicode_general_category (hb_unicode_funcs_get_default (),
+					    r_char);
+  l_grapheme = _raqm_get_grapheme_break (l_char, l_category);
+  r_grapheme = _raqm_get_grapheme_break (r_char, r_category);
+
+  if (l_grapheme == RAQM_GRAPHEM_CR && r_grapheme == RAQM_GRAPHEM_LF)
+    return false; /*Do not break between a CR and LF GB3*/
+  if (l_grapheme == RAQM_GRAPHEM_CONTROL || l_grapheme == RAQM_GRAPHEM_CR ||
+      l_grapheme == RAQM_GRAPHEM_LF || r_grapheme == RAQM_GRAPHEM_CONTROL ||
+      r_grapheme == RAQM_GRAPHEM_CR || r_grapheme == RAQM_GRAPHEM_LF)
+    return true; /*Break before and after CONTROL GB4, GB5*/
+  if (r_grapheme == RAQM_GRAPHEM_HANGUL_SYLLABLE)
+    return false; /*Do not break Hangul syllable sequences. GB6, GB7, GB8*/
+  if (l_grapheme == RAQM_GRAPHEM_REGIONAL_INDICATOR &&
+      r_grapheme == RAQM_GRAPHEM_REGIONAL_INDICATOR)
+    return false; /*Do not break between regional indicator symbols. GB8a*/
+  if (r_grapheme == RAQM_GRAPHEM_EXTEND)
+    return false; /*Do not break before extending characters. GB9*/
+  /*Do not break before SpacingMarks, or after Prepend characters.GB9a, GB9b*/
+  if (l_grapheme == RAQM_GRAPHEM_PREPEND)
+    return false;
+  if (r_grapheme == RAQM_GRAPHEM_SPACING_MARK)
+    return false;
+  return true; /*Otherwise, break everywhere. GB1, GB2, GB10*/
+}
+
+static raqm_grapheme_t
+_raqm_get_grapheme_break (hb_codepoint_t ch,
+                          hb_unicode_general_category_t category)
+{
+  raqm_grapheme_t gb_type;
+
+  gb_type = RAQM_GRAPHEM_OTHER;
+  switch ((int)category)
+  {
+    case HB_UNICODE_GENERAL_CATEGORY_FORMAT:
+      if (ch == 0x200C || ch == 0x200D)
+        gb_type = RAQM_GRAPHEM_EXTEND;
+      else
+        gb_type = RAQM_GRAPHEM_CONTROL;
+      break;
+
+    case HB_UNICODE_GENERAL_CATEGORY_CONTROL:
+      if (ch == 0x000D)
+        gb_type = RAQM_GRAPHEM_CR;
+      else if (ch == 0x000A)
+        gb_type = RAQM_GRAPHEM_LF;
+      else
+        gb_type = RAQM_GRAPHEM_CONTROL;
+      break;
+
+    case HB_UNICODE_GENERAL_CATEGORY_SURROGATE:
+    case HB_UNICODE_GENERAL_CATEGORY_LINE_SEPARATOR:
+    case HB_UNICODE_GENERAL_CATEGORY_PARAGRAPH_SEPARATOR:
+    case HB_UNICODE_GENERAL_CATEGORY_UNASSIGNED:
+      if ((ch >= 0xFFF0 && ch <= 0xFFF8) ||
+          (ch >= 0xE0000 && ch <= 0xE0FFF))
+        gb_type = RAQM_GRAPHEM_CONTROL;
+      break;
+
+    case HB_UNICODE_GENERAL_CATEGORY_NON_SPACING_MARK:
+    case HB_UNICODE_GENERAL_CATEGORY_ENCLOSING_MARK:
+    case HB_UNICODE_GENERAL_CATEGORY_SPACING_MARK:
+      if (ch != 0x102B || ch != 0x102C || ch != 0x1038 ||
+          (ch <= 0x1062 && ch >= 0x1064) || (ch <= 0x1067 && ch >= 0x106D) ||
+          ch != 0x1083 || (ch <= 0x1087 && ch >= 0x108C) || ch != 0x108F ||
+          (ch <= 0x109A && ch >= 0x109C) || ch != 0x1A61 || ch != 0x1A63 ||
+          ch != 0x1A64 || ch != 0xAA7B || ch != 0xAA70 || ch != 0x11720 ||
+          ch != 0x11721) /**/
+        gb_type = RAQM_GRAPHEM_SPACING_MARK;
+
+      else if (ch == 0x09BE || ch == 0x09D7 ||
+          ch == 0x0B3E || ch == 0x0B57 || ch == 0x0BBE || ch == 0x0BD7 ||
+          ch == 0x0CC2 || ch == 0x0CD5 || ch == 0x0CD6 ||
+          ch == 0x0D3E || ch == 0x0D57 || ch == 0x0DCF || ch == 0x0DDF ||
+          ch == 0x1D165 || (ch >= 0x1D16E && ch <= 0x1D172))
+        gb_type = RAQM_GRAPHEM_EXTEND;
+      break;
+
+    case HB_UNICODE_GENERAL_CATEGORY_OTHER_LETTER:
+      if (ch == 0x0E33 || ch == 0x0EB3)
+        gb_type = RAQM_GRAPHEM_SPACING_MARK;
+      break;
+
+    case HB_UNICODE_GENERAL_CATEGORY_OTHER_SYMBOL:
+      if (ch >= 0x1F1E6 && ch <= 0x1F1FF)
+        gb_type = RAQM_GRAPHEM_REGIONAL_INDICATOR;
+      break;
+
+    default:
+      gb_type = RAQM_GRAPHEM_OTHER;
+      break;
+  }
+
+  if (_raqm_in_hangul_syllable (ch))
+    gb_type = RAQM_GRAPHEM_HANGUL_SYLLABLE;
+
+  return gb_type;
+}
+
+static bool
+_raqm_in_hangul_syllable (hb_codepoint_t ch)
+{
+  (void)ch;
+  return false;
 }
