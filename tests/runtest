@@ -27,7 +27,27 @@ do
 	tail -n +4 $filename > $expected
 
 	output=$(mktemp output.XXXXXX)
-	$testtool --text="$text" $opts --font="$srcdir/$font" > $output
+	case $font in
+		*,* )
+			oldIFS=$IFS
+			IFS=","
+			fonts=
+			for f in $font
+			do
+				if [ x"$fonts" = x"" ]
+				then
+					fonts=$srcdir/$f
+				else
+					fonts=$fonts,$srcdir/$f
+				fi
+			done
+			IFS=$oldIFS
+			$testtool --text="$text" $opts --fonts="$fonts" > $output
+		;;
+		*)
+			$testtool --text="$text" $opts --font="$srcdir/$font" > $output
+		;;
+	esac
 
 	if $reference
 	then

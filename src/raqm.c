@@ -91,9 +91,6 @@
 # define RAQM_TEST(...)
 #endif
 
-/* FIXME: fix multi-font support */
-/* #define RAQM_MULTI_FONT */
-
 typedef enum {
   RAQM_FLAG_NONE = 0,
   RAQM_FLAG_UTF8 = 1 << 0
@@ -113,11 +110,8 @@ struct _raqm {
   size_t           features_len;
 
   hb_script_t     *scripts;
-#ifdef RAQM_MULTI_FONT
-  hb_font_t      **fonts;
-#else
-  hb_font_t       *font;
-#endif
+
+  FT_Face         *ftfaces;
 
   raqm_run_t      *runs;
   raqm_glyph_t    *glyphs;
@@ -171,11 +165,7 @@ raqm_create (void)
 
   rq->scripts = NULL;
 
-#ifdef RAQM_MULTI_FONT
-  rq->fonts = NULL;
-#else
-  rq->font = NULL;
-#endif
+  rq->ftfaces = NULL;
 
   rq->runs = NULL;
   rq->glyphs = NULL;
@@ -220,20 +210,19 @@ _raqm_free_runs (raqm_t *rq)
   }
 }
 
-#ifdef RAQM_MULTI_FONT
-static void
-_raqm_free_fonts (raqm_t *rq)
-{
-  if (!rq->fonts)
-    return;
 
+static void
+_raqm_free_ftfaces (raqm_t *rq)
+{
+  if (!rq->ftfaces)
+    return;
   for (size_t i = 0; i < rq->text_len; i++)
   {
-    if (rq->fonts[i])
-      hb_font_destroy (rq->fonts[i]);
+    if (rq->ftfaces[i])
+      FT_Done_Face(rq->ftfaces[i]);
   }
 }
-#endif
+
 
 /**
  * raqm_destroy:
@@ -253,12 +242,8 @@ raqm_destroy (raqm_t *rq)
 
   free (rq->text);
   free (rq->scripts);
-#ifdef RAQM_MULTI_FONT
-  _raqm_free_fonts (rq);
-  free (rq->fonts);
-#else
-  hb_font_destroy (rq->font);
-#endif
+  _raqm_free_ftfaces (rq);
+  free (rq->ftfaces);
   _raqm_free_runs (rq);
   free (rq->glyphs);
   free (rq);
@@ -497,23 +482,19 @@ raqm_set_freetype_face_range (raqm_t *rq,
   if (start + len > rq->text_len)
     return false;
 
-#ifdef RAQM_MULTI_FONT
-  if (!rq->fonts)
-    rq->fonts = calloc (sizeof (intptr_t), rq->text_len);
-  if (!rq->fonts)
+  if (!rq->ftfaces)
+    rq->ftfaces = calloc (sizeof (intptr_t), rq->text_len);
+  if (!rq->ftfaces)
     return NULL;
 
   for (size_t i = 0; i < len; i++)
   {
-    if (rq->fonts[start + i])
-      hb_font_destroy (rq->fonts[start + i]);
-    rq->fonts[start + i] = HB_FT_FONT_CREATE (face);
+    if (rq->ftfaces[start + i]) {
+        FT_Done_Face (rq->ftfaces[start + i]);
+    }
+    rq->ftfaces[start + i] = face;
+    FT_Reference_Face (face);
   }
-#else
-  if (rq->font)
-    hb_font_destroy (rq->font);
-  rq->font = HB_FT_FONT_CREATE (face);
-#endif
 
   return true;
 }
@@ -540,8 +521,14 @@ _raqm_shape (raqm_t *rq);
 bool
 raqm_layout (raqm_t *rq)
 {
-  if (!rq || !rq->text_len || !rq->font)
+  if (!rq || !rq->text_len || !rq->ftfaces)
     return false;
+
+  for (size_t i = 0; i < rq->text_len; i++)
+  {
+      if (!rq->ftfaces[i])
+          return false;
+  }
 
   if (!_raqm_itemize (rq))
     return false;
@@ -620,10 +607,12 @@ raqm_get_glyphs (raqm_t *rq,
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
+      rq->glyphs[count + i].ftface = rq->ftfaces[rq->glyphs[count + i].cluster];
 
-      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\n",
+      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\tfont: %s\n",
           rq->glyphs[count + i].index, rq->glyphs[count + i].x_offset,
-          rq->glyphs[count + i].y_offset, rq->glyphs[count + i].x_advance);
+          rq->glyphs[count + i].y_offset, rq->glyphs[count + i].x_advance,
+          rq->glyphs[count + i].ftface->family_name);
     }
 
     count += len;
@@ -772,10 +761,12 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos + runs[i].len - 1;
       run->script = rq->scripts[run->pos];
+      run->font = HB_FT_FONT_CREATE (rq->ftfaces[run->pos]);
       for (int j = runs[i].len - 1; j >= 0; j--)
       {
         hb_script_t script = rq->scripts[runs[i].pos + j];
-        if (script != run->script)
+        FT_Face face = rq->ftfaces[runs[i].pos + j];
+        if (script != run->script || face != rq->ftfaces[run->pos])
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -784,6 +775,7 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = script;
+          newrun->font = HB_FT_FONT_CREATE (face);
           run->next = newrun;
           run = newrun;
         }
@@ -798,10 +790,12 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos;
       run->script = rq->scripts[run->pos];
+      run->font = HB_FT_FONT_CREATE (rq->ftfaces[run->pos]);
       for (int j = 0; j < runs[i].len; j++)
       {
         hb_script_t script = rq->scripts[runs[i].pos + j];
-        if (script != run->script)
+        FT_Face face = rq->ftfaces[runs[i].pos + j];
+        if (script != run->script || face != rq->ftfaces[run->pos])
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -810,6 +804,7 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = script;
+          newrun->font = HB_FT_FONT_CREATE (face);
           run->next = newrun;
           run = newrun;
         }
@@ -833,9 +828,10 @@ _raqm_itemize (raqm_t *rq)
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
     SCRIPT_TO_STRING (run->script);
-    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\n",
+    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
                run_count++, run->pos, run->len,
-               hb_direction_to_string (run->direction), buff);
+               hb_direction_to_string (run->direction), buff,
+               rq->ftfaces[run->pos]->family_name);
   }
   RAQM_TEST ("\n");
 #endif
@@ -1105,7 +1101,7 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_set_script (run->buffer, run->script);
     hb_buffer_set_language (run->buffer, hb_language_get_default ());
     hb_buffer_set_direction (run->buffer, run->direction);
-    hb_shape_full (rq->font, run->buffer, rq->features, rq->features_len,
+    hb_shape_full (run->font, run->buffer, rq->features, rq->features_len,
                    NULL);
   }
 
