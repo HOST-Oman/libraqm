@@ -2,7 +2,9 @@
 
 set -o errexit -o nounset
 
-if test "x$TRAVIS_BRANCH" != xmaster; then exit; fi
+TAG="$(git describe --exact-match --match "v[0-9]*" HEAD 2>/dev/null || true)"
+
+if test "x$TAG" = x; then exit; fi
 
 DOCSDIR=build-docs
 REVISION=$(git rev-parse --short HEAD)
