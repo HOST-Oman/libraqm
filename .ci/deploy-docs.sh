@@ -7,7 +7,6 @@ TAG="$(git describe --exact-match --match "v[0-9]*" HEAD 2>/dev/null || true)"
 if test "x$TAG" = x; then exit; fi
 
 DOCSDIR=build-docs
-REVISION=$(git rev-parse --short HEAD)
 
 rm -rf $DOCSDIR || exit
 mkdir $DOCSDIR
@@ -27,5 +26,5 @@ git reset upstream/gh-pages
 
 touch .
 git add -A .
-git commit -m "Rebuild docs for $REVISION"
+git commit -m "Rebuild docs for $TAG"
 git push -q upstream HEAD:gh-pages
