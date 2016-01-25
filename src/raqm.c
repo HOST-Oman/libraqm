@@ -1001,7 +1001,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   for (size_t i = 0; i < rq->text_len; ++i)
   {
     SCRIPT_TO_STRING (rq->scripts[i]);
-    RAQM_TEST ("script for ch[%ld]\t%s\n", i, buff);
+    RAQM_TEST ("script for ch[%zu]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
 #endif
@@ -1074,7 +1074,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   for (size_t i = 0; i < rq->text_len; ++i)
   {
     SCRIPT_TO_STRING (rq->scripts[i]);
-    RAQM_TEST ("script for ch[%ld]\t%s\n", i, buff);
+    RAQM_TEST ("script for ch[%zu]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
 #endif
