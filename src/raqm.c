@@ -317,7 +317,11 @@ raqm_set_text_utf8 (raqm_t         *rq,
                     const char     *text,
                     size_t          len)
 {
+#ifdef _MSC_VER
+  uint32_t *unicode = _alloca (len);
+#else
   uint32_t unicode[len];
+#endif
   size_t ulen;
 
   if (!rq || !text || !len)
@@ -668,8 +672,13 @@ static bool
 _raqm_itemize (raqm_t *rq)
 {
   FriBidiParType par_type = FRIBIDI_PAR_ON;
+#ifdef _MSC_VER
+  FriBidiCharType *types = _alloca (rq->text_len);
+  FriBidiLevel *levels = _alloca (rq->text_len);
+#else
   FriBidiCharType types[rq->text_len];
   FriBidiLevel levels[rq->text_len];
+#endif
   FriBidiRun *runs = NULL;
   raqm_run_t *last;
   int max_level;
@@ -1109,7 +1118,11 @@ _raqm_u32_to_u8_index (raqm_t   *rq,
                        uint32_t  index)
 {
   FriBidiStrIndex length;
+#ifdef _MSC_VER
+  char *output = _alloca ((sizeof (uint32_t) * index) + 1);
+#else
   char output[(sizeof (uint32_t) * index) + 1];
+#endif
 
   length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8,
                                        rq->text,
