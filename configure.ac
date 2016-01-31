@@ -37,6 +37,12 @@ AM_CONDITIONAL(HAVE_GLIB, $have_glib)
 
 GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
 
+case $build_os in
+    mingw*)
+        AX_APPEND_FLAG([-D__USE_MINGW_ANSI_STDIO=1])
+        ;;
+esac
+
 AC_CONFIG_FILES([
     Makefile
     raqm.pc
