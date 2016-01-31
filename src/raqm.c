@@ -293,7 +293,7 @@ raqm_set_text (raqm_t         *rq,
   rq->text_len = len;
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
   if (!rq->text)
-    return NULL;
+    return false;
   memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
 
   return true;
@@ -749,7 +749,7 @@ _raqm_itemize (raqm_t *rq)
   {
     raqm_run_t *run = calloc (1, sizeof (raqm_run_t));
     if (!run)
-      return NULL;
+      return false;
 
     if (!rq->runs)
       rq->runs = run;
@@ -770,7 +770,7 @@ _raqm_itemize (raqm_t *rq)
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
-            return NULL;
+            return false;
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
@@ -796,7 +796,7 @@ _raqm_itemize (raqm_t *rq)
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
-            return NULL;
+            return false;
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
