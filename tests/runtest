@@ -27,7 +27,7 @@ do
 	tail -n +4 $filename > $expected
 
 	output=$(mktemp output.XXXXXX)
-	$testtool --text="$text" $opts $srcdir/$font > $output
+	$testtool --text="$text" $opts --font="$srcdir/$font" > $output
 
 	if $reference
 	then

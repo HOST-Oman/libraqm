@@ -34,13 +34,13 @@
 static gchar *direction = NULL;
 static gchar *text = NULL;
 static gchar *features = NULL;
-static gchar **args = NULL;
+static gchar *font = NULL;
 static GOptionEntry entries[] =
 {
   { "text", 0, 0, G_OPTION_ARG_STRING, &text, "The text to be displayed", "TEXT" },
+  { "font", 0, 0, G_OPTION_ARG_STRING, &font, "The font file", "FONT" },
   { "direction", 0, 0, G_OPTION_ARG_STRING, &direction, "The text direction", "DIR" },
   { "font-features", 0, 0, G_OPTION_ARG_STRING, &features, "The font features ", "FEATURES" },
-  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, "Remaining arguments", "FONTFILE" },
   { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
 };
 
@@ -70,7 +70,7 @@ main (int argc, char *argv[])
 
   g_option_context_free (context);
 
-  if (text == NULL || args == NULL)
+  if (text == NULL || font == NULL)
   {
     g_print ("Text or font is missing.\n\n%s",
              g_option_context_get_help (context, TRUE, NULL));
@@ -78,7 +78,7 @@ main (int argc, char *argv[])
   }
 
   assert (!FT_Init_FreeType (&library));
-  assert (!FT_New_Face (library, args[0], 0, &face));
+  assert (!FT_New_Face (library, font, 0, &face));
   assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
 
   dir = RAQM_DIRECTION_DEFAULT;
