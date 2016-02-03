@@ -80,4 +80,9 @@ EXTRA_DIST = \
     runtest \
     $(NULL)
 
+update-tests:
+	@if ! $(AM_V_P); then echo "  GEN      test references"; fi
+	$(AM_V_at)$(AM_TESTS_ENVIRONMENT) \
+	          $(TEST_LOG_COMPILER) --reference $(TEST_FILES)
+
 -include $(top_srcdir)/git.mk

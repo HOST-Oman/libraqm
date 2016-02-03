@@ -1,13 +1,24 @@
+test x"$srcdir" = x && srcdir=.
+test x"$builddir" = x && builddir=.
+
 testtool=$builddir/raqm-test$EXEEXT
 
 if test $# = 0; then
 	set /dev/stdin
 fi
 
+reference=false
+if [ x"$1" = x"--reference" ]
+then
+	reference=true
+	shift
+fi
+
 fails=0
 for filename in "$@"
 do
-	echo -ne "Testing $filename...\t"
+	$reference || echo -ne "Testing $filename...\t"
+	$reference && filename=$srcdir/$filename
 
 	font=$(sed -n 1p $filename)
 	text=$(sed -n 2p $filename)
@@ -18,20 +29,28 @@ do
 	output=$(mktemp output.XXXXXX)
 	$testtool --text="$text" $opts $srcdir/$font > $output
 
-	result=$(diff -u $expected $output)
-	if test "x$result" != "x"
+	if $reference
 	then
-		fails=$((fails+1))
-		echo "The diff is:"
-		echo "$result"
+		echo "$font" > $filename
+		echo "$text" >> $filename
+		echo "$opts" >> $filename
+		cat $output  >> $filename
+	else
+		result=$(diff -u $expected $output)
+		if test "x$result" != "x"
+		then
+			fails=$((fails+1))
+			echo "The diff is:"
+			echo "$result"
+		fi
 	fi
 
 	rm -f $expected $output
 done
 
 if test $fails != 0; then
-	echo "$fails tests failed."
+	$reference || echo "$fails tests failed."
 	exit 1
 else
-	echo "All tests passed."
+	$reference || echo "All tests passed."
 fi
