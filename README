@@ -45,11 +45,11 @@ export XML_CATALOG_FILES="/usr/local/etc/xml/catalog";
 
 Once you have the source code and the dependencies, you can proceed to build. To do that, run the customary sequence of commands in the source code directory:
 ```
-  ./autogen.sh
-  ./configure --enable-gtk-doc
-  make
-  make check
-  make distcheck
+./autogen.sh
+./configure --enable-gtk-doc
+make
+make check
+make distcheck
 ```
 
 Contributing
