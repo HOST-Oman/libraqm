@@ -20,3 +20,42 @@ digital (رَقَمِيّ) shares the same root, so it is a play on “digital 
 
 [1]: http://fribidi.org
 [2]: http://harfbuzz.org
+
+Building the code
+=================
+Raqm uses a standard autotools build system, so build instructions should be the standard ones in  *nix system such as Linux.
+You will need these tools and libraries to build raqm:
+```
+  freetype6
+  harfbuzz
+  fribidi
+  glib2
+  gtk-doc-tools
+```
+
+### Install dependencies on ubuntu 14.04:
+```
+sudo apt-get install -y libfreetype6-dev libharfbuzz-dev libfribidi-dev libglib2.0-dev gtk-doc-tools;
+```
+### Install dependencies on OSX using Homeberw:
+```
+brew install freetype harfbuzz fribidi glib gtk-doc;
+export XML_CATALOG_FILES="/usr/local/etc/xml/catalog";
+```
+
+Once you have the source code and the dependencies, you can proceed to build. To do that, run the customary sequence of commands in the source code directory:
+```
+  ./autogen.sh
+  ./configure --enable-gtk-doc
+  make
+  make check
+  make distcheck
+```
+
+Contributing
+============
+Once you have made a change that you are happy with, contribute it back, we'll be happy to integrate it! just fork our main repository then make a pull request.
+
+List of projects known to use Raqm:
+============================
+1. [ImageMagick](https://github.com/ImageMagick/ImageMagick/pull/88)
