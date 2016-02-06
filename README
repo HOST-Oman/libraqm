@@ -50,6 +50,7 @@ Once you have the source code and the dependencies, you can proceed to build. To
 make
 make check
 make distcheck
+make install
 ```
 
 Contributing
