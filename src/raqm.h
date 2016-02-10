@@ -74,7 +74,7 @@ typedef enum
  * @x_offset: the horizontal movement of the glyph from the current point.
  * @y_offset: the vertical movement of the glyph from the current point.
  * @cluster: the index of original character in input text.
- * @ftface: the FT_Face of the glyph.
+ * @ftface: the @FT_Face of the glyph.
  *
  * The structure that holds information about output glyphs, returned from
  * raqm_get_glyphs().
