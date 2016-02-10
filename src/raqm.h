@@ -33,6 +33,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * raqm_t:
  *
@@ -129,5 +133,9 @@ raqm_layout (raqm_t *rq);
 raqm_glyph_t *
 raqm_get_glyphs (raqm_t *rq,
                  size_t *length);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _RAQM_H_ */
