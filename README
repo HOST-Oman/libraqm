@@ -60,3 +60,11 @@ Once you have made a change that you are happy with, contribute it back, we'll b
 List of projects known to use Raqm:
 ============================
 1. [ImageMagick](https://github.com/ImageMagick/ImageMagick/pull/88)
+
+List of projects waiting their appovel to use Raqm to support CTL:
+============================
+1. [LibGD](https://github.com/libgd/libgd/pull/196)
+2. [Pillow](https://github.com/python-pillow/Pillow/pull/1682)
+3. [SDL_ttf](https://bugzilla.libsdl.org/show_bug.cgi?id=3211)
+4. [Pygame](https://bitbucket.org/pygame/pygame/pull-requests/52/add-complex-text-layout-to-pygamefreetype/)
+5. [Blender](https://developer.blender.org/D1809)
