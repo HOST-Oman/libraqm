@@ -1,0 +1,36 @@
+NULL =
+
+RAQM_TEST_sources = \
+	raqm-test.c \
+	$(NULL)
+
+RAQM_TEST_files = \
+	features-arabic.test \
+	features-kerning.test \
+	features-ligature.test \
+	scripts-backward.test \
+	scripts-backward-ltr.test \
+	scripts-backward-rtl.test \
+	scripts-forward.test \
+	scripts-forward-ltr.test \
+	scripts-forward-rtl.test \
+	multi-fonts.test \
+	multi-fonts2.test \
+	xyoffset.test \
+	test1.test \
+	test2.test \
+	test3.test \
+	test4.test \
+	test5.test \
+	test1_LTR.test \
+	test2_LTR.test \
+	test3_LTR.test \
+	test4_LTR.test \
+	test5_LTR.test \
+	test1_RTL.test \
+	test2_RTL.test \
+	test3_RTL.test \
+	test4_RTL.test \
+	test5_RTL.test \
+	$(NULL)
+

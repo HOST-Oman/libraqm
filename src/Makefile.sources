@@ -1,0 +1,17 @@
+NULL =
+
+#Base and default-include source and headers
+
+RAQM_BASE_sources = \
+	raqm.c \
+	raqm.h \
+	reorder_runs.c \
+	reorder_runs.h \
+	$(NULL)
+
+RAQM_INCLUDE_headers = \
+	raqm.h \
+	$(NULL)
+	
+
+

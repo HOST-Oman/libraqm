@@ -1,0 +1,3 @@
+Running suite(s): gtk-doc-raqm
+100.0%: Checks 4, Failures: 0
+PASS gtkdoc-check.test (exit status: 0)
