@@ -58,8 +58,9 @@ To run the units tests:
 Contributing
 ------------
 
-Once you have made a change that you are happy with, contribute it back, we’ll
-be happy to integrate it! Just fork the repository and make a pull request.
+Once you have made a change that you are happy with, contribute it back, we'll
+be happy to integrate it! just fork our main repository then make a pull
+request.
 
 Projects using Raqm
 ===================
