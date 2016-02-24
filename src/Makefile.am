@@ -1,18 +1,11 @@
-NULL = 
 
 lib_LTLIBRARIES = libraqm.la
 check_LTLIBRARIES = libraqm-test.la
 
-libraqm_la_SOURCES = \
-    raqm.c \
-    raqm.h \
-    reorder_runs.c \
-    reorder_runs.h \
-    $(NULL)
+include Makefile.source
 
-include_HEADERS = \
-    raqm.h \
-    $(NULL)
+libraqm_la_SOURCES = $(RAQM_BASE_sources)
+include_HEADERS = $(RAQM_INCLUDE_headers)
 
 libraqm_la_LIBADD = \
     $(FREETYPE_LIBS) \

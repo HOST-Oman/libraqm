@@ -1,11 +1,10 @@
-NULL = 
 
 check_PROGRAMS =
 TESTS =
 
-raqm_test_SOURCES = \
-    raqm-test.c \
-    $(NULL)
+include Makefile.sources
+
+raqm_test_SOURCES = $(RAQM_TEST_sources)
 
 raqm_test_CPPFLAGS = \
     -I$(top_srcdir)/src/ \
@@ -26,36 +25,7 @@ raqm_test_LDADD = \
     $(WARN_LDLAGS)
     $(NULL)
 
-TEST_FILES = \
-    features-arabic.test \
-    features-kerning.test \
-    features-ligature.test \
-    scripts-backward.test \
-    scripts-backward-ltr.test \
-    scripts-backward-rtl.test \
-    scripts-forward.test \
-    scripts-forward-ltr.test \
-    scripts-forward-rtl.test \
-    multi-fonts.test \
-    multi-fonts2.test \
-    xyoffset.test \
-    test1.test \
-    test2.test \
-    test3.test \
-    test4.test \
-    test5.test \
-    test1_LTR.test \
-    test2_LTR.test \
-    test3_LTR.test \
-    test4_LTR.test \
-    test5_LTR.test \
-    test1_RTL.test \
-    test2_RTL.test \
-    test3_RTL.test \
-    test4_RTL.test \
-    test5_RTL.test \
-    $(NULL)
-
+TEST_FILES = $(RAQM_TEST_files)
 if HAVE_GLIB
 check_PROGRAMS += raqm-test
 TESTS += $(TEST_FILES)
