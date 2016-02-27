@@ -18,7 +18,7 @@ libraqm_la_LIBADD = \
     $(FREETYPE_LIBS) \
     $(HARFBUZZ_LIBS) \
     $(FRIBIDI_LIBS) \
-    $(WARN_LDLAGS)
+    $(WARN_LDLAGS) \
     $(NULL)
 
 libraqm_la_CPPFLAGS = \
