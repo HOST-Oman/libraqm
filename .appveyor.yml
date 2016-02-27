@@ -13,11 +13,12 @@ install:
 build_script:
   - set CC=cccl
   - set CXX=cccl
+  - set LD=cccl
   - set PKG_CONFIG_PATH=%PKG_CONFIG_PATH%:/mingw64/lib/pkgconfig
   - bash -c "mv cccl /usr/bin"
   - bash -c "exec 0</dev/null; ./autogen.sh"
   - bash -c "exec 0</dev/null; ./configure"
-  - bash -c "exec 0</dev/null; make"
+  - bash -c "exec 0</dev/null; make CFLAGS='/W4 /WX /wd4068'"
 
 #test_script:
 #  - bash -c "make check"
