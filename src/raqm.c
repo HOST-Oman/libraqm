@@ -556,7 +556,7 @@ raqm_set_freetype_face_range (raqm_t *rq,
   if (!rq->ftfaces)
     rq->ftfaces = calloc (sizeof (intptr_t), rq->text_len);
   if (!rq->ftfaces)
-    return NULL;
+    return false;
 
   for (size_t i = 0; i < len; i++)
   {
