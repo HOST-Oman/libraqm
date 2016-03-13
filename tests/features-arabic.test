@@ -45,19 +45,19 @@ Final Runs:
 run[0]:	 start: 0	length: 13	direction: rtl	script: Arab	font: Amiri
 
 Glyph information:
-glyph [390]	x_offset: 0	y_offset: 0	x_advance: 756	font: Amiri
-glyph [423]	x_offset: 0	y_offset: 0	x_advance: 1566	font: Amiri
-glyph [389]	x_offset: 0	y_offset: 0	x_advance: 1897	font: Amiri
-glyph [398]	x_offset: 0	y_offset: 0	x_advance: 819	font: Amiri
-glyph [406]	x_offset: 0	y_offset: 0	x_advance: 1107	font: Amiri
-glyph [417]	x_offset: 0	y_offset: 0	x_advance: 1236	font: Amiri
-glyph [388]	x_offset: 0	y_offset: 0	x_advance: 446	font: Amiri
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
-glyph [390]	x_offset: 0	y_offset: 0	x_advance: 756	font: Amiri
-glyph [407]	x_offset: 0	y_offset: 0	x_advance: 1107	font: Amiri
-glyph [417]	x_offset: 0	y_offset: 0	x_advance: 1236	font: Amiri
-glyph [417]	x_offset: 0	y_offset: 0	x_advance: 1236	font: Amiri
-glyph [388]	x_offset: 0	y_offset: 0	x_advance: 446	font: Amiri
+glyph [390]	x_offset: 0	y_offset: 0	x_advance: 756	x_position: 0	y_position: 0	font: Amiri
+glyph [423]	x_offset: 0	y_offset: 0	x_advance: 1566	x_position: 756	y_position: 0	font: Amiri
+glyph [389]	x_offset: 0	y_offset: 0	x_advance: 1897	x_position: 2322	y_position: 0	font: Amiri
+glyph [398]	x_offset: 0	y_offset: 0	x_advance: 819	x_position: 4219	y_position: 0	font: Amiri
+glyph [406]	x_offset: 0	y_offset: 0	x_advance: 1107	x_position: 5038	y_position: 0	font: Amiri
+glyph [417]	x_offset: 0	y_offset: 0	x_advance: 1236	x_position: 6145	y_position: 0	font: Amiri
+glyph [388]	x_offset: 0	y_offset: 0	x_advance: 446	x_position: 7381	y_position: 0	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	x_position: 7827	y_position: 0	font: Amiri
+glyph [390]	x_offset: 0	y_offset: 0	x_advance: 756	x_position: 8427	y_position: 0	font: Amiri
+glyph [407]	x_offset: 0	y_offset: 0	x_advance: 1107	x_position: 9183	y_position: 0	font: Amiri
+glyph [417]	x_offset: 0	y_offset: 0	x_advance: 1236	x_position: 10290	y_position: 0	font: Amiri
+glyph [417]	x_offset: 0	y_offset: 0	x_advance: 1236	x_position: 11526	y_position: 0	font: Amiri
+glyph [388]	x_offset: 0	y_offset: 0	x_advance: 446	x_position: 12762	y_position: 0	font: Amiri
 
 UTF-32 clusters: 12 11 10 09 08 07 06 05 04 03 02 01 00
 UTF-8 clusters:  23 21 19 17 15 13 11 10 08 06 04 02 00
