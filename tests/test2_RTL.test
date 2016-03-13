@@ -54,21 +54,21 @@ run[2]:	 start: 6	length: 1	direction: rtl	script: Latn	font: Amiri
 run[3]:	 start: 0	length: 6	direction: ltr	script: Latn	font: Amiri
 
 Glyph information:
-glyph [20]	x_offset: 0	y_offset: 0	x_advance: 1090	font: Amiri
-glyph [21]	x_offset: 0	y_offset: 0	x_advance: 1090	font: Amiri
-glyph [22]	x_offset: 0	y_offset: 0	x_advance: 1090	font: Amiri
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
-glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 975	font: Amiri
-glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 529	font: Amiri
-glyph [3104]	x_offset: 180	y_offset: 0	x_advance: 1150	font: Amiri
-glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 978	font: Amiri
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	font: Amiri
-glyph [85]	x_offset: 0	y_offset: 0	x_advance: 766	font: Amiri
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	font: Amiri
-glyph [69]	x_offset: 0	y_offset: 0	x_advance: 996	font: Amiri
-glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540	font: Amiri
-glyph [70]	x_offset: 0	y_offset: 0	x_advance: 846	font: Amiri
+glyph [20]	x_offset: 0	y_offset: 0	x_advance: 1090	x_position: 0	y_position: 0	font: Amiri
+glyph [21]	x_offset: 0	y_offset: 0	x_advance: 1090	x_position: 1090	y_position: 0	font: Amiri
+glyph [22]	x_offset: 0	y_offset: 0	x_advance: 1090	x_position: 2180	y_position: 0	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	x_position: 3270	y_position: 0	font: Amiri
+glyph [5132]	x_offset: 0	y_offset: 0	x_advance: 975	x_position: 3870	y_position: 0	font: Amiri
+glyph [5049]	x_offset: 0	y_offset: 0	x_advance: 529	x_position: 4845	y_position: 0	font: Amiri
+glyph [3104]	x_offset: 180	y_offset: 0	x_advance: 1150	x_position: 5554	y_position: 0	font: Amiri
+glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 978	x_position: 6524	y_position: 0	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	x_position: 7502	y_position: 0	font: Amiri
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	x_position: 8102	y_position: 0	font: Amiri
+glyph [85]	x_offset: 0	y_offset: 0	x_advance: 766	x_position: 8964	y_position: 0	font: Amiri
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	x_position: 9730	y_position: 0	font: Amiri
+glyph [69]	x_offset: 0	y_offset: 0	x_advance: 996	x_position: 10592	y_position: 0	font: Amiri
+glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540	x_position: 11588	y_position: 0	font: Amiri
+glyph [70]	x_offset: 0	y_offset: 0	x_advance: 846	x_position: 12128	y_position: 0	font: Amiri
 
 UTF-32 clusters: 12 13 14 11 10 09 08 07 06 00 01 02 03 04 05
 UTF-8 clusters:  16 17 18 15 13 11 09 07 06 00 01 02 03 04 05
