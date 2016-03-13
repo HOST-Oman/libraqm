@@ -31,6 +31,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -68,6 +69,22 @@ typedef enum
 } raqm_direction_t;
 
 /**
+ * raqm_alignment_t:
+ * @RAQM_ALIGNMENT_RIGHT: Paragraph is right aligned.
+ * @RAQM_ALIGNMENT_LEFT: Paragraph is left aligned.
+ * @RAQM_ALIGNMENT_CENTER: Paragraph is center aligned..
+ *
+ *
+ * Since: 0.2
+ */
+typedef enum
+{
+    RAQM_ALIGNMENT_RIGHT,
+    RAQM_ALIGNMENT_LEFT,
+    RAQM_ALIGNMENT_CENTER,
+} raqm_alignment_t;
+
+/**
  * raqm_glyph_t:
  * @index: the index of the glyph in the font file.
  * @x_advance: the glyph advance width in horizontal text.
@@ -82,10 +99,14 @@ typedef enum
  */
 typedef struct raqm_glyph_t {
     unsigned int index;
+    int visual_index;
+    int line;
     int x_advance;
     int y_advance;
     int x_offset;
     int y_offset;
+    int x_position;
+    int y_position;
     uint32_t cluster;
     FT_Face ftface;
 } raqm_glyph_t;
@@ -137,6 +158,14 @@ raqm_set_freetype_face_range (raqm_t *rq,
 bool
 raqm_set_freetype_load_flags (raqm_t *rq,
                               int flags);
+
+bool
+raqm_set_line_width (raqm_t *rq,
+                     int    width);
+
+bool
+raqm_set_paragraph_alignment (raqm_t           *rq,
+                              raqm_alignment_t align);
 
 bool
 raqm_layout (raqm_t *rq);

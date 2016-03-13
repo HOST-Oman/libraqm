@@ -37,15 +37,15 @@ Final Runs:
 run[0]:	 start: 0	length: 9	direction: ltr	script: Latn	font: Amiri
 
 Glyph information:
-glyph [82]	x_offset: 0	y_offset: 0	x_advance: 1018	font: Amiri
-glyph [80]	x_offset: 0	y_offset: 0	x_advance: 1580	font: Amiri
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	font: Amiri
-glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
-glyph [82]	x_offset: 0	y_offset: 0	x_advance: 1018	font: Amiri
-glyph [80]	x_offset: 0	y_offset: 0	x_advance: 1580	font: Amiri
-glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	font: Amiri
-glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	font: Amiri
+glyph [82]	x_offset: 0	y_offset: 0	x_advance: 1018	x_position: 0	y_position: 0	font: Amiri
+glyph [80]	x_offset: 0	y_offset: 0	x_advance: 1580	x_position: 1018	y_position: 0	font: Amiri
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	x_position: 2598	y_position: 0	font: Amiri
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	x_position: 3460	y_position: 0	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 4524	y_position: 0	font: Amiri
+glyph [82]	x_offset: 0	y_offset: 0	x_advance: 1018	x_position: 5272	y_position: 0	font: Amiri
+glyph [80]	x_offset: 0	y_offset: 0	x_advance: 1580	x_position: 6290	y_position: 0	font: Amiri
+glyph [68]	x_offset: 0	y_offset: 0	x_advance: 862	x_position: 7870	y_position: 0	font: Amiri
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	x_position: 8732	y_position: 0	font: Amiri
 
 UTF-32 clusters: 00 01 02 03 04 05 06 07 08
 UTF-8 clusters:  00 01 02 03 04 06 07 08 09

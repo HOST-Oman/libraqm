@@ -55,24 +55,24 @@ Final Runs:
 run[0]:	 start: 0	length: 18	direction: rtl	script: Arab	font: Amiri
 
 Glyph information:
-glyph [419]	x_offset: 0	y_offset: 0	x_advance: 1173	font: Amiri
-glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 470	font: Amiri
-glyph [4992]	x_offset: 0	y_offset: 0	x_advance: 444	font: Amiri
-glyph [4959]	x_offset: 0	y_offset: 0	x_advance: 1005	font: Amiri
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
-glyph [2926]	x_offset: 0	y_offset: 0	x_advance: 961	font: Amiri
-glyph [2914]	x_offset: 0	y_offset: 0	x_advance: 401	font: Amiri
-glyph [2382]	x_offset: 0	y_offset: 0	x_advance: 1480	font: Amiri
-glyph [2334]	x_offset: 0	y_offset: 0	x_advance: 797	font: Amiri
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
-glyph [5199]	x_offset: 0	y_offset: 0	x_advance: 416	font: Amiri
-glyph [5154]	x_offset: 0	y_offset: 0	x_advance: 488	font: Amiri
-glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 470	font: Amiri
-glyph [2396]	x_offset: 0	y_offset: 0	x_advance: 1164	font: Amiri
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
-glyph [2052]	x_offset: 0	y_offset: 0	x_advance: 1810	font: Amiri
-glyph [4494]	x_offset: 0	y_offset: 0	x_advance: 500	font: Amiri
-glyph [4460]	x_offset: 0	y_offset: 0	x_advance: 478	font: Amiri
+glyph [419]	x_offset: 0	y_offset: 0	x_advance: 1173	x_position: 0	y_position: 0	font: Amiri
+glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 470	x_position: 1173	y_position: 0	font: Amiri
+glyph [4992]	x_offset: 0	y_offset: 0	x_advance: 444	x_position: 1643	y_position: 0	font: Amiri
+glyph [4959]	x_offset: 0	y_offset: 0	x_advance: 1005	x_position: 2087	y_position: 0	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	x_position: 3092	y_position: 0	font: Amiri
+glyph [2926]	x_offset: 0	y_offset: 0	x_advance: 961	x_position: 3692	y_position: 0	font: Amiri
+glyph [2914]	x_offset: 0	y_offset: 0	x_advance: 401	x_position: 4653	y_position: 0	font: Amiri
+glyph [2382]	x_offset: 0	y_offset: 0	x_advance: 1480	x_position: 5054	y_position: 0	font: Amiri
+glyph [2334]	x_offset: 0	y_offset: 0	x_advance: 797	x_position: 6534	y_position: 0	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	x_position: 7331	y_position: 0	font: Amiri
+glyph [5199]	x_offset: 0	y_offset: 0	x_advance: 416	x_position: 7931	y_position: 0	font: Amiri
+glyph [5154]	x_offset: 0	y_offset: 0	x_advance: 488	x_position: 8347	y_position: 0	font: Amiri
+glyph [2018]	x_offset: 0	y_offset: 0	x_advance: 470	x_position: 8835	y_position: 0	font: Amiri
+glyph [2396]	x_offset: 0	y_offset: 0	x_advance: 1164	x_position: 9305	y_position: 0	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	x_position: 10469	y_position: 0	font: Amiri
+glyph [2052]	x_offset: 0	y_offset: 0	x_advance: 1810	x_position: 11069	y_position: 0	font: Amiri
+glyph [4494]	x_offset: 0	y_offset: 0	x_advance: 500	x_position: 12879	y_position: 0	font: Amiri
+glyph [4460]	x_offset: 0	y_offset: 0	x_advance: 478	x_position: 13379	y_position: 0	font: Amiri
 
 UTF-32 clusters: 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
 UTF-8 clusters:  31 29 27 25 24 22 20 18 16 15 13 11 09 07 06 04 02 00
