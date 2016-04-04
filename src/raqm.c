@@ -1152,6 +1152,41 @@ _raqm_line_break (raqm_t *rq)
                 i = j + 1;
             }
         }    
+        if (rq->alignment == RAQM_ALIGNMENT_FULL)
+        {
+            current_line = -1;
+            for (i = glyphs_length - 1; i >= 0; i--)
+            {
+                if (rq->glyphs[i].line != current_line)
+                {
+                    current_line = rq->glyphs[i].line;
+                    align_offset = rq->line_width - (rq->glyphs[i].x_position + rq->glyphs[i].x_advance);
+
+                    /* counting spaces in one line */
+                    for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--)
+                    {
+                        if (rq->text[rq->glyphs[j].cluster] == 32) //space
+                            space_count++;
+                    }
+
+                    /* distributing align offset to all spaces */
+                    if (space_count == 0)
+                        align_offset = 0;
+                    else
+                        align_offset = align_offset / space_count;
+                    space_extension = 0;
+                    for (k = j + 1; rq->glyphs[k].line == current_line; k++)
+                    {
+                        rq->glyphs[k].x_position += space_extension;
+                        if (rq->text[rq->glyphs[k].cluster] == 32) //space
+                        {
+                            space_extension += align_offset;
+                        }
+                    }
+                }
+                i = j + 1;
+            }
+        }
     }
 
     free (break_here);
