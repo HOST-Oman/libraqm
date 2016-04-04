@@ -73,7 +73,7 @@ typedef enum
  * @RAQM_ALIGNMENT_RIGHT: Paragraph is right aligned.
  * @RAQM_ALIGNMENT_LEFT: Paragraph is left aligned.
  * @RAQM_ALIGNMENT_CENTER: Paragraph is center aligned..
- *
+ * @RAQM_ALIGNMENT_FULL: Paragraph is full justified.
  *
  * Since: 0.2
  */
@@ -82,6 +82,7 @@ typedef enum
     RAQM_ALIGNMENT_RIGHT,
     RAQM_ALIGNMENT_LEFT,
     RAQM_ALIGNMENT_CENTER,
+    RAQM_ALIGNMENT_FULL,
 } raqm_alignment_t;
 
 /**
