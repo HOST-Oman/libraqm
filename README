@@ -5,11 +5,8 @@ Raqm is a small library that encapsulates the logic for complex text layout and
 provide a convenient API.
 
 It currently provides bidirectional text support (using [FriBiDi][1]), shaping
-(using [HarfBuzz][2]), with proper script itemization. By the virtue of this,
+(using [HarfBuzz][2]), and proper script itemization. As a result,
 Raqm can support most writing systems covered by Unicode.
-
-This is an early prototype and is still work in progress. We try to not break
-the API and ABI needlessly, though.
 
 The documentation can be accessed on the web at:
 > http://host-oman.github.io/libraqm/
