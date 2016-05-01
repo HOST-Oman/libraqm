@@ -1,3 +1,9 @@
+Overview of changes leading to 0.1.1
+Sunday, May 1, 2016
+====================================
+
+Fix make check on 32-bit systems.
+
 Overview of changes leading to 0.1.0
 Wednesday, January 20, 2016
 ====================================
