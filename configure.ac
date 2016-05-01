@@ -1,5 +1,5 @@
 AC_INIT([Raqm],
-        [0.1.0],
+        [0.1.1],
         [https://github.com/HOST-Oman/libraqm/issues],
         [raqm],
         [https://github.com/HOST-Oman/libraqm/])
