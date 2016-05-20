@@ -17,7 +17,7 @@ digital (رَقَمِيّ) shares the same root, so it is a play on “digital 
 Building
 --------
 
-Raqm depends on the follwing libraries:
+Raqm depends on the following libraries:
 * [FreeType][3]
 * [HarfBuzz][2]
 * [FriBiDi][1]
@@ -33,7 +33,7 @@ To install dependencies on Ubuntu:
     sudo apt-get install libfreetype6-dev libharfbuzz-dev libfribidi-dev \
                          libglib2.0-dev gtk-doc-tools
 
-On Mac OS X you can use Homeberw:
+On Mac OS X you can use Homebrew:
 
     brew install freetype harfbuzz fribidi glib gtk-doc
     export XML_CATALOG_FILES="/usr/local/etc/xml/catalog" # for the docs
@@ -63,7 +63,7 @@ Projects using Raqm
 
 1. ImageMagick
 
-The follwing projects have patches to support complex text layout using Raqm:
+The following projects have patches to support complex text layout using Raqm:
 
 1. LibGD: https://github.com/libgd/libgd/pull/196
 2. Pillow: https://github.com/python-pillow/Pillow/pull/1682
