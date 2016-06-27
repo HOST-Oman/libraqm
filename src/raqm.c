@@ -1008,64 +1008,64 @@ _raqm_reorder_runs (const FriBidiCharType *types,
 
 enum break_class
 {
-	// input types
-	OP = 0,	// open
-	CL,	// closing punctuation
-	CP,	// closing parentheses (from 5.2.0) (before 5.2.0 treat like CL)
-	QU,	// quotation
-	GL,	// glue
-	NS,	// no-start
-	EX,	// exclamation/interrogation
-	SY,	// Syntax (slash)
-	IS,	// infix (numeric) separator
-	PR,	// prefix
-	PO,	// postfix
-	NU,	// numeric
-	AL,	// alphabetic
-	ID,	// ideograph (atomic)
-	IN,	// inseparable
-	HY,	// hyphen
-	BA,	// break after
-	BB,	// break before
-	B2,	// break both
-	ZW,	// ZW space
-	CM,	// combining mark
-	WJ, // word joiner
+    /* input types */
+    RAQM_BREAK_CLASS_OP = 0,	// open
+    RAQM_BREAK_CLASS_CL,	// closing punctuation
+    RAQM_BREAK_CLASS_CP,	// closing parentheses (from 5.2.0) (before 5.2.0 treat like CL)
+    RAQM_BREAK_CLASS_QU,	// quotation
+    RAQM_BREAK_CLASS_GL,	// glue
+    RAQM_BREAK_CLASS_NS,	// no-start
+    RAQM_BREAK_CLASS_EX,	// exclamation/interrogation
+    RAQM_BREAK_CLASS_SY,	// Syntax (slash)
+    RAQM_BREAK_CLASS_IS,	// infix (numeric) separator
+    RAQM_BREAK_CLASS_PR,	// prefix
+    RAQM_BREAK_CLASS_PO,	// postfix
+    RAQM_BREAK_CLASS_NU,	// numeric
+    RAQM_BREAK_CLASS_AL,	// alphabetic
+    RAQM_BREAK_CLASS_ID,	// ideograph (atomic)
+    RAQM_BREAK_CLASS_IN,	// inseparable
+    RAQM_BREAK_CLASS_HY,	// hyphen
+    RAQM_BREAK_CLASS_BA,	// break after
+    RAQM_BREAK_CLASS_BB,	// break before
+    RAQM_BREAK_CLASS_B2,	// break both
+    RAQM_BREAK_CLASS_ZW,	// ZW space
+    RAQM_BREAK_CLASS_CM,	// combining mark
+    RAQM_BREAK_CLASS_WJ,    // word joiner
 
-	// used for Korean Syllable Block pair table
-	H2, // Hamgul 2 Jamo Syllable
-	H3, // Hangul 3 Jamo Syllable
-	JL, // Jamo leading consonant
-	JV, // Jamo vowel
-	JT, // Jamo trailing consonant
+    /* used for Korean Syllable Block pair table */
+    RAQM_BREAK_CLASS_H2,    // Hamgul 2 Jamo Syllable
+    RAQM_BREAK_CLASS_H3,    // Hangul 3 Jamo Syllable
+    RAQM_BREAK_CLASS_JL,    // Jamo leading consonant
+    RAQM_BREAK_CLASS_JV,    // Jamo vowel
+    RAQM_BREAK_CLASS_JT,    // Jamo trailing consonant
 
-	// these are not handled in the pair tables
-	SA, // South (East) Asian
-	SP,	// space
-	PS,	// paragraph and line separators
-	BK,	// hard break (newline)
-	CR, // carriage return
-	LF, // line feed
-	NL, // next line
-	CB, // contingent break opportunity
-	SG, // surrogate
-	AI, // ambiguous
-	XX, // unknown
+    /* these are not handled in the pair tables */
+    RAQM_BREAK_CLASS_SA,    // South (East) Asian
+    RAQM_BREAK_CLASS_SP,	// space
+    RAQM_BREAK_CLASS_PS,	// paragraph and line separators
+    RAQM_BREAK_CLASS_BK,	// hard break (newline)
+    RAQM_BREAK_CLASS_CR,    // carriage return
+    RAQM_BREAK_CLASS_LF,    // line feed
+    RAQM_BREAK_CLASS_NL,    // next line
+    RAQM_BREAK_CLASS_CB,    // contingent break opportunity
+    RAQM_BREAK_CLASS_SG,    // surrogate
+    RAQM_BREAK_CLASS_AI,    // ambiguous
+    RAQM_BREAK_CLASS_XX,    // unknown
 };
 
-// Define some short-cuts for the table
-#define oo DIRECT_BREAK				// '_' break allowed
-#define SS INDIRECT_BREAK				// '%' only break across space (aka 'indirect break' below)
-#define cc COMBINING_INDIRECT_BREAK	// '#' indirect break for combining marks
-#define CC COMBINING_PROHIBITED_BREAK	// '@' indirect break for combining marks
-#define XX PROHIBITED_BREAK			// '^' no break allowed_BRK
+/* Define some short-cuts for the table */
+#define oo RAQM_DIRECT_BREAK			         // '_' break allowed
+#define SS RAQM_INDIRECT_BREAK				// '%' only break across space (aka 'indirect break' below)
+#define cc RAQM_COMBINING_INDIRECT_BREAK	// '#' indirect break for combining marks
+#define CC RAQM_COMBINING_PROHIBITED_BREAK	// '@' indirect break for combining marks
+#define XX RAQM_PROHIBITED_BREAK			// '^' no break allowed_BRK
 
 enum break_action {
-        DIRECT_BREAK = 0,             	// _ in table, 	oo in array
-        INDIRECT_BREAK,               	// % in table, 	SS in array
-        COMBINING_INDIRECT_BREAK,		// # in table, 	cc in array
-        COMBINING_PROHIBITED_BREAK,  	// @ in table 	CC in array
-        PROHIBITED_BREAK,             	// ^ in table, 	XX in array
+        RAQM_DIRECT_BREAK = 0,             	// _ in table, 	oo in array
+        RAQM_INDIRECT_BREAK,               	// % in table, 	SS in array
+        RAQM_COMBINING_INDIRECT_BREAK,		// # in table, 	cc in array
+        RAQM_COMBINING_PROHIBITED_BREAK,  	// @ in table 	CC in array
+        RAQM_PROHIBITED_BREAK,             	// ^ in table, 	XX in array
 };
 
 static bool *
@@ -1078,9 +1078,9 @@ _raqm_find_line_break (raqm_t *rq)
 	enum break_action  current_action;
 	bool *break_here;
 
-	enum break_action  break_pairs[][JT+1] =  {
-		//       1   2   3   4	5	6	7	8	9  10  11  12  13  14  15  16  17  18  19  20  21   22  23  24  25  26  27
-		//     OP, CL, CL, QU, GL, NS, EX, SY, IS, PR, PO, NU, AL, ID, IN, HY, BA, BB, B2, ZW, CM, WJ,  H2, H3, JL, JV, JT, = after class
+    static enum break_action  break_pairs[][RAQM_BREAK_CLASS_JT+1] =  {
+        /*       1   2   3   4	5	6	7	8	9  10  11  12  13  14  15  16  17  18  19  20  21   22  23  24  25  26  27 */
+        /*     OP, CL, CL, QU, GL, NS, EX, SY, IS, PR, PO, NU, AL, ID, IN, HY, BA, BB, B2, ZW, CM, WJ,  H2, H3, JL, JV, JT, = after class */
 		/*OP*/ { XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, CC, XX, XX, XX, XX, XX, XX }, // OP open
 		/*CL*/ { oo, XX, XX, SS, SS, XX, XX, XX, XX, SS, SS, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // CL close
 		/*CP*/ { oo, XX, XX, SS, SS, XX, XX, XX, XX, SS, SS, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // CL close
@@ -1116,69 +1116,69 @@ _raqm_find_line_break (raqm_t *rq)
 	current_class = ucdn_get_resolved_linebreak_class(rq->text[0]);
 	next_class    = ucdn_get_resolved_linebreak_class(rq->text[1]);
 
-	// handle case where input starts with an LF
-	if (current_class == LF)
-		current_class = BK;
+    /* handle case where input starts with an LF */
+    if (current_class == RAQM_BREAK_CLASS_LF)
+        current_class = RAQM_BREAK_CLASS_BK;
 
-	// treat NL like BK
-	if (current_class == NL)
-		current_class = BK;
+    /* treat NL like BK */
+    if (current_class == RAQM_BREAK_CLASS_NL)
+        current_class = RAQM_BREAK_CLASS_BK;
 
-	// treat SP at start of input as if it followed WJ
-	if (current_class == SP)
-		current_class = WJ;
+    /* treat SP at start of input as if it followed WJ */
+    if (current_class == RAQM_BREAK_CLASS_SP)
+        current_class = RAQM_BREAK_CLASS_WJ;
 
-	// loop over all pairs in the string up to a hard break or CRLF pair
-	for (size_t i = 1; (i < length) && (current_class != BK) && (current_class != CR || next_class == LF); i++)
+    /* loop over all pairs in the string up to a hard break or CRLF pair */
+    for (size_t i = 1; (i < length) && (current_class != RAQM_BREAK_CLASS_BK) && (current_class != RAQM_BREAK_CLASS_CR || next_class == RAQM_BREAK_CLASS_LF); i++)
 	{
 		next_class = ucdn_get_resolved_linebreak_class(rq->text[i]);
 
-		// handle spaces explicitly
-		if (next_class == SP) {
-                        break_actions[i-1]  = PROHIBITED_BREAK;   // apply rule LB 7: � SP
+        /* handle spaces explicitly */
+        if (next_class == RAQM_BREAK_CLASS_SP) {
+                        break_actions[i-1]  = RAQM_PROHIBITED_BREAK;   // apply rule LB 7: � SP
 			continue;
 		}
 
-		if (next_class == BK || next_class == NL || next_class == LF) {
-                        break_actions[i-1]  = PROHIBITED_BREAK;
-			current_class = BK;
+        if (next_class == RAQM_BREAK_CLASS_BK || next_class == RAQM_BREAK_CLASS_NL || next_class == RAQM_BREAK_CLASS_LF) {
+                        break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
+            current_class = RAQM_BREAK_CLASS_BK;
 			continue;
 		}
 
-		if (next_class == CR)
+        if (next_class == RAQM_BREAK_CLASS_CR)
 		{
-                        break_actions[i-1]  = PROHIBITED_BREAK;
-			current_class = CR;
+                        break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
+            current_class = RAQM_BREAK_CLASS_CR;
 			continue;
 		}
 
-		// lookup pair table information in brkPairs[before, after];
+        /* lookup pair table information in brkPairs[before, after] */
 		current_action = break_pairs[current_class][next_class];
 		break_actions[i-1] = current_action;
 
-                if (current_action == INDIRECT_BREAK)		// resolve indirect break
+                if (current_action == RAQM_INDIRECT_BREAK)		// resolve indirect break
 		{
-			if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) == SP)                    // if context is A SP * B
-                                break_actions[i-1] = INDIRECT_BREAK;             //       break opportunity
+            if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) == RAQM_BREAK_CLASS_SP)          // if context is A SP * B
+                                break_actions[i-1] = RAQM_INDIRECT_BREAK;             // break opportunity
 			else                                        // else
-                                break_actions[i-1] = PROHIBITED_BREAK;           //       no break opportunity
+                                break_actions[i-1] = RAQM_PROHIBITED_BREAK;           // no break opportunity
 		}
 
-                else if (current_action == COMBINING_PROHIBITED_BREAK)		// this is the case OP SP* CM
+                else if (current_action == RAQM_COMBINING_PROHIBITED_BREAK)		// this is the case OP SP* CM
 		{
-                        break_actions[i-1] = COMBINING_PROHIBITED_BREAK;     // no break allowed
-			if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) != SP)
+                        break_actions[i-1] = RAQM_COMBINING_PROHIBITED_BREAK;     // no break allowed
+            if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) != RAQM_BREAK_CLASS_SP)
 				continue;                               // apply rule 9: X CM* -> X
 		}
 
-                else if (current_action == COMBINING_INDIRECT_BREAK)		// resolve combining mark break
+                else if (current_action == RAQM_COMBINING_INDIRECT_BREAK)		// resolve combining mark break
 		{
-                        break_actions[i-1] = PROHIBITED_BREAK;               // don't break before CM
-			if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) == SP)
+                        break_actions[i-1] = RAQM_PROHIBITED_BREAK;               // don't break before CM
+            if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) == RAQM_BREAK_CLASS_SP)
 			{
-                                break_actions[i-1] = PROHIBITED_BREAK;		// legacy: keep SP CM together
+                                break_actions[i-1] = RAQM_PROHIBITED_BREAK;		// legacy: keep SP CM together
 				if (i > 1)
-                                        break_actions[i-2] = ((ucdn_get_resolved_linebreak_class(rq->text[i-2]) == SP) ? INDIRECT_BREAK : DIRECT_BREAK);
+                                        break_actions[i-2] = ((ucdn_get_resolved_linebreak_class(rq->text[i-2]) == RAQM_BREAK_CLASS_SP) ? RAQM_INDIRECT_BREAK : RAQM_DIRECT_BREAK);
 			} else                                     // apply rule 9: X CM * -> X
 				continue;
 		}
@@ -1188,13 +1188,19 @@ _raqm_find_line_break (raqm_t *rq)
 
 	for(size_t i = 0; i < length; i++)
 	{
-                if (break_actions[i] == INDIRECT_BREAK || break_actions[i] == DIRECT_BREAK )
+                if (break_actions[i] == RAQM_INDIRECT_BREAK || break_actions[i] == RAQM_DIRECT_BREAK )
 		{
 			break_here[i] = true;
 		}
 		else
 			break_here[i] = false;
 	}
+
+#undef oo
+#undef SS
+#undef cc
+#undef CC
+#undef XX
 
 	free (break_actions);
 	return break_here;
