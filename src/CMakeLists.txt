@@ -144,6 +144,23 @@ target_link_libraries (raqm
 	${HARFBUZZ_LIBRARIES}
 )
 
+############################################## GTK MAIL LISTING
+
+set(exec_prefix /usr/local/)
+find_package (GtkDoc REQUIRED)
+
+
+
+gtk_doc_add_module(
+      libraqm
+      SOURCE ${CMAKE_SOURCE_DIR}/src 
+      XML ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
+      LIBRARIES raqm
+)
+
+add_custom_target (doc ALL)
+
+
 ###############################################
 
 # INSTALLING PART
