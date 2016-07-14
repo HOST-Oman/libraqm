@@ -147,7 +147,6 @@ target_link_libraries (raqm
 ############################################## GTK MAIL LISTING
 
 set(exec_prefix /usr/local/)
-find_package (GtkDoc REQUIRED)
 
 
 
