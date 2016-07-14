@@ -1,30 +1,35 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 
 ######################################
 
 #check GLIB module if exist
 INCLUDE(FindPkgConfig)
 PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
+
+######################################
+
 FIND_PACKAGE(Freetype REQUIRED)
-FIND_PATH(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h
-  /usr/local/include
-  /usr/include
-  )
-pkg_check_modules(PC_HARFBUZZ REQUIRED harfbuzz>=0.9.20)
+
+#FIND_PATH(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h
+ # /usr/local/include
+  #/usr/include
+  #)
+#pkg_check_modules(PC_HARFBUZZ REQUIRED harfbuzz>=0.9.20)
 
 
 include_directories(
-	${GLIB_INCLUDE_DIRS}
-	${HARFBUZZ_INCLUDE_DIRS}
-	${FRIBIDI_INCLUDE_DIR}/fribidi	
+	#${HARFBUZZ_INCLUDE_DIRS}
+	#${FRIBIDI_INCLUDE_DIR}/fribidi	
+	${GLIB_INCLUDE_DIRS}	
 	${FREETYPE_INCLUDE_DIR_freetype2}
 	${CMAKE_CURRENT_SOURCE_DIR}/fonts/sha1sum
+	${CMAKE_CURRENT_SOURCE_DIR}
  )
 
 add_subdirectory (fonts)
 
 #enable C99 mode
-add_definitions(-std=gnu99)
+add_definitions(-std=c99)
 
 #set the variable TEST_SRCS to the paths of the test files 
 set(TEST_SRCS 

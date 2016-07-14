@@ -77,31 +77,3 @@ endif()
 #	DESTINATION ${path}
 #)
 
-
-
-
-
-# Add "tags" target and make my_project depending on this target.
-#set_source_files_properties(tags PROPERTIES GENERATED true)
-#add_custom_command(tags
-#    COMMAND gtkdocize --copy || exit 1
-#    COMMAND autoreconf --force --install --verbose || exit $?
-#    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-#add_dependencies(libraqm tags)
-
-
-
-#delete some files
-#set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt
-#                   ${CMAKE_BINARY_DIR}/cmake_install.cmake  
-#                  ${CMAKE_BINARY_DIR}/Makefile
-#                 ${CMAKE_BINARY_DIR}/CMakeFiles
-#)
-#
-#foreach(file ${cmake_generated})
-#
-# if (EXISTS ${file})
-#     file(REMOVE_RECURSE ${file})
-#  endif()
-#
-#endforeach(file)
