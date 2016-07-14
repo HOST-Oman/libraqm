@@ -73,17 +73,19 @@ set(TEST_SRCS
 )
 
 #find the path of RAQM_INCLUDE_DIR
-FIND_PATH(RAQM_INCLUDE_DIR
-  /usr/local/include
-  /usr/include
-)
+#FIND_PATH(RAQM_INCLUDE_DIR
+#  /usr/local/include
+#  /usr/include
+#)
 
 #find RAQM_LIBRARY
 FIND_LIBRARY(RAQM_LIBRARY
   NAMES raqm
-  PATHS /usr/lib /usr/local/lib
+  PATHS /usr/local/lib /usr/lib
 )
 
+#set(CMAKE_C_COMPILER_INIT gcc)
+#message("path : ${RAQM_LIBRARY}")
 
 add_executable(raqm-test raqm-test.c)
 
@@ -91,7 +93,9 @@ add_executable(raqm-test raqm-test.c)
 target_link_libraries(raqm-test 
 	${RAQM_LIBRARY} 
 	${FREETYPE_LIBRARIES}
-	${GLIB_LIBRARIES}	
+	${GLIB_LIBRARIES}
+	#${FRIBIDI_LIBRARY}
+	#${HARFBUZZ_LIBRARIES}	
 )
 
 
@@ -99,14 +103,45 @@ target_link_libraries(raqm-test
 set(SHELL_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/runtest)
 
 
- add_custom_target(check ALL
-                   COMMAND  sh ${SHELL_EXECUTABLE} ${TEST_SRCS}
-                   DEPENDS  raqm-test
+#copy the executable file "raqm-test" from build dir to the src dir after calling cmake 
+add_custom_command(TARGET raqm-test
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/raqm-test ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 
+#run "make check" for testing
+ add_custom_target(check #ALL
+                   COMMAND  sh ${SHELL_EXECUTABLE} ${TEST_SRCS}
+		   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
-######################3
 
+###########################################
 
+#include(CTest)
+
+#Setup CMake to run tests
+#enable_testing()
+
+#Run through each source
+#foreach(testSrc ${TEST_SRCS})
+        #Extract the filename without an extension (NAME_WE)
+#        get_filename_component(testName ${testSrc} NAME_WE)
+
+ #       add_test(
+#		 NAME ${testName} 
+ #                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  #               COMMAND sh ${SHELL_EXECUTABLE} ${TEST_SRCS}
+#)
+
+#set_tests_properties (${testName} PROPERTIES PASS_REGULAR_EXPRESSION "All tests passed.")
+
+#endforeach(testSrc)
+
+########################################
+
+#file(COPY ${TEST_SRCS}  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+#file(COPY ${SHELL_EXECUTABLE} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+#file(GLOB TEST_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.test")
 
