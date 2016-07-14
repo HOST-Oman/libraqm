@@ -151,12 +151,12 @@ target_link_libraries (raqm
 
 
 
-      SOURCE ${CMAKE_SOURCE_DIR}/src 
-add_custom_target (doc ALL)
 #gtk_doc_add_module(
 #      libraqm
+#      SOURCE ${CMAKE_SOURCE_DIR}/src 
 #      XML ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
 #)
+
 
 
 ###############################################
