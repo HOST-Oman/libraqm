@@ -33,6 +33,7 @@ set (AX_PACKAGE_REQUIRES_PRIVATE "harfbuzz fribidi")
 # configure a file to pass some of the CMake settings to other file
 configure_file (
   "${PROJECT_SOURCE_DIR}/raqm.pc.in"
+  "${PROJECT_BINARY_DIR}/raqm.pc"
   )
 
 
