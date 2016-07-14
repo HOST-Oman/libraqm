@@ -146,18 +146,17 @@ target_link_libraries (raqm
 
 ############################################## GTK MAIL LISTING
 
-set(exec_prefix /usr/local/)
+#set(exec_prefix /usr/local/)
+#find_package (GtkDoc REQUIRED)
 
 
 
-gtk_doc_add_module(
-      libraqm
       SOURCE ${CMAKE_SOURCE_DIR}/src 
-      XML ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
-      LIBRARIES raqm
-)
-
 add_custom_target (doc ALL)
+#gtk_doc_add_module(
+#      libraqm
+#      XML ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
+#)
 
 
 ###############################################
