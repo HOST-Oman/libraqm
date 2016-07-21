@@ -8,17 +8,45 @@
 #  This is the concatenation of the paths:
 #  FREETYPE_INCLUDE_DIR_ft2build
 #  FREETYPE_INCLUDE_DIR_freetype2
-FIND_PACKAGE(Freetype REQUIRED)
-IF (FREETYPE_FOUND)
-	MESSAGE(STATUS "FreeType2 Library Found OK: ${FREETYPE_LIBRARIES}")
-	#INCLUDE(CheckLibraryExists)
-	#CHECK_LIBRARY_EXISTS(${FREETYPE_LIBRARY} FT_Get_First_Char "" HAVE_FREETYPE_FIRST)
-	#CHECK_LIBRARY_EXISTS(${FREETYPE_LIBRARY} FT_Get_Next_Char "" HAVE_FREETYPE_NEXT)
-ELSE (FREETYPE_FOUND)
-	MESSAGE(FATAL_ERROR "No Freetype Found")
-ENDIF(FREETYPE_FOUND)
+
+if( WIN32 AND NOT(MSYS OR CYGWIN OR MINGW) )
+	FIND_PATH(FREETYPE_INCLUDE_DIR ft2build.h
+		PATH
+		${PROJECT_SOURCE_DIR}/win/include/freetype2
+	)
+  
+	option(32bit "Compile the library for WIN32.. make the option OFF to compile it for WIN64" ON)
+  
+	if(32bit)
+		FIND_LIBRARY(FREETYPE_LIBRARIES libfreetype-6
+			PATH
+			${PROJECT_SOURCE_DIR}/win/lib/windows32
+		)
+	else(32bit)
+		FIND_LIBRARY(FREETYPE_LIBRARIES libfreetype-6
+			PATH
+			${PROJECT_SOURCE_DIR}/win/lib/windows64
+		)
+	endif(32bit)
+		message("-- Found Freetype: ${FREETYPE_LIBRARIES} ")
+
+else()
+	FIND_PACKAGE(Freetype REQUIRED)
+	IF (FREETYPE_FOUND)
+		MESSAGE(STATUS "FreeType2 Library Found OK: ${FREETYPE_LIBRARIES}")
+		#INCLUDE(CheckLibraryExists)
+		#CHECK_LIBRARY_EXISTS(${FREETYPE_LIBRARY} FT_Get_First_Char "" HAVE_FREETYPE_FIRST)
+		#CHECK_LIBRARY_EXISTS(${FREETYPE_LIBRARY} FT_Get_Next_Char "" HAVE_FREETYPE_NEXT)
+	ELSE (FREETYPE_FOUND)
+		MESSAGE(FATAL_ERROR "No Freetype Found")
+	ENDIF(FREETYPE_FOUND)
+endif(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 
 ##################################3
+
+
+INCLUDE(FindPkgConfig)
+PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
 
 # - Find the native FriBiDI includes and library
 #
@@ -28,45 +56,65 @@ ENDIF(FREETYPE_FOUND)
 #  FRIBIDI_FOUND, If false, do not try to use fribidi.
 # also defined, but not for general use are
 #  FRIBIDI_LIBRARY, where to find the FriBiDi library.
+if (WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
+	FIND_PATH( FRIBIDI_INCLUDE_DIR fribidi.h
+		PATH
+		${PROJECT_SOURCE_DIR}/win/include/fribidi
+	)
 
-include(CheckFunctionExists)
-SET(FRIBIDI_FOUND "NO")
+	if(32bit)
+		FIND_LIBRARY(FRIBIDI_LIBRARY libfribidi
+		PATH
+		${PROJECT_SOURCE_DIR}/win/lib/windows32
+		)
+	else()
+		FIND_LIBRARY(FRIBIDI_LIBRARY libfribidi
+		PATH
+		${PROJECT_SOURCE_DIR}/win/lib/windows64
+		)
+	endif(32bit)
 
-FIND_PATH(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h
-  /usr/local/include
-  /usr/include
-  )
+	message("-- Found Fribidi: ${FRIBIDI_LIBRARY} ")
 
-SET(FRIBIDI_NAMES ${FRIBIDI_NAMES} fribidi libfribidi)
-FIND_LIBRARY(FRIBIDI_LIBRARY
-  NAMES ${FRIBIDI_NAMES}
-  PATHS /usr/lib /usr/local/lib
-  )
+else()
+	include(CheckFunctionExists)
+	SET(FRIBIDI_FOUND "NO")
 
-IF (FRIBIDI_LIBRARY AND FRIBIDI_INCLUDE_DIR)
-  SET(CMAKE_REQUIRED_INCLUDES ${FRIBIDI_INCLUDE_DIR})
-  SET(CMAKE_REQUIRED_LIBRARIES ${FRIBIDI_LIBRARY})
-  CHECK_FUNCTION_EXISTS(fribidi_utf8_to_unicode FOUND_fribidi_utf8_to_unicode)
-  IF(FOUND_fribidi_utf8_to_unicode)
-    SET(FRIBIDI_LIBRARIES ${FRIBIDI_LIBRARY})
-    SET(FRIBIDI_FOUND "YES")
-  ELSE(FOUND_fribidi_utf8_to_unicode)
-   SET(FRIBIDI_LIBRARIES "NOTFOUND")
-    SET(FRIBIDI_INCLUDE_DIR "NOTFOUND")
-    SET(FRIBIDI_FOUND "NO")
-  ENDIF(FOUND_fribidi_utf8_to_unicode)
-ENDIF (FRIBIDI_LIBRARY AND FRIBIDI_INCLUDE_DIR)
+	FIND_PATH(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h
+		/usr/local/include
+		/usr/include
+	)
 
-IF (FRIBIDI_FOUND)
-  IF (NOT FRIBIDI_FIND_QUIETLY)
-    MESSAGE(STATUS "Found FriBiDi: ${FRIBIDI_LIBRARY}")
-  ENDIF (NOT FRIBIDI_FIND_QUIETLY)
-ELSE (FRIBIDI_FOUND)
-  IF (FRIBIDI_FIND_REQUIRED)
-    MESSAGE(FATAL_ERROR "Could not find FriBiDi library")
-  ENDIF (FRIBIDI_FIND_REQUIRED)
-ENDIF (FRIBIDI_FOUND)
+	SET(FRIBIDI_NAMES ${FRIBIDI_NAMES} fribidi libfribidi)
+	FIND_LIBRARY(FRIBIDI_LIBRARY
+		NAMES ${FRIBIDI_NAMES}
+		PATHS /usr/lib /usr/local/lib
+	)
 
+	IF (FRIBIDI_LIBRARY AND FRIBIDI_INCLUDE_DIR)
+		SET(CMAKE_REQUIRED_INCLUDES ${FRIBIDI_INCLUDE_DIR})
+		SET(CMAKE_REQUIRED_LIBRARIES ${FRIBIDI_LIBRARY})
+		CHECK_FUNCTION_EXISTS(fribidi_utf8_to_unicode FOUND_fribidi_utf8_to_unicode)
+		IF(FOUND_fribidi_utf8_to_unicode)
+			SET(FRIBIDI_LIBRARIES ${FRIBIDI_LIBRARY})
+			SET(FRIBIDI_FOUND "YES")
+		ELSE(FOUND_fribidi_utf8_to_unicode)
+			SET(FRIBIDI_LIBRARIES "NOTFOUND")
+			SET(FRIBIDI_INCLUDE_DIR "NOTFOUND")
+			SET(FRIBIDI_FOUND "NO")
+		ENDIF(FOUND_fribidi_utf8_to_unicode)
+	ENDIF (FRIBIDI_LIBRARY AND FRIBIDI_INCLUDE_DIR)
+
+	IF (FRIBIDI_FOUND)
+		IF (NOT FRIBIDI_FIND_QUIETLY)
+			MESSAGE(STATUS "Found FriBiDi: ${FRIBIDI_LIBRARY}")
+		ENDIF (NOT FRIBIDI_FIND_QUIETLY)
+		ELSE (FRIBIDI_FOUND)
+			IF (FRIBIDI_FIND_REQUIRED)
+				MESSAGE(FATAL_ERROR "Could not find FriBiDi library")
+			ENDIF (FRIBIDI_FIND_REQUIRED)
+	ENDIF (FRIBIDI_FOUND)
+endif()
 ##################################33
 
 
@@ -77,25 +125,45 @@ ENDIF (FRIBIDI_FOUND)
 # HARFBUZZ_LIBRARIES - containg the HarfBuzz library
 
 
+if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
+	FIND_PATH(HARFBUZZ_INCLUDE_DIRS hb.h
+		PATH
+		${PROJECT_SOURCE_DIR}/win/include/harfbuzz
+	)
+	
+	if(32bit)
+		FIND_LIBRARY(HARFBUZZ_LIBRARIES libharfbuzz-0
+			PATH
+			${PROJECT_SOURCE_DIR}/win/lib/windows32
+		)
+	else(32bit)
+		FIND_LIBRARY(HARFBUZZ_LIBRARIES libharfbuzz-0
+			PATH
+			${PROJECT_SOURCE_DIR}/win/lib/windows64
+		)
+	endif(32bit)
+  
+	message("-- Found Harfbuzz: ${HARFBUZZ_LIBRARIES} ")
+ 
+else()
+	INCLUDE(FindPkgConfig)
+	pkg_check_modules(PC_HARFBUZZ REQUIRED harfbuzz>=0.9.20)
 
-INCLUDE(FindPkgConfig)
-pkg_check_modules(PC_HARFBUZZ REQUIRED harfbuzz>=0.9.20)
 
+	FIND_PATH(HARFBUZZ_INCLUDE_DIRS NAMES hb.h
+		HINTS ${PC_HARFBUZZ_INCLUDE_DIRS} ${PC_HARFBUZZ_INCLUDEDIR} )
 
-FIND_PATH(HARFBUZZ_INCLUDE_DIRS NAMES hb.h
-  HINTS ${PC_HARFBUZZ_INCLUDE_DIRS} ${PC_HARFBUZZ_INCLUDEDIR} )
+	FIND_LIBRARY(HARFBUZZ_LIBRARIES NAMES harfbuzz
+		HINTS ${PC_HARFBUZZ_LIBRARY_DIRS} ${PC_HARFBUZZ_LIBDIR} )
 
-FIND_LIBRARY(HARFBUZZ_LIBRARIES NAMES harfbuzz
-  HINTS ${PC_HARFBUZZ_LIBRARY_DIRS} ${PC_HARFBUZZ_LIBDIR} )
-
-IF (PC_HARFBUZZ_FOUND)
-	MESSAGE(STATUS "Harfbuzz Library Found OK:  ${HARFBUZZ_LIBRARIES} ")
-	INCLUDE(FindPackageHandleStandardArgs)
-	FIND_PACKAGE_HANDLE_STANDARD_ARGS(HarfBuzz DEFAULT_MSG HARFBUZZ_INCLUDE_DIRS HARFBUZZ_LIBRARIES)
-ELSE ()
-	MESSAGE(FATAL_ERROR "No harfbuzz Found")
-ENDIF()
-
+	IF (PC_HARFBUZZ_FOUND)
+		MESSAGE(STATUS "Harfbuzz Library Found OK:  ${HARFBUZZ_LIBRARIES} ")
+		INCLUDE(FindPackageHandleStandardArgs)
+		FIND_PACKAGE_HANDLE_STANDARD_ARGS(HarfBuzz DEFAULT_MSG HARFBUZZ_INCLUDE_DIRS HARFBUZZ_LIBRARIES)
+	ELSE ()
+		MESSAGE(FATAL_ERROR "No harfbuzz Found")
+	ENDIF()
+endif(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 ####################################
 
 # add the binary tree directory to the search path for include files
@@ -105,9 +173,21 @@ INCLUDE_DIRECTORIES(
  	${CMAKE_CURRENT_SOURCE_DIR}
 	${PROJECT_SOURCE_DIR}
 	${HARFBUZZ_INCLUDE_DIRS}
-	${FRIBIDI_INCLUDE_DIR}/fribidi	
+	${GLIB_INCLUDE_DIRS}
+	
+)
+
+if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
+INCLUDE_DIRECTORIES(
+	${FRIBIDI_INCLUDE_DIR}
+	${FREETYPE_INCLUDE_DIR}
+)
+else()
+INCLUDE_DIRECTORIES(
+	${FRIBIDI_INCLUDE_DIR}/fribidi
 	${FREETYPE_INCLUDE_DIR_freetype2}
 )
+endif()
 
 #headers files
 set(HEADERS
@@ -141,6 +221,7 @@ endif()
 target_link_libraries (raqm
 	${FREETYPE_LIBRARIES}
 	${FRIBIDI_LIBRARY}
+	${GLIB_LIBRARY}
 	${HARFBUZZ_LIBRARIES}
 )
 

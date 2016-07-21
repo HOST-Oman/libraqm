@@ -7,14 +7,24 @@ project (raqm)
 ##############################3
 
 #enable compiler warning
-add_definitions ("-Wall  -Wno-portability ")
-
+if(CMAKE_COMPILER_IS_GNUCC)
+add_definitions (-Wall  -Wno-portability)
 #enable C99 mode
 add_definitions(-std=gnu99)
+endif()
+
+#not working yet.. check
+if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW) )
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /wd4068")
+endif()
+
+
 
 #check GLIB module if exist
-INCLUDE(FindPkgConfig)
-PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
+#INCLUDE(FindPkgConfig)
+#PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
+
+
 
 
 #set the values of raqam.pc file
@@ -41,13 +51,11 @@ configure_file (
 include_directories ( 
 	${PROJECT_SOURCE_DIR}
 	${PROJECT_SOURCE_DIR}/docs
-	#${PROJECT_SOURCE_DIR}/tests
 	${PROJECT_SOURCE_DIR}/src
 	#${PROJECT_SOURCE_DIR}/m4
 )
 
 add_subdirectory (docs)
-#add_subdirectory (tests)
 add_subdirectory (src)
 #add_subdirectory (m4)
 
