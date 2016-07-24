@@ -61,15 +61,15 @@ be happy to integrate it! Just fork the repository and make a pull request.
 Projects using Raqm
 ===================
 
-1. ImageMagick
+1. [ImageMagick](https://github.com/ImageMagick/ImageMagick)
+2. [LibGD](https://github.com/libgd/libgd)
 
 The following projects have patches to support complex text layout using Raqm:
 
-1. LibGD: https://github.com/libgd/libgd/pull/196
-2. Pillow: https://github.com/python-pillow/Pillow/pull/1682
-3. SDL_ttf: https://bugzilla.libsdl.org/show_bug.cgi?id=3211
-4. Pygame: https://bitbucket.org/pygame/pygame/pull-requests/52
-5. Blender: https://developer.blender.org/D1809
+1. Pillow: https://github.com/python-pillow/Pillow/pull/1682
+2. SDL_ttf: https://bugzilla.libsdl.org/show_bug.cgi?id=3211
+3. Pygame: https://bitbucket.org/pygame/pygame/pull-requests/52
+4. Blender: https://developer.blender.org/D1809
 
 
 
