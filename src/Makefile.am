@@ -8,6 +8,9 @@ libraqm_la_SOURCES = \
     raqm.h \
     reorder_runs.c \
     reorder_runs.h \
+    ucdn/ucdn.h \
+    ucdn/ucdn.c \
+    ucdn/unicodedata_db.h \
     $(NULL)
 
 include_HEADERS = \
