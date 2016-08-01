@@ -1,0 +1,3 @@
+[submodule "src/ucdn"]
+	path = src/ucdn
+	url = https://github.com/grigorig/ucdn.git
