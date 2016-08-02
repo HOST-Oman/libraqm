@@ -740,7 +740,7 @@ raqm_set_line_width (raqm_t *rq, int width)
 /**
  * raqm_set_paragraph_alignment:
  * @rq: a #raqm_t.
- * @alignment: paragraph alignment.
+ * @alignment: the aligment of paragraph.
  *
  * Sets the paragraph alignment.
  *
@@ -750,7 +750,8 @@ raqm_set_line_width (raqm_t *rq, int width)
  * Since: 0.2
  */
 bool
-raqm_set_paragraph_alignment (raqm_t *rq, raqm_alignment_t alignment)
+raqm_set_paragraph_alignment (raqm_t           *rq,
+                              raqm_alignment_t alignment)
 {
   if (!rq)
     return false;
