@@ -92,9 +92,9 @@
  *         goto final;
  *
  *     dir = RAQM_DIRECTION_DEFAULT;
- *     if (strcmp(direction, "-rtl") == 0)
+ *     if (strcmp (direction, "-rtl") == 0)
  *       dir = RAQM_DIRECTION_RTL;
- *     else if (strcmp(direction, "-ltr") == 0)
+ *     else if (strcmp (direction, "-ltr") == 0)
  *       dir = RAQM_DIRECTION_LTR;
  *
  *     rq = raqm_create ();
@@ -119,7 +119,7 @@
  *
  *     for (i = 0; i < count; i++)
  *     {
- *         printf("%d %d %d %d %d %d\n",
+ *         printf ("%d %d %d %d %d %d\n",
  *                glyphs[i].index,
  *                glyphs[i].x_offset,
  *                glyphs[i].y_offset,
@@ -294,7 +294,7 @@ _raqm_free_ftfaces (raqm_t *rq)
   for (size_t i = 0; i < rq->text_len; i++)
   {
     if (rq->ftfaces[i])
-      FT_Done_Face(rq->ftfaces[i]);
+      FT_Done_Face (rq->ftfaces[i]);
   }
 }
 
@@ -1279,9 +1279,9 @@ raqm_index_to_position (raqm_t *rq,
 
   RAQM_TEST ("\n");
 
-  while(*index < rq->text_len)
+  while (*index < rq->text_len)
   {
-    if (_raqm_allowed_grapheme_boundary(rq->text[*index], rq->text[*index+1]))
+    if (_raqm_allowed_grapheme_boundary (rq->text[*index], rq->text[*index + 1]))
       break;
 
     ++*index;
@@ -1306,8 +1306,8 @@ raqm_index_to_position (raqm_t *rq,
         for (size_t j = i + 1; j < len && next_cluster == curr_cluster; j++)
           next_cluster = info[j].cluster;
       else
-	for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
-	     j--)
+        for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
+             j--)
           next_cluster = info[j].cluster;
 
       if (next_cluster == curr_cluster)
@@ -1324,7 +1324,7 @@ raqm_index_to_position (raqm_t *rq,
   }
 
   if (rq->flags & RAQM_FLAG_UTF8)
-    *index = _raqm_u32_to_u8_index(rq, *index);
+    *index = _raqm_u32_to_u8_index (rq, *index);
   RAQM_TEST ("The position is %d at index %ld\n",*x ,*index);
   return true;
 }
@@ -1398,8 +1398,8 @@ raqm_position_to_index (raqm_t *rq,
             for (size_t j = i + 1; j < len && next_cluster == curr_cluster; j++)
               next_cluster = info[j].cluster;
           else
-	  for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
-		 j--)
+          for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
+                 j--)
               next_cluster = info[j].cluster;
 
           if (next_cluster == curr_cluster)
@@ -1407,7 +1407,7 @@ raqm_position_to_index (raqm_t *rq,
 
           *index = next_cluster;
         }
-        if (_raqm_allowed_grapheme_boundary(rq->text[*index],rq->text[*index+1]))
+        if (_raqm_allowed_grapheme_boundary (rq->text[*index],rq->text[*index + 1]))
         {
           RAQM_TEST ("The start-index is %ld  at position %d \n", *index, x);
             return true;
@@ -1415,8 +1415,8 @@ raqm_position_to_index (raqm_t *rq,
 
         while (*index < (unsigned)run->pos + run->len)
         {
-	  if (_raqm_allowed_grapheme_boundary(rq->text[*index],
-					      rq->text[*index+1]))
+          if (_raqm_allowed_grapheme_boundary (rq->text[*index],
+                                               rq->text[*index + 1]))
           {
             *index += 1;
             break;
@@ -1468,9 +1468,9 @@ _raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
   raqm_grapheme_t l_grapheme, r_grapheme;
 
   l_category = hb_unicode_general_category (hb_unicode_funcs_get_default (),
-					    l_char);
+                                            l_char);
   r_category = hb_unicode_general_category (hb_unicode_funcs_get_default (),
-					    r_char);
+                                            r_char);
   l_grapheme = _raqm_get_grapheme_break (l_char, l_category);
   r_grapheme = _raqm_get_grapheme_break (r_char, r_category);
 
