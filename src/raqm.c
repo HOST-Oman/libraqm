@@ -200,7 +200,7 @@ struct _raqm {
 struct _raqm_run {
   int            pos;
   int            len;
-  int			 line;
+  int            line;
 
   hb_direction_t direction;
   hb_script_t    script;
@@ -780,8 +780,9 @@ raqm_set_freetype_load_flags (raqm_t *rq,
  * @rq: a #raqm_t.
  * @width: the line width.
  *
- * Sets the maximum line width for the paragraph, so that when the width is
- * exceeded, a breaking line mechanism is applied.
+ * Sets the maximum line width for the paragraph. Causes Raqm to break lines
+ * exceeding @width. If no width is set Raqm will assume line width is
+ * infinite, and no line breaking will take place.
  *
  * Return value:
  * %true if no errors happened, %false otherwise.
@@ -789,7 +790,8 @@ raqm_set_freetype_load_flags (raqm_t *rq,
  * Since: 0.2
  */
 bool
-raqm_set_line_width (raqm_t *rq, int width)
+raqm_set_line_width (raqm_t *rq,
+                     int     width)
 {
   if (!rq)
     return false;
@@ -800,11 +802,12 @@ raqm_set_line_width (raqm_t *rq, int width)
 }
 
 /**
- * raqm_set_paragraph_alignment:
+ * raqm_set_par_alignment:
  * @rq: a #raqm_t.
- * @alignment: the aligment of paragraph.
+ * @alignment: the alignment of paragraph.
  *
- * Sets the paragraph alignment.
+ * Sets the paragraph alignment. By default text is left aligned. Has no effect
+ * if line width is not set, see raqm_set_line_width().
  *
  * Return value:
  * %true if no errors happened, %false otherwise.
@@ -812,8 +815,8 @@ raqm_set_line_width (raqm_t *rq, int width)
  * Since: 0.2
  */
 bool
-raqm_set_paragraph_alignment (raqm_t           *rq,
-                              raqm_alignment_t alignment)
+raqm_set_par_alignment (raqm_t           *rq,
+                        raqm_alignment_t  alignment)
 {
   if (!rq)
     return false;
@@ -870,7 +873,7 @@ raqm_layout (raqm_t *rq)
     return false;
 
   if (!_raqm_line_break (rq))
-	return false;
+    return false;
 
   return true;
 }
@@ -918,17 +921,19 @@ raqm_get_glyphs (raqm_t *rq,
     return NULL;
   }
 
+#ifdef RAQM_TESTING
   RAQM_TEST ("Glyph information:\n");
 
   for (size_t i = 0; i < *length; i++)
   {
-      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\tx_position:"
-                 " %d\ty_position: %d\tfont: %s\n",
+      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance:"
+                 " %d\tx_position: %d\ty_position: %d\tfont: %s\n",
                  rq->glyphs[i].index, rq->glyphs[i].x_offset,
                  rq->glyphs[i].y_offset, rq->glyphs[i].x_advance,
                  rq->glyphs[i].x_position, rq->glyphs[i].y_position,
                  rq->glyphs[i].ftface->family_name);
   }
+#endif
 
   if (rq->flags & RAQM_FLAG_UTF8)
   {
@@ -1075,201 +1080,203 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   return runs;
 }
 
-enum break_class
-{
-    /* input types */
-    RAQM_BREAK_CLASS_OP = 0,	// open
-    RAQM_BREAK_CLASS_CL,	// closing punctuation
-    RAQM_BREAK_CLASS_CP,	// closing parentheses (from 5.2.0) (before 5.2.0 treat like CL)
-    RAQM_BREAK_CLASS_QU,	// quotation
-    RAQM_BREAK_CLASS_GL,	// glue
-    RAQM_BREAK_CLASS_NS,	// no-start
-    RAQM_BREAK_CLASS_EX,	// exclamation/interrogation
-    RAQM_BREAK_CLASS_SY,	// Syntax (slash)
-    RAQM_BREAK_CLASS_IS,	// infix (numeric) separator
-    RAQM_BREAK_CLASS_PR,	// prefix
-    RAQM_BREAK_CLASS_PO,	// postfix
-    RAQM_BREAK_CLASS_NU,	// numeric
-    RAQM_BREAK_CLASS_AL,	// alphabetic
-    RAQM_BREAK_CLASS_ID,	// ideograph (atomic)
-    RAQM_BREAK_CLASS_IN,	// inseparable
-    RAQM_BREAK_CLASS_HY,	// hyphen
-    RAQM_BREAK_CLASS_BA,	// break after
-    RAQM_BREAK_CLASS_BB,	// break before
-    RAQM_BREAK_CLASS_B2,	// break both
-    RAQM_BREAK_CLASS_ZW,	// ZW space
-    RAQM_BREAK_CLASS_CM,	// combining mark
-    RAQM_BREAK_CLASS_WJ,    // word joiner
+typedef enum {
+  /* input types */
+  RAQM_BREAK_CLASS_OP = 0,      /* open */
+  RAQM_BREAK_CLASS_CL,  /* closing punctuation */
+  RAQM_BREAK_CLASS_CP,  /* closing parentheses */
+  RAQM_BREAK_CLASS_QU,  /* quotation */
+  RAQM_BREAK_CLASS_GL,  /* glue */
+  RAQM_BREAK_CLASS_NS,  /* no-start */
+  RAQM_BREAK_CLASS_EX,  /* exclamation/interrogation */
+  RAQM_BREAK_CLASS_SY,  /* Syntax (slash) */
+  RAQM_BREAK_CLASS_IS,  /* infix (numeric) separator */
+  RAQM_BREAK_CLASS_PR,  /* prefix */
+  RAQM_BREAK_CLASS_PO,  /* postfix */
+  RAQM_BREAK_CLASS_NU,  /* numeric */
+  RAQM_BREAK_CLASS_AL,  /* alphabetic */
+  RAQM_BREAK_CLASS_ID,  /* ideograph (atomic) */
+  RAQM_BREAK_CLASS_IN,  /* inseparable */
+  RAQM_BREAK_CLASS_HY,  /* hyphen */
+  RAQM_BREAK_CLASS_BA,  /* break after */
+  RAQM_BREAK_CLASS_BB,  /* break before */
+  RAQM_BREAK_CLASS_B2,  /* break both */
+  RAQM_BREAK_CLASS_ZW,  /* ZW space */
+  RAQM_BREAK_CLASS_CM,  /* combining mark */
+  RAQM_BREAK_CLASS_WJ,  /* word joiner */
 
-    /* used for Korean Syllable Block pair table */
-    RAQM_BREAK_CLASS_H2,    // Hamgul 2 Jamo Syllable
-    RAQM_BREAK_CLASS_H3,    // Hangul 3 Jamo Syllable
-    RAQM_BREAK_CLASS_JL,    // Jamo leading consonant
-    RAQM_BREAK_CLASS_JV,    // Jamo vowel
-    RAQM_BREAK_CLASS_JT,    // Jamo trailing consonant
+  /* used for Korean Syllable Block pair table */
+  RAQM_BREAK_CLASS_H2,  /* Hamgul 2 Jamo Syllable */
+  RAQM_BREAK_CLASS_H3,  /* Hangul 3 Jamo Syllable */
+  RAQM_BREAK_CLASS_JL,  /* Jamo leading consonant */
+  RAQM_BREAK_CLASS_JV,  /* Jamo vowel */
+  RAQM_BREAK_CLASS_JT,  /* Jamo trailing consonant */
 
-    /* these are not handled in the pair tables */
-    RAQM_BREAK_CLASS_SA,    // South (East) Asian
-    RAQM_BREAK_CLASS_SP,	// space
-    RAQM_BREAK_CLASS_PS,	// paragraph and line separators
-    RAQM_BREAK_CLASS_BK,	// hard break (newline)
-    RAQM_BREAK_CLASS_CR,    // carriage return
-    RAQM_BREAK_CLASS_LF,    // line feed
-    RAQM_BREAK_CLASS_NL,    // next line
-    RAQM_BREAK_CLASS_CB,    // contingent break opportunity
-    RAQM_BREAK_CLASS_SG,    // surrogate
-    RAQM_BREAK_CLASS_AI,    // ambiguous
-    RAQM_BREAK_CLASS_XX,    // unknown
-};
+  /* these are not handled in the pair tables */
+  RAQM_BREAK_CLASS_SA,  /* South (East) Asian */
+  RAQM_BREAK_CLASS_SP,  /* space */
+  RAQM_BREAK_CLASS_PS,  /* paragraph and line separators */
+  RAQM_BREAK_CLASS_BK,  /* hard break (newline) */
+  RAQM_BREAK_CLASS_CR,  /* carriage return */
+  RAQM_BREAK_CLASS_LF,  /* line feed */
+  RAQM_BREAK_CLASS_NL,  /* next line */
+  RAQM_BREAK_CLASS_CB,  /* contingent break opportunity */
+  RAQM_BREAK_CLASS_SG,  /* surrogate */
+  RAQM_BREAK_CLASS_AI,  /* ambiguous */
+  RAQM_BREAK_CLASS_XX,  /* unknown */
+} raqm_break_class_t;
+
+typedef enum {
+  RAQM_DIRECT_BREAK = 0,                    /* _ in table,  oo in array */
+  RAQM_INDIRECT_BREAK,                      /* % in table,  SS in array */
+  RAQM_COMBINING_INDIRECT_BREAK,            /* # in table,  cc in array */
+  RAQM_COMBINING_PROHIBITED_BREAK,          /* @ in table   CC in array */
+  RAQM_PROHIBITED_BREAK,                    /* ^ in table,  XX in array */
+  RAQM_UNDEFINE_BREAK,                      /* the defualt value */
+} raqm_break_action_t;
 
 /* Define some short-cuts for the table */
-#define oo RAQM_DIRECT_BREAK			         // '_' break allowed
-#define SS RAQM_INDIRECT_BREAK				// '%' only break across space (aka 'indirect break' below)
-#define cc RAQM_COMBINING_INDIRECT_BREAK	// '#' indirect break for combining marks
-#define CC RAQM_COMBINING_PROHIBITED_BREAK	// '@' indirect break for combining marks
-#define XX RAQM_PROHIBITED_BREAK			// '^' no break allowed_BRK
-
-enum break_action {
-        RAQM_DIRECT_BREAK = 0,             	// _ in table, 	oo in array
-        RAQM_INDIRECT_BREAK,               	// % in table, 	SS in array
-        RAQM_COMBINING_INDIRECT_BREAK,		// # in table, 	cc in array
-        RAQM_COMBINING_PROHIBITED_BREAK,  	// @ in table 	CC in array
-        RAQM_PROHIBITED_BREAK,             	// ^ in table, 	XX in array
-        RAQM_UNDEFINE_BREAK,             	// the defualt value
-};
+#define oo RAQM_DIRECT_BREAK                /* '_' break allowed */
+#define SS RAQM_INDIRECT_BREAK              /* '%' only break across space (aka 'indirect break' below) */
+#define cc RAQM_COMBINING_INDIRECT_BREAK    /* '#' indirect break for combining marks */
+#define CC RAQM_COMBINING_PROHIBITED_BREAK  /* '@' indirect break for combining marks */
+#define XX RAQM_PROHIBITED_BREAK            /* '^' no break allowed_BRK */
 
 static bool *
 _raqm_find_line_break (raqm_t *rq)
 {
-	size_t length = rq->text_len;
-	enum break_class   current_class;
-	enum break_class   next_class;
-	enum break_action *break_actions;
-	enum break_action  current_action;
-	bool *break_here;
+  size_t length = rq->text_len;
+  raqm_break_class_t current_class;
+  raqm_break_class_t next_class;
+  raqm_break_action_t *break_actions;
+  raqm_break_action_t current_action;
+  bool *break_here;
 
-    static enum break_action  break_pairs[][RAQM_BREAK_CLASS_JT+1] =  {
-        /*       1   2   3   4	5	6	7	8	9  10  11  12  13  14  15  16  17  18  19  20  21   22  23  24  25  26  27 */
-        /*     OP, CL, CL, QU, GL, NS, EX, SY, IS, PR, PO, NU, AL, ID, IN, HY, BA, BB, B2, ZW, CM, WJ,  H2, H3, JL, JV, JT, = after class */
-		/*OP*/ { XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, CC, XX, XX, XX, XX, XX, XX }, // OP open
-		/*CL*/ { oo, XX, XX, SS, SS, XX, XX, XX, XX, SS, SS, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // CL close
-		/*CP*/ { oo, XX, XX, SS, SS, XX, XX, XX, XX, SS, SS, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // CL close
-		/*QU*/ { XX, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, // QU quotation
-		/*GL*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, // GL glue
-		/*NS*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // NS no-start
-		/*EX*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // EX exclamation/interrogation
-		/*SY*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // SY Syntax (slash)
-		/*IS*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // IS infix (numeric) separator
-		/*PR*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, SS, oo, SS, SS, oo, oo, XX, cc, XX, SS, SS, SS, SS, SS }, // PR prefix
-		/*PO*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // NU numeric
-		/*NU*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // AL alphabetic
-		/*AL*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // AL alphabetic
-		/*ID*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // ID ideograph (atomic)
-		/*IN*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // IN inseparable
-		/*HY*/ { oo, XX, XX, SS, oo, SS, XX, XX, XX, oo, oo, SS, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // HY hyphens and spaces
-		/*BA*/ { oo, XX, XX, SS, oo, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // BA break after
-		/*BB*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, // BB break before
-		/*B2*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, XX, XX, cc, XX, oo, oo, oo, oo, oo }, // B2 break either side, but not pair
-		/*ZW*/ { oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, XX, oo, oo, oo, oo, oo, oo, oo }, // ZW zero width space
-		/*CM*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, // CM combining mark
-		/*WJ*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, // WJ word joiner
-		/*H2*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, SS, SS }, // Hangul 2 Jamo syllable
-		/*H3*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, SS }, // Hangul 3 Jamo syllable
-		/*JL*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, SS, SS, SS, SS, oo }, // Jamo Leading Consonant
-		/*JV*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, SS, SS }, // Jamo Vowel
-		/*JT*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, SS }, // Jamo Trailing Consonant
-	};
+  static raqm_break_action_t  break_pairs[][RAQM_BREAK_CLASS_JT+1] = {
+    /*       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27 */
+    /*       OP, CL, CL, QU, GL, NS, EX, SY, IS, PR, PO, NU, AL, ID, IN, HY, BA, BB, B2, ZW, CM, WJ, H2, H3, JL, JV, JT, = after class */
+    /*OP*/ { XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, CC, XX, XX, XX, XX, XX, XX }, /* OP open */
+    /*CL*/ { oo, XX, XX, SS, SS, XX, XX, XX, XX, SS, SS, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* CL close */
+    /*CP*/ { oo, XX, XX, SS, SS, XX, XX, XX, XX, SS, SS, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* CL close */
+    /*QU*/ { XX, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, /* QU quotation */
+    /*GL*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, /* GL glue */
+    /*NS*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* NS no-start */
+    /*EX*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* EX exclamation/interrogation */
+    /*SY*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* SY Syntax (slash) */
+    /*IS*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* IS infix (numeric) separator */
+    /*PR*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, SS, oo, SS, SS, oo, oo, XX, cc, XX, SS, SS, SS, SS, SS }, /* PR prefix */
+    /*PO*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* NU numeric */
+    /*NU*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* AL alphabetic */
+    /*AL*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* AL alphabetic */
+    /*ID*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* ID ideograph (atomic) */
+    /*IN*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* IN inseparable */
+    /*HY*/ { oo, XX, XX, SS, oo, SS, XX, XX, XX, oo, oo, SS, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* HY hyphens and spaces */
+    /*BA*/ { oo, XX, XX, SS, oo, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* BA break after */
+    /*BB*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, /* BB break before */
+    /*B2*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, XX, XX, cc, XX, oo, oo, oo, oo, oo }, /* B2 break either side, but not pair */
+    /*ZW*/ { oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, XX, oo, oo, oo, oo, oo, oo, oo }, /* ZW zero width space */
+    /*CM*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* CM combining mark */
+    /*WJ*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, /* WJ word joiner */
+    /*H2*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, SS, SS }, /* Hangul 2 Jamo syllable */
+    /*H3*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, SS }, /* Hangul 3 Jamo syllable */
+    /*JL*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, SS, SS, SS, SS, oo }, /* Jamo Leading Consonant */
+    /*JV*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, SS, SS }, /* Jamo Vowel */
+    /*JT*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, SS }, /* Jamo Trailing Consonant */
+  };
 
-	break_actions = malloc (sizeof (enum break_action) * length);
-	break_here = malloc (sizeof (bool) * length);
+  break_actions = malloc (sizeof (raqm_break_action_t) * length);
+  break_here = malloc (sizeof (bool) * length);
 
-	current_class = ucdn_get_resolved_linebreak_class(rq->text[0]);
-	next_class    = ucdn_get_resolved_linebreak_class(rq->text[1]);
+  current_class = ucdn_get_resolved_linebreak_class (rq->text[0]);
+  next_class    = ucdn_get_resolved_linebreak_class (rq->text[1]);
 
-    for(size_t i = 0; i < length; i++)
+  for (size_t i = 0; i < length; i++)
+    break_actions[i] = RAQM_UNDEFINE_BREAK;
+
+  /* handle case where input starts with an LF */
+  if (current_class == RAQM_BREAK_CLASS_LF)
+    current_class = RAQM_BREAK_CLASS_BK;
+
+  /* treat NL like BK */
+  if (current_class == RAQM_BREAK_CLASS_NL)
+    current_class = RAQM_BREAK_CLASS_BK;
+
+  /* treat SP at start of input as if it followed WJ */
+  if (current_class == RAQM_BREAK_CLASS_SP)
+    current_class = RAQM_BREAK_CLASS_WJ;
+
+  /* loop over all pairs in the string up to a hard break or CRLF pair */
+  for (size_t i = 1;
+       (i < length) && (current_class != RAQM_BREAK_CLASS_BK) &&
+       (current_class != RAQM_BREAK_CLASS_CR ||
+        next_class == RAQM_BREAK_CLASS_LF);
+       i++)
+  {
+    next_class = ucdn_get_resolved_linebreak_class (rq->text[i]);
+
+    /* handle spaces explicitly */
+    if (next_class == RAQM_BREAK_CLASS_SP)
     {
-        break_actions[i] = RAQM_UNDEFINE_BREAK;
+      break_actions[i-1]  = RAQM_PROHIBITED_BREAK;   /* apply rule LB 7: � SP */
+      continue;
     }
 
-    /* handle case where input starts with an LF */
-    if (current_class == RAQM_BREAK_CLASS_LF)
-        current_class = RAQM_BREAK_CLASS_BK;
+    if (next_class == RAQM_BREAK_CLASS_BK ||
+        next_class == RAQM_BREAK_CLASS_NL ||
+        next_class == RAQM_BREAK_CLASS_LF)
+    {
+      break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
+      current_class = RAQM_BREAK_CLASS_BK;
+      continue;
+    }
 
-    /* treat NL like BK */
-    if (current_class == RAQM_BREAK_CLASS_NL)
-        current_class = RAQM_BREAK_CLASS_BK;
+    if (next_class == RAQM_BREAK_CLASS_CR)
+    {
+      break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
+      current_class = RAQM_BREAK_CLASS_CR;
+      continue;
+    }
 
-    /* treat SP at start of input as if it followed WJ */
-    if (current_class == RAQM_BREAK_CLASS_SP)
-        current_class = RAQM_BREAK_CLASS_WJ;
+    /* lookup pair table information in brkPairs[before, after] */
+    current_action = break_pairs[current_class][next_class];
+    break_actions[i-1] = current_action;
 
-    /* loop over all pairs in the string up to a hard break or CRLF pair */
-    for (size_t i = 1; (i < length) && (current_class != RAQM_BREAK_CLASS_BK) && (current_class != RAQM_BREAK_CLASS_CR || next_class == RAQM_BREAK_CLASS_LF); i++)
-	{
-		next_class = ucdn_get_resolved_linebreak_class(rq->text[i]);
+    if (current_action == RAQM_INDIRECT_BREAK)      /* resolve indirect break */
+    {
+      if (ucdn_get_resolved_linebreak_class (rq->text[i-1]) == RAQM_BREAK_CLASS_SP)          /* if context is A SP * B */
+        break_actions[i-1] = RAQM_INDIRECT_BREAK;   /* break opportunity */
+      else                                          /* else */
+        break_actions[i-1] = RAQM_PROHIBITED_BREAK; /* no break opportunity */
+    }
+    else if (current_action == RAQM_COMBINING_PROHIBITED_BREAK)             /* this is the case OP SP* CM */
+    {
+      break_actions[i-1] = RAQM_COMBINING_PROHIBITED_BREAK;     /* no break allowed */
+      if (ucdn_get_resolved_linebreak_class (rq->text[i-1]) != RAQM_BREAK_CLASS_SP)
+        continue;                               /* apply rule 9: X CM* -> X */
+    }
+    else if (current_action == RAQM_COMBINING_INDIRECT_BREAK)               /* resolve combining mark break */
+    {
+      break_actions[i-1] = RAQM_PROHIBITED_BREAK;               /* don't break before CM */
+      if (ucdn_get_resolved_linebreak_class (rq->text[i-1]) == RAQM_BREAK_CLASS_SP)
+      {
+        break_actions[i-1] = RAQM_PROHIBITED_BREAK;             /* legacy: keep SP CM together */
+        if (i > 1)
+          break_actions[i-2] = ((ucdn_get_resolved_linebreak_class (rq->text[i-2]) == RAQM_BREAK_CLASS_SP) ? RAQM_INDIRECT_BREAK : RAQM_DIRECT_BREAK);
+       }
+      else                                     /* apply rule 9: X CM * -> X */
+        continue;
+    }
 
-        /* handle spaces explicitly */
-        if (next_class == RAQM_BREAK_CLASS_SP) {
-                        break_actions[i-1]  = RAQM_PROHIBITED_BREAK;   // apply rule LB 7: � SP
-			continue;
-		}
+    current_class = next_class;
+  }
 
-        if (next_class == RAQM_BREAK_CLASS_BK || next_class == RAQM_BREAK_CLASS_NL || next_class == RAQM_BREAK_CLASS_LF) {
-                        break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
-            current_class = RAQM_BREAK_CLASS_BK;
-			continue;
-		}
-
-        if (next_class == RAQM_BREAK_CLASS_CR)
-		{
-                        break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
-            current_class = RAQM_BREAK_CLASS_CR;
-			continue;
-		}
-
-        /* lookup pair table information in brkPairs[before, after] */
-		current_action = break_pairs[current_class][next_class];
-		break_actions[i-1] = current_action;
-
-                if (current_action == RAQM_INDIRECT_BREAK)		// resolve indirect break
-		{
-            if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) == RAQM_BREAK_CLASS_SP)          // if context is A SP * B
-                                break_actions[i-1] = RAQM_INDIRECT_BREAK;             // break opportunity
-			else                                        // else
-                                break_actions[i-1] = RAQM_PROHIBITED_BREAK;           // no break opportunity
-		}
-
-                else if (current_action == RAQM_COMBINING_PROHIBITED_BREAK)		// this is the case OP SP* CM
-		{
-                        break_actions[i-1] = RAQM_COMBINING_PROHIBITED_BREAK;     // no break allowed
-            if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) != RAQM_BREAK_CLASS_SP)
-				continue;                               // apply rule 9: X CM* -> X
-		}
-
-                else if (current_action == RAQM_COMBINING_INDIRECT_BREAK)		// resolve combining mark break
-		{
-                        break_actions[i-1] = RAQM_PROHIBITED_BREAK;               // don't break before CM
-            if (ucdn_get_resolved_linebreak_class(rq->text[i-1]) == RAQM_BREAK_CLASS_SP)
-			{
-                                break_actions[i-1] = RAQM_PROHIBITED_BREAK;		// legacy: keep SP CM together
-				if (i > 1)
-                                        break_actions[i-2] = ((ucdn_get_resolved_linebreak_class(rq->text[i-2]) == RAQM_BREAK_CLASS_SP) ? RAQM_INDIRECT_BREAK : RAQM_DIRECT_BREAK);
-			} else                                     // apply rule 9: X CM * -> X
-				continue;
-		}
-
-		current_class = next_class;
-	}
-
-	for(size_t i = 0; i < length; i++)
-	{
-                if (break_actions[i] == RAQM_INDIRECT_BREAK || break_actions[i] == RAQM_DIRECT_BREAK )
-		{
-			break_here[i] = true;
-		}
-		else
-			break_here[i] = false;
-	}
+  for (size_t i = 0; i < length; i++)
+  {
+    if (break_actions[i] == RAQM_INDIRECT_BREAK || break_actions[i] == RAQM_DIRECT_BREAK )
+      break_here[i] = true;
+    else
+      break_here[i] = false;
+  }
 
 #undef oo
 #undef SS
@@ -1277,253 +1284,241 @@ _raqm_find_line_break (raqm_t *rq)
 #undef CC
 #undef XX
 
-	free (break_actions);
-	return break_here;
+  free (break_actions);
+  return break_here;
 }
 
 static int
-_raqm_logical_sort(const void *a,const void *b)
+_raqm_logical_sort (const void *a, const void *b)
 {
-    raqm_glyph_t *ia = (raqm_glyph_t *)a;
-    raqm_glyph_t *ib = (raqm_glyph_t *)b;
+  raqm_glyph_t *ia = (raqm_glyph_t *) a;
+  raqm_glyph_t *ib = (raqm_glyph_t *) b;
 
-return ia->cluster - ib->cluster;
+  return ia->cluster - ib->cluster;
 }
 
 static int
-_raqm_visual_sort(const void *a,const void *b)
+_raqm_visual_sort (const void *a, const void *b)
 {
-    raqm_glyph_t *ia = (raqm_glyph_t *)a;
-    raqm_glyph_t *ib = (raqm_glyph_t *)b;
+  raqm_glyph_t *ia = (raqm_glyph_t *) a;
+  raqm_glyph_t *ib = (raqm_glyph_t *) b;
 
-    if (ia->line == ib->line)
-    {
-        return ia->visual_index - ib->visual_index;
-    }
-
-    else
-    {
-        return ia->line - ib->line;
-    }
+  if (ia->line == ib->line)
+    return ia->visual_index - ib->visual_index;
+  else
+    return ia->line - ib->line;
 }
 
 static bool
 _raqm_line_break (raqm_t *rq)
 {
-    int count = 0;
-    int glyphs_length = 0;
-    int current_x = 0;
-    int line_space;
-    int current_line = 0;
-    int align_offset = 0;
-    int space_width;
+  int count = 0;
+  int glyphs_length = 0;
+  int current_x = 0;
+  int line_space;
+  int current_line = 0;
+  int align_offset = 0;
+  int space_width;
 
-    int i = 0;
-    int j = 0;
-    int k = 0;
+  int i = 0;
+  int j = 0;
+  int k = 0;
 
-    int space_count = 0;
-    int space_extension;
+  int space_count = 0;
+  int space_extension;
 
-    bool *break_here = NULL;
+  bool *break_here = NULL;
 
-    /* finding possible breaks in text */
-    break_here = _raqm_find_line_break(rq);
+  /* finding possible breaks in text */
+  break_here = _raqm_find_line_break (rq);
 
-    /* counting total glyphs */
-    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-      count += hb_buffer_get_length (run->buffer);
+  /* counting total glyphs */
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+    count += hb_buffer_get_length (run->buffer);
 
-    glyphs_length = count;
+  glyphs_length = count;
 
-    rq->glyphs = malloc (sizeof (raqm_glyph_t) * count);
-    if (!rq->glyphs)
+  rq->glyphs = malloc (sizeof (raqm_glyph_t) * count);
+  if (!rq->glyphs)
+  {
+    return false;
+  }
+
+  /* populating glyphs */
+  count = 0;
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    size_t len;
+    hb_glyph_info_t *info;
+    hb_glyph_position_t *position;
+
+    len = hb_buffer_get_length (run->buffer);
+    info = hb_buffer_get_glyph_infos (run->buffer, NULL);
+    position = hb_buffer_get_glyph_positions (run->buffer, NULL);
+
+    for (i = 0; i < (int)len; i++)
     {
-      return false;
+      rq->glyphs[count + i].index = info[i].codepoint;
+      rq->glyphs[count + i].cluster = info[i].cluster;
+      rq->glyphs[count + i].x_advance = position[i].x_advance;
+      rq->glyphs[count + i].y_advance = position[i].y_advance;
+      rq->glyphs[count + i].x_offset = position[i].x_offset;
+      rq->glyphs[count + i].y_offset = position[i].y_offset;
+      rq->glyphs[count + i].ftface = rq->text_info[rq->glyphs[count + i].cluster].ftface;
+      rq->glyphs[count + i].visual_index = count + i;
+      rq->glyphs[count + i].line = 0;
     }
 
-    /* populating glyphs */
-    count = 0;
-    for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+    count += len;
+  }
+
+  /* Sorting glyphs to logical order */
+  qsort (rq->glyphs, glyphs_length, sizeof (raqm_glyph_t), _raqm_logical_sort);
+
+  /* Line breaking */
+  current_x = 0;
+  current_line = 0;
+  for (i = 0; i < glyphs_length; i++)
+  {
+    rq->glyphs[i].line = current_line;
+    current_x += rq->glyphs[i].x_offset + rq->glyphs[i].x_advance;
+
+    if (current_x > rq->line_width)
     {
-      size_t len;
-      hb_glyph_info_t *info;
-      hb_glyph_position_t *position;
+      while (!break_here[rq->glyphs[i].cluster] && i >= 0)
+        i--;
 
-      len = hb_buffer_get_length (run->buffer);
-      info = hb_buffer_get_glyph_infos (run->buffer, NULL);
-      position = hb_buffer_get_glyph_positions (run->buffer, NULL);
+      /* Next line cannot start with a white space */
+      if (rq->text[rq->glyphs[i + 1].cluster] == 32)
+      {
+        for (j = i + 1; rq->text[rq->glyphs[j].cluster] == 32; j++)
+          rq->glyphs[j].line = current_line;
+        i = j - 1; /* skip those */
+      }
 
-          for (i = 0; i < (int)len; i++)
-          {
-              rq->glyphs[count + i].index = info[i].codepoint;
-              rq->glyphs[count + i].cluster = info[i].cluster;
-              rq->glyphs[count + i].x_advance = position[i].x_advance;
-              rq->glyphs[count + i].y_advance = position[i].y_advance;
-              rq->glyphs[count + i].x_offset = position[i].x_offset;
-              rq->glyphs[count + i].y_offset = position[i].y_offset;
-              rq->glyphs[count + i].ftface = rq->text_info[rq->glyphs[count + i].cluster].ftface;
-              rq->glyphs[count + i].visual_index = count + i;
-              rq->glyphs[count + i].line = 0;
-          }
+      /* Handeling glyphs for the same character */
+      if (rq->glyphs[i + 1].cluster == rq->glyphs[i].cluster)
+      {
+        for (k = i + 1; rq->glyphs[k].cluster == rq->glyphs[i].cluster; k++)
+          rq->glyphs[j].line = current_line;
+        i = k - 1; /* skip those */
+      }
 
-      count += len;
+      current_line ++;
+      current_x = 0;
+    }
+  }
+
+  /* Sorting glyphs back to visual order */
+  qsort (rq->glyphs, glyphs_length, sizeof (raqm_glyph_t), _raqm_visual_sort);
+
+  /* calculating positions */
+  current_line = 0;
+  current_x = 0;
+  for (i = 0; i < glyphs_length; i++)
+  {
+    line_space = (-1) * (rq->text_info[rq->glyphs[i].cluster].ftface->ascender + abs (rq->text_info[rq->glyphs[i].cluster].ftface->descender));
+
+    if (rq->glyphs[i].line != current_line)
+    {
+      current_x = 0;
+      current_line = rq->glyphs[i].line;
     }
 
-    /* Sorting glyphs to logical order */
-    qsort(rq->glyphs, glyphs_length, sizeof(raqm_glyph_t), _raqm_logical_sort);
+    rq->glyphs[i].x_position = current_x + rq->glyphs[i].x_offset;
+    rq->glyphs[i].y_position = rq->glyphs[i].y_offset + rq->glyphs[i].line * line_space;
 
-    /* Line breaking */
-    current_x = 0;
-    current_line = 0;
-    for (i = 0; i < glyphs_length; i++)
+    current_x += rq->glyphs[i].x_advance;
+  }
+
+  /* handeling alighnment */
+  if (rq->alignment != RAQM_ALIGNMENT_LEFT)
+  {
+    if (rq->alignment == RAQM_ALIGNMENT_RIGHT)
     {
-        rq->glyphs[i].line = current_line;
-        current_x += rq->glyphs[i].x_offset + rq->glyphs[i].x_advance;
-
-        if (current_x > rq->line_width)
-        {
-            while (!break_here[rq->glyphs[i].cluster] && i >= 0)
-            {
-                i--;
-            }
-
-            /* Next line cannot start with a white space */
-            if (rq->text[rq->glyphs[i + 1].cluster] == 32)
-            {
-                for (j = i + 1; rq->text[rq->glyphs[j].cluster] == 32; j++)
-                {
-                    rq->glyphs[j].line = current_line;
-                }
-                i = j - 1; //skip those
-            }
-
-            /* Handeling glyphs for the same character */
-            if (rq->glyphs[i + 1].cluster == rq->glyphs[i].cluster)
-            {
-                for (k = i + 1; rq->glyphs[k].cluster == rq->glyphs[i].cluster; k++)
-                {
-                    rq->glyphs[j].line = current_line;
-                }
-                i = k - 1; //skip those
-            }
-
-            current_line ++;
-            current_x = 0;
-        }
-    }
-
-    /* Sorting glyphs back to visual order */
-    qsort(rq->glyphs, glyphs_length, sizeof(raqm_glyph_t), _raqm_visual_sort);
-
-    /* calculating positions */
-    current_line = 0;
-    current_x = 0;
-    for (i = 0; i < glyphs_length; i++)
-    {
-        line_space =  (-1) * (rq->text_info[rq->glyphs[i].cluster].ftface->ascender + abs(rq->text_info[rq->glyphs[i].cluster].ftface->descender));
-
+      current_line = -1;
+      for (i = glyphs_length - 1; i >= 0; i--)
+      {
         if (rq->glyphs[i].line != current_line)
         {
-            current_x = 0;
-            current_line = rq->glyphs[i].line;
+          current_line = rq->glyphs[i].line;
+          align_offset = rq->line_width - (rq->glyphs[i].x_position + rq->glyphs[i].x_advance);
+          for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--)
+          {
+            /* check if at the start of the line there is a space */
+            if (rq->text[rq->glyphs[j].cluster] == 32 && (current_line != rq->glyphs[j+1].line ))
+            {
+              space_width = rq->glyphs[j].x_advance; /* save width of the space */
+
+              for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--) /* apply shift */
+              {
+                rq->glyphs[j-1].x_position = rq->glyphs[j-1].x_position + space_width;
+                rq->glyphs[j-1].x_position += align_offset;
+              }
+            }
+            else
+            {
+              rq->glyphs[j].x_position += align_offset;
+            }
+          }
         }
-
-        rq->glyphs[i].x_position = current_x + rq->glyphs[i].x_offset;
-        rq->glyphs[i].y_position = rq->glyphs[i].y_offset + rq->glyphs[i].line * line_space;
-
-        current_x += rq->glyphs[i].x_advance;
+        i = j + 1;
+      }
     }
 
-    /* handeling alighnment */
-    if (rq->alignment != RAQM_ALIGNMENT_LEFT)
+    if (rq->alignment == RAQM_ALIGNMENT_CENTER)
     {
-        if (rq->alignment == RAQM_ALIGNMENT_RIGHT)
+      current_line = -1;
+      for (i = glyphs_length - 1; i >= 0; i--)
+      {
+        if (rq->glyphs[i].line != current_line)
         {
-            current_line = -1;
-            for (i = glyphs_length - 1; i >= 0; i--)
-            {
-                if (rq->glyphs[i].line != current_line)
-                {
-                    current_line = rq->glyphs[i].line;
-                    align_offset = rq->line_width - (rq->glyphs[i].x_position + rq->glyphs[i].x_advance);
-                    for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--)
-                    {
-                        /* check if at the start of the line there is a space */
-                        if (rq->text[rq->glyphs[j].cluster] == 32 && (current_line != rq->glyphs[j+1].line ))
-                        {
-                            space_width = rq->glyphs[j].x_advance; // save width of the space
-
-                            for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--) // apply shift
-                            {
-                                rq->glyphs[j-1].x_position = rq->glyphs[j-1].x_position + space_width;
-                                rq->glyphs[j-1].x_position += align_offset;
-                            }
-                        }
-                        else
-                            rq->glyphs[j].x_position += align_offset;
-                    }
-                }
-                i = j + 1;
-            }
+          current_line = rq->glyphs[i].line;
+          align_offset = (rq->line_width - (rq->glyphs[i].x_position + rq->glyphs[i].x_advance)) / 2;
+          for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--)
+            rq->glyphs[j].x_position += align_offset;
         }
-
-        if (rq->alignment == RAQM_ALIGNMENT_CENTER)
-        {
-            current_line = -1;
-            for (i = glyphs_length - 1; i >= 0; i--)
-            {
-                if (rq->glyphs[i].line != current_line)
-                {
-                    current_line = rq->glyphs[i].line;
-                    align_offset = (rq->line_width - (rq->glyphs[i].x_position + rq->glyphs[i].x_advance)) / 2;
-                    for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--)
-                    {
-                        rq->glyphs[j].x_position += align_offset;
-                    }
-                }
-                i = j + 1;
-            }
-        }    
-        if (rq->alignment == RAQM_ALIGNMENT_FULL)
-        {
-            current_line = -1;
-            for (i = glyphs_length - 1; i >= 0; i--)
-            {
-                if (rq->glyphs[i].line != current_line)
-                {
-                    current_line = rq->glyphs[i].line;
-                    align_offset = rq->line_width - (rq->glyphs[i].x_position + rq->glyphs[i].x_advance);
-
-                    /* counting spaces in one line */
-                    for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--)
-                    {
-                        if (rq->text[rq->glyphs[j].cluster] == 32) //space
-                            space_count++;
-                    }
-
-                    /* distributing align offset to all spaces */
-                    if (space_count == 0)
-                        align_offset = 0;
-                    else
-                        align_offset = align_offset / space_count;
-                    space_extension = 0;
-                    for (k = j + 1; rq->glyphs[k].line == current_line; k++)
-                    {
-                        rq->glyphs[k].x_position += space_extension;
-                        if (rq->text[rq->glyphs[k].cluster] == 32) //space
-                        {
-                            space_extension += align_offset;
-                        }
-                    }
-                }
-                i = j + 1;
-            }
-        }
+        i = j + 1;
+      }
     }
 
-    free (break_here);
-    return true;
+    if (rq->alignment == RAQM_ALIGNMENT_FULL)
+    {
+      current_line = -1;
+      for (i = glyphs_length - 1; i >= 0; i--)
+      {
+        if (rq->glyphs[i].line != current_line)
+        {
+          current_line = rq->glyphs[i].line;
+          align_offset = rq->line_width - (rq->glyphs[i].x_position + rq->glyphs[i].x_advance);
+
+          /* counting spaces in one line */
+          for (j = i; j >= 0 && rq->glyphs[j].line == current_line; j--)
+          {
+            if (rq->text[rq->glyphs[j].cluster] == 32) /* space */
+              space_count++;
+          }
+
+          /* distributing align offset to all spaces */
+          if (space_count == 0)
+            align_offset = 0;
+          else
+            align_offset = align_offset / space_count;
+          space_extension = 0;
+          for (k = j + 1; rq->glyphs[k].line == current_line; k++)
+          {
+            rq->glyphs[k].x_position += space_extension;
+            if (rq->text[rq->glyphs[k].cluster] == 32) /* space */
+              space_extension += align_offset;
+          }
+        }
+        i = j + 1;
+      }
+    }
+  }
+
+  free (break_here);
+  return true;
 }
 
 static bool
