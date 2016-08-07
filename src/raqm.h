@@ -108,10 +108,10 @@ typedef struct raqm_glyph_t {
     int y_advance;
     int x_offset;
     int y_offset;
-    int x_position;
-    int y_position;
     uint32_t cluster;
     FT_Face ftface;
+    int x_position;
+    int y_position;
     /*< private >*/
     int visual_index;
     int line;
