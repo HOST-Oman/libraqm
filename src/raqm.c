@@ -1086,7 +1086,6 @@ typedef enum {
   RAQM_COMBINING_INDIRECT_BREAK,            /* # in table,  cc in array */
   RAQM_COMBINING_PROHIBITED_BREAK,          /* @ in table   CC in array */
   RAQM_PROHIBITED_BREAK,                    /* ^ in table,  XX in array */
-  RAQM_UNDEFINE_BREAK,                      /* the defualt value */
 } raqm_break_action_t;
 
 /* Define some short-cuts for the table */
@@ -1144,8 +1143,7 @@ _raqm_find_line_break (raqm_t *rq)
   current_class = ucdn_get_resolved_linebreak_class (rq->text[0]);
   next_class    = ucdn_get_resolved_linebreak_class (rq->text[1]);
 
-  for (size_t i = 0; i < length; i++)
-    break_actions[i] = RAQM_UNDEFINE_BREAK;
+  memset (break_actions, RAQM_PROHIBITED_BREAK, length);
 
   /* handle case where input starts with an LF */
   if (current_class == UCDN_LINEBREAK_CLASS_LF)
