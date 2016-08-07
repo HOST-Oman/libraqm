@@ -19,5 +19,6 @@ raqm_index_to_position
 raqm_position_to_index
 raqm_t
 raqm_direction_t
+raqm_alignment_t
 raqm_glyph_t
 </SECTION>
