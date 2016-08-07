@@ -1329,9 +1329,6 @@ _raqm_line_break (raqm_t *rq)
 
   bool *break_here = NULL;
 
-  /* finding possible breaks in text */
-  break_here = _raqm_find_line_break (rq);
-
   /* counting total glyphs */
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     count += hb_buffer_get_length (run->buffer);
@@ -1343,6 +1340,9 @@ _raqm_line_break (raqm_t *rq)
   {
     return false;
   }
+
+  /* finding possible breaks in text */
+  break_here = _raqm_find_line_break (rq);
 
   /* populating glyphs */
   count = 0;
