@@ -61,7 +61,6 @@ AC_DEFUN([AX_COMPILER_FLAGS_CFLAGS],[
         AX_APPEND_COMPILE_FLAGS([ dnl
             -Wall dnl
             -Wextra dnl
-            -Wundef dnl
             -Wnested-externs dnl
             -Wwrite-strings dnl
             -Wpointer-arith dnl
