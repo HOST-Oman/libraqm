@@ -312,7 +312,7 @@ raqm_create (void)
 
   rq->ft_loadflags = -1;
 
-  rq->line_width = 2147483647;
+  rq->line_width = -1;
 
   rq->alignment = RAQM_ALIGNMENT_LEFT;
 
@@ -781,8 +781,8 @@ raqm_set_freetype_load_flags (raqm_t *rq,
  * @width: the line width.
  *
  * Sets the maximum line width for the paragraph. Causes Raqm to break lines
- * exceeding @width. If no width is set Raqm will assume line width is
- * infinite, and no line breaking will take place.
+ * exceeding @width. By default no line breaking takes place, and negative
+ * @width has the same effect.
  *
  * Return value:
  * %true if no errors happened, %false otherwise.
@@ -1285,11 +1285,9 @@ _raqm_line_break (raqm_t *rq)
     return false;
   }
 
-  /* finding possible breaks in text */
-  break_here = _raqm_find_line_break (rq);
-
   /* populating glyphs */
   count = 0;
+  current_x = 0;
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
     size_t len;
@@ -1308,18 +1306,29 @@ _raqm_line_break (raqm_t *rq)
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
+      rq->glyphs[count + i].x_position = current_x + position[i].x_offset;
+      rq->glyphs[count + i].y_position = position[i].y_offset;
       rq->glyphs[count + i].ftface = rq->text_info[rq->glyphs[count + i].cluster].ftface;
       rq->glyphs[count + i].visual_index = count + i;
       rq->glyphs[count + i].line = 0;
+
+      current_x += position[i].x_advance;
     }
 
     count += len;
   }
 
+  if (rq->line_width < 0)
+    return true;
+
   /* Sorting glyphs to logical order */
   qsort (rq->glyphs, glyphs_length, sizeof (raqm_glyph_t), _raqm_logical_sort);
 
   /* Line breaking */
+
+  /* finding possible breaks in text */
+  break_here = _raqm_find_line_break (rq);
+
   current_x = 0;
   current_line = 0;
   for (size_t i = 0; i < glyphs_length; i++)
