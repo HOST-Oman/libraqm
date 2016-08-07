@@ -1088,13 +1088,6 @@ typedef enum {
   RAQM_PROHIBITED_BREAK,                    /* ^ in table,  XX in array */
 } raqm_break_action_t;
 
-/* Define some short-cuts for the table */
-#define oo RAQM_DIRECT_BREAK                /* '_' break allowed */
-#define SS RAQM_INDIRECT_BREAK              /* '%' only break across space (aka 'indirect break' below) */
-#define cc RAQM_COMBINING_INDIRECT_BREAK    /* '#' indirect break for combining marks */
-#define CC RAQM_COMBINING_PROHIBITED_BREAK  /* '@' indirect break for combining marks */
-#define XX RAQM_PROHIBITED_BREAK            /* '^' no break allowed_BRK */
-
 static bool *
 _raqm_find_line_break (raqm_t *rq)
 {
@@ -1104,6 +1097,13 @@ _raqm_find_line_break (raqm_t *rq)
   raqm_break_action_t *break_actions;
   raqm_break_action_t current_action;
   bool *break_here;
+
+/* Define some short-cuts for the table */
+#define oo RAQM_DIRECT_BREAK                /* '_' break allowed */
+#define SS RAQM_INDIRECT_BREAK              /* '%' only break across space (aka 'indirect break' below) */
+#define cc RAQM_COMBINING_INDIRECT_BREAK    /* '#' indirect break for combining marks */
+#define CC RAQM_COMBINING_PROHIBITED_BREAK  /* '@' indirect break for combining marks */
+#define XX RAQM_PROHIBITED_BREAK            /* '^' no break allowed_BRK */
 
   static raqm_break_action_t  break_pairs[][UCDN_LINEBREAK_CLASS_JT+1] = {
     /*       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27 */
@@ -1136,6 +1136,12 @@ _raqm_find_line_break (raqm_t *rq)
     /*JV*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, SS, SS }, /* Jamo Vowel */
     /*JT*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, SS }, /* Jamo Trailing Consonant */
   };
+
+#undef oo
+#undef SS
+#undef cc
+#undef CC
+#undef XX
 
   break_actions = malloc (sizeof (raqm_break_action_t) * length);
   break_here = malloc (sizeof (bool) * length);
@@ -1229,12 +1235,6 @@ _raqm_find_line_break (raqm_t *rq)
     else
       break_here[i] = false;
   }
-
-#undef oo
-#undef SS
-#undef cc
-#undef CC
-#undef XX
 
   free (break_actions);
   return break_here;
