@@ -1149,11 +1149,11 @@ _raqm_find_line_break (raqm_t *rq)
   if (length < 2)
     return break_here;
 
-  current_class = ucdn_get_resolved_linebreak_class (rq->text[0]);
-  next_class    = ucdn_get_resolved_linebreak_class (rq->text[1]);
-
   break_actions = malloc (sizeof (raqm_break_action_t) * length);
   memset (break_actions, RAQM_PROHIBITED_BREAK, length);
+
+  current_class = ucdn_get_resolved_linebreak_class (rq->text[0]);
+  next_class    = ucdn_get_resolved_linebreak_class (rq->text[1]);
 
   /* handle case where input starts with an LF */
   if (current_class == UCDN_LINEBREAK_CLASS_LF)
