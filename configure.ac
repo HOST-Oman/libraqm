@@ -4,7 +4,7 @@ AC_INIT([Raqm],
         [raqm],
         [https://github.com/HOST-Oman/libraqm/])
 
-AM_INIT_AUTOMAKE([foreign color-tests -Wall -Wno-portability])
+AM_INIT_AUTOMAKE([foreign color-tests -Wall -Wno-portability subdir-objects])
 AM_SILENT_RULES([yes])
 
 AC_CONFIG_HEADERS([config.h])
