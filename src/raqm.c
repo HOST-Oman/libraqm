@@ -739,19 +739,17 @@ _raqm_hb_dir (raqm_t *rq, FriBidiLevel level)
 }
 
 typedef struct {
-  FriBidiStrIndex pos;
-  FriBidiStrIndex len;
+  size_t pos;
+  size_t len;
   FriBidiLevel level;
 } _raqm_bidi_run;
 
 static void
-_raqm_reverse_run (_raqm_bidi_run *run, const FriBidiStrIndex len)
+_raqm_reverse_run (_raqm_bidi_run *run, const size_t len)
 {
-  FriBidiStrIndex i;
-
   assert (run);
 
-  for (i = 0; i < len / 2; i++)
+  for (size_t i = 0; i < len / 2; i++)
   {
     _raqm_bidi_run temp = run[i];
     run[i] = run[len - 1 - i];
@@ -761,19 +759,18 @@ _raqm_reverse_run (_raqm_bidi_run *run, const FriBidiStrIndex len)
 
 static _raqm_bidi_run *
 _raqm_reorder_runs (const FriBidiCharType *types,
-                    const FriBidiStrIndex len,
+                    const size_t len,
                     const FriBidiParType base_dir,
                     /* input and output */
                     FriBidiLevel *levels,
                     /* output */
                     size_t *run_count)
 {
-  FriBidiStrIndex i;
   FriBidiLevel level;
   FriBidiLevel last_level = -1;
   FriBidiLevel max_level = 0;
-  FriBidiStrIndex run_start = 0;
-  FriBidiStrIndex run_index = 0;
+  size_t run_start = 0;
+  size_t run_index = 0;
   _raqm_bidi_run *runs = NULL;
   size_t count = 0;
 
@@ -788,7 +785,8 @@ _raqm_reorder_runs (const FriBidiCharType *types,
 
   /* L1. Reset the embedding levels of some chars:
      4. any sequence of white space characters at the end of the line. */
-  for (i = len - 1; i >= 0 && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
+  for (int i = len - 1;
+       i >= 0 && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
   {
     levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
   }
@@ -796,13 +794,13 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   /* Find max_level of the line.  We don't reuse the paragraph
    * max_level, both for a cleaner API, and that the line max_level
    * may be far less than paragraph max_level. */
-  for (i = len - 1; i >= 0; i--)
+  for (int i = len - 1; i >= 0; i--)
   {
     if (levels[i] > max_level)
        max_level = levels[i];
   }
 
-  for (i = 0; i < len; i++)
+  for (size_t i = 0; i < len; i++)
   {
     if (levels[i] != last_level)
       count++;
@@ -814,7 +812,7 @@ _raqm_reorder_runs (const FriBidiCharType *types,
 
   while (run_start < len)
   {
-    int run_end = run_start;
+    size_t run_end = run_start;
     while (run_end < len && levels[run_start] == levels[run_end])
     {
       run_end++;
@@ -830,7 +828,7 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   /* L2. Reorder. */
   for (level = max_level; level > 0; level--)
   {
-    for (i = count - 1; i >= 0; i--)
+    for (int i = count - 1; i >= 0; i--)
     {
       if (runs[i].level >= level)
       {
@@ -979,7 +977,7 @@ _raqm_itemize (raqm_t *rq)
       run->pos = runs[i].pos;
       run->script = rq->scripts[run->pos];
       run->font = HB_FT_FONT_CREATE (rq->ftfaces[run->pos]);
-      for (int j = 0; j < runs[i].len; j++)
+      for (size_t j = 0; j < runs[i].len; j++)
       {
         hb_script_t script = rq->scripts[runs[i].pos + j];
         FT_Face face = rq->ftfaces[runs[i].pos + j];
