@@ -760,11 +760,11 @@ _raqm_reverse_run (_raqm_bidi_run *run, const FriBidiStrIndex len)
 }
 
 static FriBidiStrIndex
-_raqm_reorder_runs (const FriBidiCharType *bidi_types,
+_raqm_reorder_runs (const FriBidiCharType *types,
                     const FriBidiStrIndex len,
                     const FriBidiParType base_dir,
                     /* input and output */
-                    FriBidiLevel *embedding_levels,
+                    FriBidiLevel *levels,
                     /* output */
                     _raqm_bidi_run *runs)
 {
@@ -779,15 +779,14 @@ _raqm_reorder_runs (const FriBidiCharType *bidi_types,
   if (len == 0)
     goto out;
 
-  assert (bidi_types);
-  assert (embedding_levels);
+  assert (types);
+  assert (levels);
 
   /* L1. Reset the embedding levels of some chars:
      4. any sequence of white space characters at the end of the line. */
-  for (i = len - 1; i >= 0 &&
-       FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (bidi_types[i]); i--)
+  for (i = len - 1; i >= 0 && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
   {
-    embedding_levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
+    levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
   }
 
   /* Find max_level of the line.  We don't reuse the paragraph
@@ -795,16 +794,16 @@ _raqm_reorder_runs (const FriBidiCharType *bidi_types,
    * may be far less than paragraph max_level. */
   for (i = len - 1; i >= 0; i--)
   {
-    if (embedding_levels[i] > max_level)
-       max_level = embedding_levels[i];
+    if (levels[i] > max_level)
+       max_level = levels[i];
   }
 
   for (i = 0; i < len; i++)
   {
-    if (embedding_levels[i] != last_level)
+    if (levels[i] != last_level)
       run_count++;
 
-    last_level = embedding_levels[i];
+    last_level = levels[i];
   }
 
   if (runs == NULL)
@@ -813,14 +812,13 @@ _raqm_reorder_runs (const FriBidiCharType *bidi_types,
   while (run_start < len)
   {
     int run_end = run_start;
-    while (run_end < len
-           && embedding_levels[run_start] == embedding_levels[run_end])
+    while (run_end < len && levels[run_start] == levels[run_end])
     {
       run_end++;
     }
 
     runs[run_index].pos = run_start;
-    runs[run_index].level = embedding_levels[run_start];
+    runs[run_index].level = levels[run_start];
     runs[run_index].len = run_end - run_start;
     run_start = run_end;
     run_index++;
