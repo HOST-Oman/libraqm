@@ -28,11 +28,11 @@
 #include <assert.h>
 #include <string.h>
 
+#include <fribidi.h>
 #include <hb.h>
 #include <hb-ft.h>
 
 #include "raqm.h"
-#include "reorder_runs.h"
 
 /**
  * SECTION:raqm
@@ -738,6 +738,114 @@ _raqm_hb_dir (raqm_t *rq, FriBidiLevel level)
   return dir;
 }
 
+typedef struct {
+  FriBidiStrIndex pos;
+  FriBidiStrIndex len;
+  FriBidiLevel level;
+} _raqm_bidi_run;
+
+static void
+_raqm_reverse_run (_raqm_bidi_run *run, const FriBidiStrIndex len)
+{
+  FriBidiStrIndex i;
+
+  assert (run);
+
+  for (i = 0; i < len / 2; i++)
+  {
+    _raqm_bidi_run temp = run[i];
+    run[i] = run[len - 1 - i];
+    run[len - 1 - i] = temp;
+  }
+}
+
+static FriBidiStrIndex
+_raqm_reorder_runs (const FriBidiCharType *bidi_types,
+                    const FriBidiStrIndex len,
+                    const FriBidiParType base_dir,
+                    /* input and output */
+                    FriBidiLevel *embedding_levels,
+                    /* output */
+                    _raqm_bidi_run *runs)
+{
+  FriBidiStrIndex i;
+  FriBidiLevel level;
+  FriBidiLevel last_level = -1;
+  FriBidiLevel max_level = 0;
+  FriBidiStrIndex run_count = 0;
+  FriBidiStrIndex run_start = 0;
+  FriBidiStrIndex run_index = 0;
+
+  if (len == 0)
+    goto out;
+
+  assert (bidi_types);
+  assert (embedding_levels);
+
+  /* L1. Reset the embedding levels of some chars:
+     4. any sequence of white space characters at the end of the line. */
+  for (i = len - 1; i >= 0 &&
+       FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (bidi_types[i]); i--)
+  {
+    embedding_levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
+  }
+
+  /* Find max_level of the line.  We don't reuse the paragraph
+   * max_level, both for a cleaner API, and that the line max_level
+   * may be far less than paragraph max_level. */
+  for (i = len - 1; i >= 0; i--)
+  {
+    if (embedding_levels[i] > max_level)
+       max_level = embedding_levels[i];
+  }
+
+  for (i = 0; i < len; i++)
+  {
+    if (embedding_levels[i] != last_level)
+      run_count++;
+
+    last_level = embedding_levels[i];
+  }
+
+  if (runs == NULL)
+    goto out;
+
+  while (run_start < len)
+  {
+    int run_length = 0;
+    while ((run_start + run_length) < len &&
+       embedding_levels[run_start] == embedding_levels[run_start + run_length])
+    {
+      run_length++;
+    }
+
+    runs[run_index].pos = run_start;
+    runs[run_index].level = embedding_levels[run_start];
+    runs[run_index].len = run_length;
+    run_start += run_length;
+    run_index++;
+  }
+
+  /* L2. Reorder. */
+  for (level = max_level; level > 0; level--)
+  {
+    for (i = run_count - 1; i >= 0; i--)
+    {
+      if (runs[i].level >= level)
+      {
+        int end = i;
+        for (i--; (i >= 0 && runs[i].level >= level); i--)
+            ;
+        _raqm_reverse_run (runs + i + 1, end - i);
+      }
+    }
+  }
+
+out:
+
+  return run_count;
+}
+
 static bool
 _raqm_itemize (raqm_t *rq)
 {
@@ -749,7 +857,7 @@ _raqm_itemize (raqm_t *rq)
   FriBidiCharType types[rq->text_len];
   FriBidiLevel levels[rq->text_len];
 #endif
-  FriBidiRun *runs = NULL;
+  _raqm_bidi_run *runs = NULL;
   raqm_run_t *last;
   int max_level;
   int run_count;
@@ -806,16 +914,14 @@ _raqm_itemize (raqm_t *rq)
     return false;
 
   /* Get the number of bidi runs */
-  run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
-                                    levels, NULL);
+  run_count = _raqm_reorder_runs (types, rq->text_len, par_type, levels, NULL);
 
   /* Populate bidi runs array */
-  runs = malloc (sizeof (FriBidiRun) * (size_t)run_count);
+  runs = malloc (sizeof (_raqm_bidi_run) * (size_t)run_count);
   if (!runs)
     return false;
 
-  run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
-                                    levels, runs);
+  run_count = _raqm_reorder_runs (types, rq->text_len, par_type, levels, runs);
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Number of runs before script itemization: %d\n\n", run_count);

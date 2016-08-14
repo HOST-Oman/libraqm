@@ -28,7 +28,7 @@ _save_libs="$LIBS"
 _save_cflags="$CFLAGS"
 LIBS="$LIBS $HARFBUZZ_LIBS $FRIBIDI_LIBS"
 CFLAGS="$CFLAGS $HARFBUZZ_CFLAGS $FRIBIDI_CFLAGS"
-AC_CHECK_FUNCS(fribidi_reorder_runs hb_ft_font_create_referenced)
+AC_CHECK_FUNCS(hb_ft_font_create_referenced)
 LIBS="$_save_libs"
 CFLAGS="$_save_cflags"
 
