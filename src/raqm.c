@@ -812,17 +812,17 @@ _raqm_reorder_runs (const FriBidiCharType *bidi_types,
 
   while (run_start < len)
   {
-    int run_length = 0;
-    while ((run_start + run_length) < len &&
-       embedding_levels[run_start] == embedding_levels[run_start + run_length])
+    int run_end = run_start;
+    while (run_end < len
+           && embedding_levels[run_start] == embedding_levels[run_end])
     {
-      run_length++;
+      run_end++;
     }
 
     runs[run_index].pos = run_start;
     runs[run_index].level = embedding_levels[run_start];
-    runs[run_index].len = run_length;
-    run_start += run_length;
+    runs[run_index].len = run_end - run_start;
+    run_start = run_end;
     run_index++;
   }
 
