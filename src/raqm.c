@@ -777,7 +777,7 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   FriBidiStrIndex run_index = 0;
 
   if (len == 0)
-    goto out;
+    return run_count;
 
   assert (types);
   assert (levels);
@@ -807,7 +807,7 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   }
 
   if (runs == NULL)
-    goto out;
+    return run_count;
 
   while (run_start < len)
   {
@@ -838,8 +838,6 @@ _raqm_reorder_runs (const FriBidiCharType *types,
       }
     }
   }
-
-out:
 
   return run_count;
 }
