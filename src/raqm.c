@@ -759,25 +759,29 @@ _raqm_reverse_run (_raqm_bidi_run *run, const FriBidiStrIndex len)
   }
 }
 
-static FriBidiStrIndex
+static _raqm_bidi_run *
 _raqm_reorder_runs (const FriBidiCharType *types,
                     const FriBidiStrIndex len,
                     const FriBidiParType base_dir,
                     /* input and output */
                     FriBidiLevel *levels,
                     /* output */
-                    _raqm_bidi_run *runs)
+                    size_t *run_count)
 {
   FriBidiStrIndex i;
   FriBidiLevel level;
   FriBidiLevel last_level = -1;
   FriBidiLevel max_level = 0;
-  FriBidiStrIndex run_count = 0;
   FriBidiStrIndex run_start = 0;
   FriBidiStrIndex run_index = 0;
+  _raqm_bidi_run *runs = NULL;
+  size_t count = 0;
 
   if (len == 0)
-    return run_count;
+  {
+    *run_count = 0;
+    return NULL;
+  }
 
   assert (types);
   assert (levels);
@@ -801,13 +805,12 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   for (i = 0; i < len; i++)
   {
     if (levels[i] != last_level)
-      run_count++;
+      count++;
 
     last_level = levels[i];
   }
 
-  if (runs == NULL)
-    return run_count;
+  runs = malloc (sizeof (_raqm_bidi_run) * count);
 
   while (run_start < len)
   {
@@ -827,7 +830,7 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   /* L2. Reorder. */
   for (level = max_level; level > 0; level--)
   {
-    for (i = run_count - 1; i >= 0; i--)
+    for (i = count - 1; i >= 0; i--)
     {
       if (runs[i].level >= level)
       {
@@ -839,7 +842,8 @@ _raqm_reorder_runs (const FriBidiCharType *types,
     }
   }
 
-  return run_count;
+  *run_count = count;
+  return runs;
 }
 
 static bool
@@ -856,7 +860,7 @@ _raqm_itemize (raqm_t *rq)
   _raqm_bidi_run *runs = NULL;
   raqm_run_t *last;
   int max_level;
-  int run_count;
+  size_t run_count;
   bool ok = true;
 
 #ifdef RAQM_TESTING
@@ -910,29 +914,24 @@ _raqm_itemize (raqm_t *rq)
     return false;
 
   /* Get the number of bidi runs */
-  run_count = _raqm_reorder_runs (types, rq->text_len, par_type, levels, NULL);
-
-  /* Populate bidi runs array */
-  runs = malloc (sizeof (_raqm_bidi_run) * (size_t)run_count);
+  runs = _raqm_reorder_runs (types, rq->text_len, par_type, levels, &run_count);
   if (!runs)
     return false;
 
-  run_count = _raqm_reorder_runs (types, rq->text_len, par_type, levels, runs);
-
 #ifdef RAQM_TESTING
-  RAQM_TEST ("Number of runs before script itemization: %d\n\n", run_count);
+  RAQM_TEST ("Number of runs before script itemization: %zu\n\n", run_count);
 
   RAQM_TEST ("Fribidi Runs:\n");
-  for (int i = 0; i < run_count; i++)
+  for (size_t i = 0; i < run_count; i++)
   {
-    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
+    RAQM_TEST ("run[%zu]:\t start: %zu\tlength: %zu\tlevel: %d\n",
                i, runs[i].pos, runs[i].len, runs[i].level);
   }
   RAQM_TEST ("\n");
 #endif
 
   last = NULL;
-  for (int i = 0; i < run_count; i++)
+  for (size_t i = 0; i < run_count; i++)
   {
     raqm_run_t *run = calloc (1, sizeof (raqm_run_t));
     if (!run)
@@ -1010,14 +1009,14 @@ _raqm_itemize (raqm_t *rq)
   run_count = 0;
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     run_count++;
-  RAQM_TEST ("Number of runs after script itemization: %d\n\n", run_count);
+  RAQM_TEST ("Number of runs after script itemization: %zu\n\n", run_count);
 
   run_count = 0;
   RAQM_TEST ("Final Runs:\n");
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
     SCRIPT_TO_STRING (run->script);
-    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
+    RAQM_TEST ("run[%zu]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
                run_count++, run->pos, run->len,
                hb_direction_to_string (run->direction), buff,
                rq->ftfaces[run->pos]->family_name);
