@@ -63,6 +63,7 @@ Projects using Raqm
 
 1. [ImageMagick](https://github.com/ImageMagick/ImageMagick)
 2. [LibGD](https://github.com/libgd/libgd)
+3. [FontView](https://github.com/googlei18n/fontview)
 
 The following projects have patches to support complex text layout using Raqm:
 
