@@ -134,10 +134,6 @@ raqm_glyph_t *
 raqm_get_glyphs (raqm_t *rq,
                  size_t *length);
 
-#ifdef __cplusplus
-}
-#endif
-
 bool
 raqm_index_to_position (raqm_t *rq,
                         size_t *index,
@@ -149,4 +145,8 @@ raqm_position_to_index (raqm_t *rq,
                         int x,
                         int y,
                         size_t *index);
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* _RAQM_H_ */
