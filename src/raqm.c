@@ -171,6 +171,7 @@ typedef enum {
 typedef struct {
   FT_Face       ftface;
   hb_language_t lang;
+  hb_script_t   script;
 } _raqm_text_info;
 
 typedef struct _raqm_run raqm_run_t;
@@ -189,8 +190,6 @@ struct _raqm {
 
   hb_feature_t    *features;
   size_t           features_len;
-
-  hb_script_t     *scripts;
 
   raqm_run_t      *runs;
   raqm_glyph_t    *glyphs;
@@ -227,6 +226,7 @@ _raqm_init_text_info (raqm_t *rq)
   {
     rq->text_info[i].ftface = NULL;
     rq->text_info[i].lang = default_lang;
+    rq->text_info[i].script = HB_SCRIPT_INVALID;
   }
 
   return true;
@@ -256,6 +256,9 @@ _raqm_compare_text_info (_raqm_text_info a,
     return false;
 
   if (a.lang != b.lang)
+    return false;
+
+  if (a.script != b.script)
     return false;
 
   return true;
@@ -296,8 +299,6 @@ raqm_create (void)
 
   rq->features = NULL;
   rq->features_len = 0;
-
-  rq->scripts = NULL;
 
   rq->runs = NULL;
   rq->glyphs = NULL;
@@ -361,7 +362,6 @@ raqm_destroy (raqm_t *rq)
 
   free (rq->text);
   free (rq->text_utf8);
-  free (rq->scripts);
   _raqm_free_text_info (rq);
   _raqm_free_runs (rq);
   free (rq->glyphs);
@@ -1041,14 +1041,12 @@ _raqm_itemize (raqm_t *rq)
     if (HB_DIRECTION_IS_BACKWARD (run->direction))
     {
       run->pos = runs[i].pos + runs[i].len - 1;
-      run->script = rq->scripts[run->pos];
+      run->script = rq->text_info[run->pos].script;
       run->font = HB_FT_FONT_CREATE (rq->text_info[run->pos].ftface);
       for (int j = runs[i].len - 1; j >= 0; j--)
       {
-        hb_script_t script = rq->scripts[runs[i].pos + j];
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
-        if (script != run->script ||
-            !_raqm_compare_text_info (rq->text_info[run->pos], info))
+        if (!_raqm_compare_text_info (rq->text_info[run->pos], info))
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -1056,7 +1054,7 @@ _raqm_itemize (raqm_t *rq)
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
-          newrun->script = script;
+          newrun->script = info.script;
           newrun->font = HB_FT_FONT_CREATE (info.ftface);
           run->next = newrun;
           run = newrun;
@@ -1071,14 +1069,12 @@ _raqm_itemize (raqm_t *rq)
     else
     {
       run->pos = runs[i].pos;
-      run->script = rq->scripts[run->pos];
+      run->script = rq->text_info[run->pos].script;
       run->font = HB_FT_FONT_CREATE (rq->text_info[run->pos].ftface);
       for (size_t j = 0; j < runs[i].len; j++)
       {
-        hb_script_t script = rq->scripts[runs[i].pos + j];
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
-        if (script != run->script ||
-            !_raqm_compare_text_info (rq->text_info[run->pos], info))
+        if (!_raqm_compare_text_info (rq->text_info[run->pos], info))
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -1086,7 +1082,7 @@ _raqm_itemize (raqm_t *rq)
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
-          newrun->script = script;
+          newrun->script = info.script;
           newrun->font = HB_FT_FONT_CREATE (info.ftface);
           run->next = newrun;
           run = newrun;
@@ -1273,22 +1269,15 @@ _raqm_resolve_scripts (raqm_t *rq)
   hb_script_t last_script_value = HB_SCRIPT_INVALID;
   _raqm_stack_t *stack = NULL;
 
-  if (rq->scripts)
-    return true;
-
-  rq->scripts = malloc (sizeof (hb_script_t) * rq->text_len);
-  if (!rq->scripts)
-    return false;
-
   for (size_t i = 0; i < rq->text_len; ++i)
-    rq->scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (),
-                                        rq->text[i]);
+    rq->text_info[i].script = hb_unicode_script (
+        hb_unicode_funcs_get_default (), rq->text[i]);
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Before script detection:\n");
   for (size_t i = 0; i < rq->text_len; ++i)
   {
-    SCRIPT_TO_STRING (rq->scripts[i]);
+    SCRIPT_TO_STRING (rq->text_info[i].script);
     RAQM_TEST ("script for ch[%zu]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
@@ -1300,7 +1289,8 @@ _raqm_resolve_scripts (raqm_t *rq)
 
   for (int i = 0; i < (int) rq->text_len; i++)
   {
-    if (rq->scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
+    if (rq->text_info[i].script == HB_SCRIPT_COMMON &&
+        last_script_index != -1)
     {
       int pair_index = get_pair_index (rq->text[i]);
       if (pair_index >= 0)
@@ -1308,9 +1298,9 @@ _raqm_resolve_scripts (raqm_t *rq)
         if (IS_OPEN (pair_index))
         {
           /* is a paired character */
-          rq->scripts[i] = last_script_value;
+          rq->text_info[i].script = last_script_value;
           last_set_index = i;
-          _raqm_stack_push (stack, rq->scripts[i], pair_index);
+          _raqm_stack_push (stack, rq->text_info[i].script, pair_index);
         }
         else
         {
@@ -1325,33 +1315,34 @@ _raqm_resolve_scripts (raqm_t *rq)
           }
           if (STACK_IS_NOT_EMPTY (stack))
           {
-            rq->scripts[i] = _raqm_stack_top (stack);
-            last_script_value = rq->scripts[i];
+            rq->text_info[i].script = _raqm_stack_top (stack);
+            last_script_value = rq->text_info[i].script;
             last_set_index = i;
           }
           else
           {
-            rq->scripts[i] = last_script_value;
+            rq->text_info[i].script = last_script_value;
             last_set_index = i;
           }
         }
       }
       else
       {
-        rq->scripts[i] = last_script_value;
+        rq->text_info[i].script = last_script_value;
         last_set_index = i;
       }
     }
-    else if (rq->scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
+    else if (rq->text_info[i].script == HB_SCRIPT_INHERITED &&
+             last_script_index != -1)
     {
-      rq->scripts[i] = last_script_value;
+      rq->text_info[i].script = last_script_value;
       last_set_index = i;
     }
     else
     {
       for (int j = last_set_index + 1; j < i; ++j)
-        rq->scripts[j] = rq->scripts[i];
-      last_script_value = rq->scripts[i];
+        rq->text_info[j].script = rq->text_info[i].script;
+      last_script_value = rq->text_info[i].script;
       last_script_index = i;
       last_set_index = i;
     }
@@ -1361,7 +1352,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   RAQM_TEST ("After script detection:\n");
   for (size_t i = 0; i < rq->text_len; ++i)
   {
-    SCRIPT_TO_STRING (rq->scripts[i]);
+    SCRIPT_TO_STRING (rq->text_info[i].script);
     RAQM_TEST ("script for ch[%zu]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
