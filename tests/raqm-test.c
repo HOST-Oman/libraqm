@@ -101,27 +101,27 @@ main (int argc, char *argv[])
 
   if (fonts)
   {
-      gchar **list = g_strsplit (fonts, ",", -1);
-      for (gchar **p = list; p != NULL && *p != NULL; p++) {
-
-          gchar **sublist = g_strsplit (*p, " ", -1);
-          gchar **range;
-          int s, l;
-          assert (!FT_New_Face (library, sublist[0], 0, &face));
-          assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-          range = g_strsplit (sublist[1], ":", -1);
-          s = atoi(range[0]);
-          l = atoi(range[1]);
-          assert (raqm_set_freetype_face_range(rq, face, s, l));
-
-          g_strfreev (range);
-          g_strfreev (sublist);
-      }
-      g_strfreev (list);
-  } else {
-      assert (!FT_New_Face (library, font, 0, &face));
+    gchar **list = g_strsplit (fonts, ",", -1);
+    for (gchar **p = list; p != NULL && *p != NULL; p++)
+    {
+      gchar **sublist = g_strsplit (*p, " ", -1);
+      gchar **range;
+      int s, l;
+      assert (!FT_New_Face (library, sublist[0], 0, &face));
       assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-      assert (raqm_set_freetype_face (rq, face));
+      range = g_strsplit (sublist[1], ":", -1);
+      s = atoi(range[0]);
+      l = atoi(range[1]);
+      assert (raqm_set_freetype_face_range(rq, face, s, l));
+
+      g_strfreev (range);
+      g_strfreev (sublist);
+    }
+    g_strfreev (list);
+  } else {
+    assert (!FT_New_Face (library, font, 0, &face));
+    assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
+    assert (raqm_set_freetype_face (rq, face));
   }
 
   if (features)
