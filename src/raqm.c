@@ -1353,7 +1353,7 @@ _raqm_in_hangul_syllable (hb_codepoint_t ch);
  * Return value:
  * %true if the process was successful, %false otherwise.
  *
- * Since: 0.1
+ * Since: 0.2
  */
 bool
 raqm_index_to_position (raqm_t *rq,
@@ -1442,7 +1442,7 @@ raqm_index_to_position (raqm_t *rq,
  * Return value:
  * %true if the process was successful, %false in case of error.
  *
- * Since: 0.1
+ * Since: 0.2
  */
 bool
 raqm_position_to_index (raqm_t *rq,
