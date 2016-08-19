@@ -248,6 +248,19 @@ _raqm_free_text_info (raqm_t *rq)
   rq->text_info = NULL;
 }
 
+static bool
+_raqm_compare_text_info (_raqm_text_info a,
+                         _raqm_text_info b)
+{
+  if (a.ftface != b.ftface)
+    return false;
+
+  if (a.lang != b.lang)
+    return false;
+
+  return true;
+}
+
 /**
  * raqm_create:
  *
@@ -1033,8 +1046,9 @@ _raqm_itemize (raqm_t *rq)
       for (int j = runs[i].len - 1; j >= 0; j--)
       {
         hb_script_t script = rq->scripts[runs[i].pos + j];
-        FT_Face face = rq->text_info[runs[i].pos + j].ftface;
-        if (script != run->script || face != rq->text_info[run->pos].ftface)
+        _raqm_text_info info = rq->text_info[runs[i].pos + j];
+        if (script != run->script ||
+            !_raqm_compare_text_info (rq->text_info[run->pos], info))
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -1043,7 +1057,7 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = script;
-          newrun->font = HB_FT_FONT_CREATE (face);
+          newrun->font = HB_FT_FONT_CREATE (info.ftface);
           run->next = newrun;
           run = newrun;
         }
@@ -1062,8 +1076,9 @@ _raqm_itemize (raqm_t *rq)
       for (size_t j = 0; j < runs[i].len; j++)
       {
         hb_script_t script = rq->scripts[runs[i].pos + j];
-        FT_Face face = rq->text_info[runs[i].pos + j].ftface;
-        if (script != run->script || face != rq->text_info[run->pos].ftface)
+        _raqm_text_info info = rq->text_info[runs[i].pos + j];
+        if (script != run->script ||
+            !_raqm_compare_text_info (rq->text_info[run->pos], info))
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -1072,7 +1087,7 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = script;
-          newrun->font = HB_FT_FONT_CREATE (face);
+          newrun->font = HB_FT_FONT_CREATE (info.ftface);
           run->next = newrun;
           run = newrun;
         }
