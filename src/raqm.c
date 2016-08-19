@@ -167,6 +167,10 @@ typedef enum {
   RAQM_FLAG_UTF8 = 1 << 0
 } _raqm_flags_t;
 
+typedef struct {
+  FT_Face ftface;
+} _raqm_text_info;
+
 typedef struct _raqm_run raqm_run_t;
 
 struct _raqm {
@@ -176,6 +180,8 @@ struct _raqm {
   char            *text_utf8;
   size_t           text_len;
 
+  _raqm_text_info *text_info;
+
   raqm_direction_t base_dir;
   raqm_direction_t resolved_dir;
 
@@ -183,8 +189,6 @@ struct _raqm {
   size_t           features_len;
 
   hb_script_t     *scripts;
-
-  FT_Face         *ftfaces;
 
   raqm_run_t      *runs;
   raqm_glyph_t    *glyphs;
@@ -232,6 +236,8 @@ raqm_create (void)
   rq->text_utf8 = NULL;
   rq->text_len = 0;
 
+  rq->text_info = NULL;
+
   rq->base_dir = RAQM_DIRECTION_DEFAULT;
   rq->resolved_dir = RAQM_DIRECTION_DEFAULT;
 
@@ -239,8 +245,6 @@ raqm_create (void)
   rq->features_len = 0;
 
   rq->scripts = NULL;
-
-  rq->ftfaces = NULL;
 
   rq->runs = NULL;
   rq->glyphs = NULL;
@@ -286,19 +290,39 @@ _raqm_free_runs (raqm_t *rq)
   }
 }
 
-
 static void
-_raqm_free_ftfaces (raqm_t *rq)
+_raqm_free_text_info (raqm_t *rq)
 {
-  if (!rq->ftfaces)
+  if (!rq->text_info)
     return;
+
   for (size_t i = 0; i < rq->text_len; i++)
   {
-    if (rq->ftfaces[i])
-      FT_Done_Face (rq->ftfaces[i]);
+    if (rq->text_info[i].ftface)
+      FT_Done_Face (rq->text_info[i].ftface);
   }
+
+  free (rq->text_info);
+  rq->text_info = NULL;
 }
 
+static bool
+_raqm_init_text_info (raqm_t *rq)
+{
+  if (rq->text_info)
+    return true;
+
+  rq->text_info = malloc (sizeof (_raqm_text_info) * rq->text_len);
+  if (!rq->text_info)
+    return false;
+
+  for (size_t i = 0; i < rq->text_len; i++)
+  {
+    rq->text_info[i].ftface = NULL;
+  }
+
+  return true;
+}
 
 /**
  * raqm_destroy:
@@ -319,8 +343,7 @@ raqm_destroy (raqm_t *rq)
   free (rq->text);
   free (rq->text_utf8);
   free (rq->scripts);
-  _raqm_free_ftfaces (rq);
-  free (rq->ftfaces);
+  _raqm_free_text_info (rq);
   _raqm_free_runs (rq);
   free (rq->glyphs);
   free (rq);
@@ -356,6 +379,11 @@ raqm_set_text (raqm_t         *rq,
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
   if (!rq->text)
     return false;
+
+  _raqm_free_text_info (rq);
+  if (!_raqm_init_text_info (rq))
+    return false;
+
   memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
 
   return true;
@@ -565,17 +593,14 @@ raqm_set_freetype_face_range (raqm_t *rq,
   if (start + len > rq->text_len)
     return false;
 
-  if (!rq->ftfaces)
-    rq->ftfaces = calloc (sizeof (intptr_t), rq->text_len);
-  if (!rq->ftfaces)
+  if (!rq->text_info)
     return false;
 
   for (size_t i = 0; i < len; i++)
   {
-    if (rq->ftfaces[start + i]) {
-        FT_Done_Face (rq->ftfaces[start + i]);
-    }
-    rq->ftfaces[start + i] = face;
+    if (rq->text_info[start + i].ftface)
+        FT_Done_Face (rq->text_info[start + i].ftface);
+    rq->text_info[start + i].ftface = face;
     FT_Reference_Face (face);
   }
 
@@ -604,12 +629,12 @@ _raqm_shape (raqm_t *rq);
 bool
 raqm_layout (raqm_t *rq)
 {
-  if (!rq || !rq->text_len || !rq->ftfaces)
+  if (!rq || !rq->text_len || !rq->text_info)
     return false;
 
   for (size_t i = 0; i < rq->text_len; i++)
   {
-      if (!rq->ftfaces[i])
+      if (!rq->text_info[i].ftface)
           return false;
   }
 
@@ -690,7 +715,7 @@ raqm_get_glyphs (raqm_t *rq,
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
-      rq->glyphs[count + i].ftface = rq->ftfaces[rq->glyphs[count + i].cluster];
+      rq->glyphs[count + i].ftface = rq->text_info[info[i].cluster].ftface;
 
       RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\tfont: %s\n",
           rq->glyphs[count + i].index, rq->glyphs[count + i].x_offset,
@@ -949,12 +974,12 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos + runs[i].len - 1;
       run->script = rq->scripts[run->pos];
-      run->font = HB_FT_FONT_CREATE (rq->ftfaces[run->pos]);
+      run->font = HB_FT_FONT_CREATE (rq->text_info[run->pos].ftface);
       for (int j = runs[i].len - 1; j >= 0; j--)
       {
         hb_script_t script = rq->scripts[runs[i].pos + j];
-        FT_Face face = rq->ftfaces[runs[i].pos + j];
-        if (script != run->script || face != rq->ftfaces[run->pos])
+        FT_Face face = rq->text_info[runs[i].pos + j].ftface;
+        if (script != run->script || face != rq->text_info[run->pos].ftface)
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -978,12 +1003,12 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos;
       run->script = rq->scripts[run->pos];
-      run->font = HB_FT_FONT_CREATE (rq->ftfaces[run->pos]);
+      run->font = HB_FT_FONT_CREATE (rq->text_info[run->pos].ftface);
       for (size_t j = 0; j < runs[i].len; j++)
       {
         hb_script_t script = rq->scripts[runs[i].pos + j];
-        FT_Face face = rq->ftfaces[runs[i].pos + j];
-        if (script != run->script || face != rq->ftfaces[run->pos])
+        FT_Face face = rq->text_info[runs[i].pos + j].ftface;
+        if (script != run->script || face != rq->text_info[run->pos].ftface)
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -1019,7 +1044,7 @@ _raqm_itemize (raqm_t *rq)
     RAQM_TEST ("run[%zu]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
                run_count++, run->pos, run->len,
                hb_direction_to_string (run->direction), buff,
-               rq->ftfaces[run->pos]->family_name);
+               rq->text_info[run->pos].ftface->family_name);
   }
   RAQM_TEST ("\n");
 #endif
