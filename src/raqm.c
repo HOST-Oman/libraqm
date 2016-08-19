@@ -1,5 +1,6 @@
 /*
  * Copyright © 2015 Information Technology Authority (ITA) <foss@ita.gov.om>
+ * Copyright © 2016 Khaled Hosny <khaledhosny@eglug.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -168,7 +169,8 @@ typedef enum {
 } _raqm_flags_t;
 
 typedef struct {
-  FT_Face ftface;
+  FT_Face       ftface;
+  hb_language_t lang;
 } _raqm_text_info;
 
 typedef struct _raqm_run raqm_run_t;
@@ -309,6 +311,8 @@ _raqm_free_text_info (raqm_t *rq)
 static bool
 _raqm_init_text_info (raqm_t *rq)
 {
+  hb_language_t default_lang;
+
   if (rq->text_info)
     return true;
 
@@ -316,9 +320,11 @@ _raqm_init_text_info (raqm_t *rq)
   if (!rq->text_info)
     return false;
 
+  default_lang = hb_language_get_default ();
   for (size_t i = 0; i < rq->text_len; i++)
   {
     rq->text_info[i].ftface = NULL;
+    rq->text_info[i].lang = default_lang;
   }
 
   return true;
@@ -471,6 +477,55 @@ raqm_set_par_direction (raqm_t          *rq,
     return false;
 
   rq->base_dir = dir;
+
+  return true;
+}
+
+/**
+ * raqm_set_language:
+ * @rq: a #raqm_t.
+ * @lang: a BCP47 language code.
+ * @start: index of first character that should use @face.
+ * @len: number of characters using @face.
+ *
+ * Sets a [BCP47 language
+ * code](https://www.w3.org/International/articles/language-tags/) to be used
+ * for @len-number of characters staring at @start.  The @start and @len are
+ * UTF-32 character indices, regardless of the original text encoding.
+ *
+ * This method can be used repeatedly to set different languages for different
+ * parts of the text.
+ *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
+ * Stability:
+ * Unstable
+ *
+ * Since: 0.2
+ */
+bool
+raqm_set_language (raqm_t       *rq,
+                   const char   *lang,
+                   size_t        start,
+                   size_t        len)
+{
+  hb_language_t language;
+
+  if (!rq || !rq->text_len || start >= rq->text_len)
+    return false;
+
+  if (start + len > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+
+  language = hb_language_from_string (lang, -1);
+  for (size_t i = 0; i < len; i++)
+  {
+    rq->text_info[start + i].lang = language;
+  }
 
   return true;
 }
@@ -1312,7 +1367,7 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_add_utf32 (run->buffer, rq->text, rq->text_len,
                          run->pos, run->len);
     hb_buffer_set_script (run->buffer, run->script);
-    hb_buffer_set_language (run->buffer, hb_language_get_default ());
+    hb_buffer_set_language (run->buffer, rq->text_info[run->pos].lang);
     hb_buffer_set_direction (run->buffer, run->direction);
     hb_shape_full (run->font, run->buffer, rq->features, rq->features_len,
                    NULL);

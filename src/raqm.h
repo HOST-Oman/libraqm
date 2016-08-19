@@ -1,5 +1,6 @@
 /*
  * Copyright © 2015 Information Technology Authority (ITA) <foss@ita.gov.om>
+ * Copyright © 2016 Khaled Hosny <khaledhosny@eglug.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -111,6 +112,12 @@ raqm_set_text_utf8 (raqm_t     *rq,
 bool
 raqm_set_par_direction (raqm_t          *rq,
                         raqm_direction_t dir);
+
+bool
+raqm_set_language (raqm_t       *rq,
+                   const char   *lang,
+                   size_t        start,
+                   size_t        len);
 
 bool
 raqm_add_font_feature  (raqm_t     *rq,

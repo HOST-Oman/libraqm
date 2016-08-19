@@ -36,6 +36,7 @@ TEST_FILES = \
     scripts-forward.test \
     scripts-forward-ltr.test \
     scripts-forward-rtl.test \
+    languages-sr.test \
     multi-fonts.test \
     multi-fonts2.test \
     xyoffset.test \
