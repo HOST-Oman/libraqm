@@ -165,7 +165,7 @@
 typedef enum {
   RAQM_FLAG_NONE = 0,
   RAQM_FLAG_UTF8 = 1 << 0
-} raqm_flags_t;
+} _raqm_flags_t;
 
 typedef struct _raqm_run raqm_run_t;
 
@@ -189,7 +189,7 @@ struct _raqm {
   raqm_run_t      *runs;
   raqm_glyph_t    *glyphs;
 
-  raqm_flags_t     flags;
+  _raqm_flags_t    flags;
 };
 
 struct _raqm_run {
@@ -1033,7 +1033,7 @@ typedef struct {
   size_t       size;
   int         *pair_index;
   hb_script_t *scripts;
-} raqm_stack_t;
+} _raqm_stack_t;
 
 /* Special paired characters for script detection */
 static size_t paired_len = 34;
@@ -1059,7 +1059,7 @@ static const FriBidiChar paired_chars[] =
 };
 
 static void
-_raqm_stack_free (raqm_stack_t *stack)
+_raqm_stack_free (_raqm_stack_t *stack)
 {
   free (stack->scripts);
   free (stack->pair_index);
@@ -1067,11 +1067,11 @@ _raqm_stack_free (raqm_stack_t *stack)
 }
 
 /* Stack handling functions */
-static raqm_stack_t *
+static _raqm_stack_t *
 _raqm_stack_new (size_t max)
 {
-  raqm_stack_t *stack;
-  stack = calloc (1, sizeof (raqm_stack_t));
+  _raqm_stack_t *stack;
+  stack = calloc (1, sizeof (_raqm_stack_t));
   if (!stack)
     return NULL;
 
@@ -1096,7 +1096,7 @@ _raqm_stack_new (size_t max)
 }
 
 static bool
-_raqm_stack_pop (raqm_stack_t *stack)
+_raqm_stack_pop (_raqm_stack_t *stack)
 {
   if (!stack->size)
   {
@@ -1110,7 +1110,7 @@ _raqm_stack_pop (raqm_stack_t *stack)
 }
 
 static hb_script_t
-_raqm_stack_top (raqm_stack_t *stack)
+_raqm_stack_top (_raqm_stack_t *stack)
 {
   if (!stack->size)
   {
@@ -1122,7 +1122,7 @@ _raqm_stack_top (raqm_stack_t *stack)
 }
 
 static bool
-_raqm_stack_push (raqm_stack_t      *stack,
+_raqm_stack_push (_raqm_stack_t      *stack,
             hb_script_t script,
             int         pi)
 {
@@ -1174,7 +1174,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   int last_script_index = -1;
   int last_set_index = -1;
   hb_script_t last_script_value = HB_SCRIPT_INVALID;
-  raqm_stack_t *stack = NULL;
+  _raqm_stack_t *stack = NULL;
 
   if (rq->scripts)
     return true;
@@ -1552,9 +1552,9 @@ typedef enum
   RAQM_GRAPHEM_SPACING_MARK,
   RAQM_GRAPHEM_HANGUL_SYLLABLE,
   RAQM_GRAPHEM_OTHER
-} raqm_grapheme_t;
+} _raqm_grapheme_t;
 
-static raqm_grapheme_t
+static _raqm_grapheme_t
 _raqm_get_grapheme_break (hb_codepoint_t ch,
                           hb_unicode_general_category_t category);
 
@@ -1564,7 +1564,7 @@ _raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
 {
   hb_unicode_general_category_t l_category;
   hb_unicode_general_category_t r_category;
-  raqm_grapheme_t l_grapheme, r_grapheme;
+  _raqm_grapheme_t l_grapheme, r_grapheme;
 
   l_category = hb_unicode_general_category (hb_unicode_funcs_get_default (),
                                             l_char);
@@ -1594,11 +1594,11 @@ _raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
   return true; /*Otherwise, break everywhere. GB1, GB2, GB10*/
 }
 
-static raqm_grapheme_t
+static _raqm_grapheme_t
 _raqm_get_grapheme_break (hb_codepoint_t ch,
                           hb_unicode_general_category_t category)
 {
-  raqm_grapheme_t gb_type;
+  _raqm_grapheme_t gb_type;
 
   gb_type = RAQM_GRAPHEM_OTHER;
   switch ((int)category)
