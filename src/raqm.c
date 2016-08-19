@@ -210,6 +210,44 @@ struct _raqm_run {
   raqm_run_t    *next;
 };
 
+static bool
+_raqm_init_text_info (raqm_t *rq)
+{
+  hb_language_t default_lang;
+
+  if (rq->text_info)
+    return true;
+
+  rq->text_info = malloc (sizeof (_raqm_text_info) * rq->text_len);
+  if (!rq->text_info)
+    return false;
+
+  default_lang = hb_language_get_default ();
+  for (size_t i = 0; i < rq->text_len; i++)
+  {
+    rq->text_info[i].ftface = NULL;
+    rq->text_info[i].lang = default_lang;
+  }
+
+  return true;
+}
+
+static void
+_raqm_free_text_info (raqm_t *rq)
+{
+  if (!rq->text_info)
+    return;
+
+  for (size_t i = 0; i < rq->text_len; i++)
+  {
+    if (rq->text_info[i].ftface)
+      FT_Done_Face (rq->text_info[i].ftface);
+  }
+
+  free (rq->text_info);
+  rq->text_info = NULL;
+}
+
 /**
  * raqm_create:
  *
@@ -290,44 +328,6 @@ _raqm_free_runs (raqm_t *rq)
     hb_font_destroy (run->font);
     free (run);
   }
-}
-
-static void
-_raqm_free_text_info (raqm_t *rq)
-{
-  if (!rq->text_info)
-    return;
-
-  for (size_t i = 0; i < rq->text_len; i++)
-  {
-    if (rq->text_info[i].ftface)
-      FT_Done_Face (rq->text_info[i].ftface);
-  }
-
-  free (rq->text_info);
-  rq->text_info = NULL;
-}
-
-static bool
-_raqm_init_text_info (raqm_t *rq)
-{
-  hb_language_t default_lang;
-
-  if (rq->text_info)
-    return true;
-
-  rq->text_info = malloc (sizeof (_raqm_text_info) * rq->text_len);
-  if (!rq->text_info)
-    return false;
-
-  default_lang = hb_language_get_default ();
-  for (size_t i = 0; i < rq->text_len; i++)
-  {
-    rq->text_info[i].ftface = NULL;
-    rq->text_info[i].lang = default_lang;
-  }
-
-  return true;
 }
 
 /**
