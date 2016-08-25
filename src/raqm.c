@@ -682,9 +682,6 @@ raqm_set_freetype_face (raqm_t *rq,
  * Return value:
  * %true if no errors happened, %false otherwise.
  *
- * Stability:
- * Unstable
- *
  * Since: 0.1
  */
 bool
