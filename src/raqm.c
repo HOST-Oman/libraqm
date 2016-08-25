@@ -209,6 +209,10 @@ struct _raqm_run {
   raqm_run_t    *next;
 };
 
+static uint32_t
+_raqm_u8_to_u32_index (raqm_t   *rq,
+                       uint32_t  index);
+
 static bool
 _raqm_init_text_info (raqm_t *rq)
 {
@@ -504,7 +508,8 @@ raqm_set_par_direction (raqm_t          *rq,
  * Sets a [BCP47 language
  * code](https://www.w3.org/International/articles/language-tags/) to be used
  * for @len-number of characters staring at @start.  The @start and @len are
- * UTF-32 character indices, regardless of the original text encoding.
+ * input string array indices (i.e. counting bytes in UTF-8 and scaler values
+ * in UTF-32).
  *
  * This method can be used repeatedly to set different languages for different
  * parts of the text.
@@ -524,20 +529,27 @@ raqm_set_language (raqm_t       *rq,
                    size_t        len)
 {
   hb_language_t language;
+  size_t end = start + len;
 
-  if (!rq || !rq->text_len || start >= rq->text_len)
+  if (!rq || !rq->text_len)
     return false;
 
-  if (start + len > rq->text_len)
+  if (rq->flags & RAQM_FLAG_UTF8)
+  {
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
+  }
+
+  if (start >= rq->text_len || end > rq->text_len)
     return false;
 
   if (!rq->text_info)
     return false;
 
   language = hb_language_from_string (lang, -1);
-  for (size_t i = 0; i < len; i++)
+  for (size_t i = start; i < end; i++)
   {
-    rq->text_info[start + i].lang = language;
+    rq->text_info[i].lang = language;
   }
 
   return true;
