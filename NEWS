@@ -1,3 +1,17 @@
+Overview of changes leading to 0.2.0
+Wednesday, August 25, 2016
+====================================
+
+Fix building with MSVC due to lacking C99 support.
+
+Make multiple fonts support actually work. Start and length now respect the
+input encoding.
+
+New API:
+* raqm_index_to_position
+* raqm_position_to_index
+* raqm_set_language
+
 Overview of changes leading to 0.1.1
 Sunday, May 1, 2016
 ====================================
