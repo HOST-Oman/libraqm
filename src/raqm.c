@@ -615,6 +615,32 @@ _raqm_hb_ft_font_create_referenced (FT_Face face)
 # define HB_FT_FONT_CREATE(a) _raqm_hb_ft_font_create_referenced (a)
 #endif
 
+static bool
+_raqm_set_freetype_face (raqm_t *rq,
+                         FT_Face face,
+                         size_t  start,
+                         size_t  end)
+{
+  if (!rq || !rq->text_len)
+    return false;
+
+  if (start >= rq->text_len || end > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+
+  for (size_t i = start; i < end; i++)
+  {
+    if (rq->text_info[i].ftface)
+        FT_Done_Face (rq->text_info[i].ftface);
+    rq->text_info[i].ftface = face;
+    FT_Reference_Face (face);
+  }
+
+  return true;
+}
+
 /**
  * raqm_set_freetype_face:
  * @rq: a #raqm_t.
@@ -633,7 +659,7 @@ bool
 raqm_set_freetype_face (raqm_t *rq,
                         FT_Face face)
 {
-  return raqm_set_freetype_face_range (rq, face, 0, rq->text_len);
+  return _raqm_set_freetype_face (rq, face, 0, rq->text_len);
 }
 
 /**
@@ -644,8 +670,8 @@ raqm_set_freetype_face (raqm_t *rq,
  * @len: number of characters using @face.
  *
  * Sets an #FT_Face to be used for @len-number of characters staring at @start.
- * The @start and @len are UTF-32 character indices, regardless of the original
- * text encoding.
+ * The @start and @len are input string array indices (i.e. counting bytes in
+ * UTF-8 and scaler values in UTF-32).
  *
  * This method can be used repeatedly to set different faces for different
  * parts of the text. It is the responsibility of the client to make sure that
@@ -667,24 +693,18 @@ raqm_set_freetype_face_range (raqm_t *rq,
                               size_t  start,
                               size_t  len)
 {
-  if (!rq || !rq->text_len || start >= rq->text_len)
+  size_t end = start + len;
+
+  if (!rq || !rq->text_len)
     return false;
 
-  if (start + len > rq->text_len)
-    return false;
-
-  if (!rq->text_info)
-    return false;
-
-  for (size_t i = 0; i < len; i++)
+  if (rq->flags & RAQM_FLAG_UTF8)
   {
-    if (rq->text_info[start + i].ftface)
-        FT_Done_Face (rq->text_info[start + i].ftface);
-    rq->text_info[start + i].ftface = face;
-    FT_Reference_Face (face);
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
   }
 
-  return true;
+  return _raqm_set_freetype_face (rq, face, start, end);
 }
 
 static bool
