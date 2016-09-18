@@ -1266,6 +1266,13 @@ _raqm_visual_sort (const void *a, const void *b)
 }
 
 static bool
+_raqm_is_space_glyph (raqm_t *rq, int idx)
+{
+  uint32_t ch = rq->text[rq->glyphs[idx].cluster];
+  return ucdn_get_general_category (ch) == UCDN_GENERAL_CATEGORY_ZS;
+}
+
+static bool
 _raqm_line_break (raqm_t *rq)
 {
   size_t count = 0;
@@ -1343,9 +1350,9 @@ _raqm_line_break (raqm_t *rq)
         i--;
 
       /* Next line cannot start with a white space */
-      if (rq->text[rq->glyphs[i + 1].cluster] == 32)
+      if (_raqm_is_space_glyph (rq, i + 1))
       {
-        for (j = i + 1; rq->text[rq->glyphs[j].cluster] == 32; j++)
+        for (j = i + 1; _raqm_is_space_glyph (rq, j); j++)
           rq->glyphs[j].line = current_line;
         i = j - 1; /* skip those */
       }
@@ -1401,7 +1408,7 @@ _raqm_line_break (raqm_t *rq)
           for (j = i; j != 0 && rq->glyphs[j].line == line; j--)
           {
             /* check if at the start of the line there is a space */
-            if (rq->text[rq->glyphs[j].cluster] == 32 && (line != rq->glyphs[j+1].line ))
+            if (_raqm_is_space_glyph (rq, j) && (line != rq->glyphs[j+1].line))
             {
               int space_width = rq->glyphs[j].x_advance;
 
@@ -1455,7 +1462,7 @@ _raqm_line_break (raqm_t *rq)
           /* counting spaces in one line */
           for (j = i; j != 0 && rq->glyphs[j].line == current_line; j--)
           {
-            if (rq->text[rq->glyphs[j].cluster] == 32) /* space */
+            if (_raqm_is_space_glyph (rq, j))
               space_count++;
           }
 
@@ -1467,7 +1474,7 @@ _raqm_line_break (raqm_t *rq)
           for (size_t k = j + 1; rq->glyphs[k].line == current_line; k++)
           {
             rq->glyphs[k].x += space_extension;
-            if (rq->text[rq->glyphs[k].cluster] == 32) /* space */
+            if (_raqm_is_space_glyph (rq, k))
               space_extension += offset;
           }
         }
