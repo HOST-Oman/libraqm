@@ -1446,7 +1446,7 @@ _raqm_line_break (raqm_t *rq)
       }
     }
 
-    if (rq->alignment == RAQM_ALIGNMENT_FULL)
+    if (rq->alignment == RAQM_ALIGNMENT_JUSTIFY)
     {
       int space_count = 0;
       size_t j = 0;
