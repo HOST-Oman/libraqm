@@ -1393,9 +1393,9 @@ _raqm_line_break (raqm_t *rq)
   }
 
   /* handeling alighnment */
-  if (rq->alignment != RAQM_ALIGNMENT_LEFT)
+  switch (rq->alignment)
   {
-    if (rq->alignment == RAQM_ALIGNMENT_RIGHT)
+    case RAQM_ALIGNMENT_RIGHT:
     {
       size_t j = 0;
       int line = -1;
@@ -1427,9 +1427,9 @@ _raqm_line_break (raqm_t *rq)
         }
         i = j + 1;
       }
+      break;
     }
-
-    if (rq->alignment == RAQM_ALIGNMENT_CENTER)
+    case RAQM_ALIGNMENT_CENTER:
     {
       size_t j = 0;
       current_line = -1;
@@ -1444,9 +1444,9 @@ _raqm_line_break (raqm_t *rq)
         }
         i = j + 1;
       }
+      break;
     }
-
-    if (rq->alignment == RAQM_ALIGNMENT_JUSTIFY)
+    case RAQM_ALIGNMENT_JUSTIFY:
     {
       int space_count = 0;
       size_t j = 0;
@@ -1480,7 +1480,11 @@ _raqm_line_break (raqm_t *rq)
         }
         i = j + 1;
       }
+      break;
     }
+    case RAQM_ALIGNMENT_LEFT:
+    default:
+      break;
   }
 
   free (line_breaks);
