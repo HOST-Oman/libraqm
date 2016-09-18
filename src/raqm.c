@@ -1096,7 +1096,7 @@ _raqm_find_line_break (raqm_t *rq)
   int next_class;
   raqm_break_action_t *break_actions;
   raqm_break_action_t current_action;
-  bool *break_here;
+  bool *line_breaks;
 
 /* Define some short-cuts for the table */
 #define oo RAQM_DIRECT_BREAK                /* '_' break allowed */
@@ -1143,11 +1143,11 @@ _raqm_find_line_break (raqm_t *rq)
 #undef CC
 #undef XX
 
-  break_here = malloc (sizeof (bool) * length);
-  memset (break_here, false, length);
+  line_breaks = malloc (sizeof (bool) * length);
+  memset (line_breaks, false, length);
 
   if (length < 2)
-    return break_here;
+    return line_breaks;
 
   break_actions = malloc (sizeof (raqm_break_action_t) * length);
   memset (break_actions, RAQM_PROHIBITED_BREAK, length);
@@ -1235,13 +1235,13 @@ _raqm_find_line_break (raqm_t *rq)
   for (size_t i = 0; i < length; i++)
   {
     if (break_actions[i] == RAQM_INDIRECT_BREAK || break_actions[i] == RAQM_DIRECT_BREAK )
-      break_here[i] = true;
+      line_breaks[i] = true;
     else
-      break_here[i] = false;
+      line_breaks[i] = false;
   }
 
   free (break_actions);
-  return break_here;
+  return line_breaks;
 }
 
 static int
@@ -1269,21 +1269,19 @@ static bool
 _raqm_line_break (raqm_t *rq)
 {
   size_t count = 0;
-  size_t glyphs_length = 0;
+  size_t glyph_count = 0;
   int current_x = 0;
   int current_line = 0;
 
-  bool *break_here = NULL;
+  bool *line_breaks = NULL;
 
   /* counting total glyphs */
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
-    glyphs_length += hb_buffer_get_length (run->buffer);
+    glyph_count += hb_buffer_get_length (run->buffer);
 
-  rq->glyphs = malloc (sizeof (raqm_glyph_t) * glyphs_length);
+  rq->glyphs = malloc (sizeof (raqm_glyph_t) * glyph_count);
   if (!rq->glyphs)
-  {
     return false;
-  }
 
   /* populating glyphs */
   count = 0;
@@ -1308,7 +1306,8 @@ _raqm_line_break (raqm_t *rq)
       rq->glyphs[count + i].y_offset = position[i].y_offset;
       rq->glyphs[count + i].x_position = current_x + position[i].x_offset;
       rq->glyphs[count + i].y_position = position[i].y_offset;
-      rq->glyphs[count + i].ftface = rq->text_info[rq->glyphs[count + i].cluster].ftface;
+      rq->glyphs[count + i].ftface =
+        rq->text_info[rq->glyphs[count + i].cluster].ftface;
       rq->glyphs[count + i].visual_index = count + i;
       rq->glyphs[count + i].line = 0;
 
@@ -1322,16 +1321,16 @@ _raqm_line_break (raqm_t *rq)
     return true;
 
   /* Sorting glyphs to logical order */
-  qsort (rq->glyphs, glyphs_length, sizeof (raqm_glyph_t), _raqm_logical_sort);
+  qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_logical_sort);
 
   /* Line breaking */
 
   /* finding possible breaks in text */
-  break_here = _raqm_find_line_break (rq);
+  line_breaks = _raqm_find_line_break (rq);
 
   current_x = 0;
   current_line = 0;
-  for (size_t i = 0; i < glyphs_length; i++)
+  for (size_t i = 0; i < glyph_count; i++)
   {
     rq->glyphs[i].line = current_line;
     current_x += rq->glyphs[i].x_offset + rq->glyphs[i].x_advance;
@@ -1340,7 +1339,7 @@ _raqm_line_break (raqm_t *rq)
     {
       size_t j = 0;
       size_t k = 0;
-      while (!break_here[rq->glyphs[i].cluster] && i != 0)
+      while (!line_breaks[rq->glyphs[i].cluster] && i != 0)
         i--;
 
       /* Next line cannot start with a white space */
@@ -1359,18 +1358,18 @@ _raqm_line_break (raqm_t *rq)
         i = k - 1; /* skip those */
       }
 
-      current_line ++;
+      current_line++;
       current_x = 0;
     }
   }
 
   /* Sorting glyphs back to visual order */
-  qsort (rq->glyphs, glyphs_length, sizeof (raqm_glyph_t), _raqm_visual_sort);
+  qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_visual_sort);
 
   /* calculating positions */
   current_line = 0;
   current_x = 0;
-  for (size_t i = 0; i < glyphs_length; i++)
+  for (size_t i = 0; i < glyph_count; i++)
   {
     int line_space = (-1) * (rq->text_info[rq->glyphs[i].cluster].ftface->ascender + abs (rq->text_info[rq->glyphs[i].cluster].ftface->descender));
 
@@ -1393,7 +1392,7 @@ _raqm_line_break (raqm_t *rq)
     {
       size_t j = 0;
       current_line = -1;
-      for (size_t i = glyphs_length - 1; i != 0; i--)
+      for (size_t i = glyph_count - 1; i != 0; i--)
       {
         if (rq->glyphs[i].line != current_line)
         {
@@ -1426,7 +1425,7 @@ _raqm_line_break (raqm_t *rq)
     {
       size_t j = 0;
       current_line = -1;
-      for (size_t i = glyphs_length - 1; i != 0; i--)
+      for (size_t i = glyph_count - 1; i != 0; i--)
       {
         if (rq->glyphs[i].line != current_line)
         {
@@ -1444,7 +1443,7 @@ _raqm_line_break (raqm_t *rq)
       int space_count = 0;
       size_t j = 0;
       current_line = -1;
-      for (size_t i = glyphs_length - 1; i != 0; i--)
+      for (size_t i = glyph_count - 1; i != 0; i--)
       {
         if (rq->glyphs[i].line != current_line)
         {
@@ -1476,7 +1475,7 @@ _raqm_line_break (raqm_t *rq)
     }
   }
 
-  free (break_here);
+  free (line_breaks);
   return true;
 }
 
