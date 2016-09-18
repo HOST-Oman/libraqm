@@ -1410,7 +1410,13 @@ _raqm_line_break (raqm_t *rq)
   x = 0;
   for (size_t i = 0; i < glyph_count; i++)
   {
-    int leading = (-1) * (rq->text_info[rq->glyphs[i].cluster].ftface->ascender + abs (rq->text_info[rq->glyphs[i].cluster].ftface->descender));
+    FT_Face face;
+    int ascender, descender, leading;
+
+    face = rq->text_info[rq->glyphs[i].cluster].ftface;
+    ascender = face->size->metrics.ascender;
+    descender = -face->size->metrics.descender;
+    leading = ascender + descender;
 
     if (rq->glyphs[i].line != line)
     {
@@ -1419,7 +1425,7 @@ _raqm_line_break (raqm_t *rq)
     }
 
     rq->glyphs[i].x = x + rq->glyphs[i].x_offset;
-    rq->glyphs[i].y = rq->glyphs[i].y_offset + line * leading;
+    rq->glyphs[i].y = rq->glyphs[i].y_offset - line * leading - ascender;
 
     x += rq->glyphs[i].x_advance;
   }
