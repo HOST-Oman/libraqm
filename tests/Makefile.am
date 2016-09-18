@@ -40,6 +40,7 @@ TEST_FILES = \
     scripts-forward-rtl.test \
     languages-sr.test \
     languages-sr-ru.test \
+    line-breaking-ltr.test \
     multi-fonts.test \
     multi-fonts2.test \
     xyoffset.test \

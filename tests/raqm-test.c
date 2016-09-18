@@ -40,6 +40,7 @@ static gchar *fonts = NULL;
 static gchar *languages = NULL;
 static gint cluster = -1;
 static gint position = -1;
+static gint line_width = -1;
 static gchar **args = NULL;
 static GOptionEntry entries[] =
 {
@@ -51,6 +52,7 @@ static GOptionEntry entries[] =
   { "font-features", 0, 0, G_OPTION_ARG_STRING, &features, "The font features ", "FEATURES" },
   { "cluster", 0, 0, G_OPTION_ARG_INT, &cluster, "The glyph cluster ", "CLUSTER" },
   { "position", 0, 0, G_OPTION_ARG_INT, &position, "The glyph position ", "POSITION" },
+  { "line-width", 0, 0, G_OPTION_ARG_INT, &line_width, "The line width ", "WIDTH" },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, "Remaining arguments", "FONTFILE" },
   { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
 };
@@ -156,6 +158,9 @@ main (int argc, char *argv[])
       assert (raqm_add_font_feature (rq, *p, -1));
     g_strfreev (list);
   }
+
+  if (line_width >= 0)
+    assert (raqm_set_line_width (rq, line_width));
 
   assert (raqm_layout (rq));
 
