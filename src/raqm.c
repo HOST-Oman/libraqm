@@ -1272,6 +1272,53 @@ _raqm_is_space_glyph (raqm_t *rq, int idx)
   return ucdn_get_general_category (ch) == UCDN_GENERAL_CATEGORY_ZS;
 }
 
+static void
+_raqm_break_lines (raqm_t *rq, size_t glyph_count)
+{
+  int width = 0;
+  int line = 0;
+
+  /* Find possible break points */
+  bool *breaks = _raqm_find_line_break (rq);
+
+  for (size_t i = 0; i < glyph_count; i++)
+  {
+    rq->glyphs[i].line = line;
+    width += rq->glyphs[i].x_offset + rq->glyphs[i].x_advance;
+
+    if (width > rq->line_width)
+    {
+      /* If the current glyph does not fit into the line, search backwards for
+       * the last line break. */
+      size_t j = 0;
+      size_t k = 0;
+      while (!breaks[rq->glyphs[i].cluster] && i != 0)
+        i--;
+
+      /* Don’t start lines with white space */
+      if (_raqm_is_space_glyph (rq, i + 1))
+      {
+        for (j = i + 1; _raqm_is_space_glyph (rq, j); j++)
+          rq->glyphs[j].line = line;
+        i = j - 1; /* skip those */
+      }
+
+      /* Handle glyphs belonging to the same character */
+      if (rq->glyphs[i + 1].cluster == rq->glyphs[i].cluster)
+      {
+        for (k = i + 1; rq->glyphs[k].cluster == rq->glyphs[i].cluster; k++)
+          rq->glyphs[j].line = line;
+        i = k - 1; /* skip those */
+      }
+
+      line++;
+      width = 0;
+    }
+  }
+
+  free (breaks);
+}
+
 static bool
 _raqm_line_break (raqm_t *rq)
 {
@@ -1279,8 +1326,6 @@ _raqm_line_break (raqm_t *rq)
   size_t glyph_count = 0;
   int current_x = 0;
   int current_line = 0;
-
-  bool *line_breaks = NULL;
 
   /* counting total glyphs */
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
@@ -1327,50 +1372,13 @@ _raqm_line_break (raqm_t *rq)
   if (rq->line_width < 0)
     return true;
 
-  /* Sorting glyphs to logical order */
+  /* Sort glyphs in logical order */
   qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_logical_sort);
 
-  /* Line breaking */
+  /* Do line breaking */
+  _raqm_break_lines (rq, glyph_count);
 
-  /* finding possible breaks in text */
-  line_breaks = _raqm_find_line_break (rq);
-
-  current_x = 0;
-  current_line = 0;
-  for (size_t i = 0; i < glyph_count; i++)
-  {
-    rq->glyphs[i].line = current_line;
-    current_x += rq->glyphs[i].x_offset + rq->glyphs[i].x_advance;
-
-    if (current_x > rq->line_width)
-    {
-      size_t j = 0;
-      size_t k = 0;
-      while (!line_breaks[rq->glyphs[i].cluster] && i != 0)
-        i--;
-
-      /* Next line cannot start with a white space */
-      if (_raqm_is_space_glyph (rq, i + 1))
-      {
-        for (j = i + 1; _raqm_is_space_glyph (rq, j); j++)
-          rq->glyphs[j].line = current_line;
-        i = j - 1; /* skip those */
-      }
-
-      /* Handeling glyphs for the same character */
-      if (rq->glyphs[i + 1].cluster == rq->glyphs[i].cluster)
-      {
-        for (k = i + 1; rq->glyphs[k].cluster == rq->glyphs[i].cluster; k++)
-          rq->glyphs[j].line = current_line;
-        i = k - 1; /* skip those */
-      }
-
-      current_line++;
-      current_x = 0;
-    }
-  }
-
-  /* Sorting glyphs back to visual order */
+  /* Then sort glyphs back in visual order */
   qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_visual_sort);
 
   /* calculating positions */
@@ -1487,7 +1495,6 @@ _raqm_line_break (raqm_t *rq)
       break;
   }
 
-  free (line_breaks);
   return true;
 }
 
