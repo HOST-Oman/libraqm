@@ -20,6 +20,7 @@ libraqm_la_LIBADD = \
     $(HARFBUZZ_LIBS) \
     $(FRIBIDI_LIBS) \
     $(WARN_LDLAGS) \
+    -lm \
     $(NULL)
 
 libraqm_la_CPPFLAGS = \

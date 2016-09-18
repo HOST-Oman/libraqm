@@ -28,6 +28,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 #include <fribidi.h>
 #include <hb.h>
@@ -1303,7 +1304,10 @@ _raqm_line_break (raqm_t *rq)
   current_x = 0;
   for (size_t i = 0; i < glyph_count; i++)
   {
-    int line_space = (-1) * (rq->text_info[rq->glyphs[i].cluster].ftface->ascender + abs (rq->text_info[rq->glyphs[i].cluster].ftface->descender));
+    FT_Face ftface = rq->text_info[rq->glyphs[i].cluster].ftface;
+    int ascender = fmax (ftface->ascender, 0);
+    int descender = fmax (-ftface->descender, 0);
+    int line_space = -(ascender + descender);
 
     if (rq->glyphs[i].line != current_line)
     {
