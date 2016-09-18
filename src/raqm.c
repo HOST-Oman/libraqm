@@ -1327,29 +1327,30 @@ _raqm_line_break (raqm_t *rq)
     if (rq->alignment == RAQM_ALIGNMENT_RIGHT)
     {
       size_t j = 0;
-      current_line = -1;
+      int line = -1;
       for (size_t i = glyph_count - 1; i != 0; i--)
       {
-        if (rq->glyphs[i].line != current_line)
+        if (rq->glyphs[i].line != line)
         {
-          int align_offset = rq->line_width - (rq->glyphs[i].x + rq->glyphs[i].x_advance);
-          current_line = rq->glyphs[i].line;
-          for (j = i; j != 0 && rq->glyphs[j].line == current_line; j--)
+          int offset = rq->line_width - (rq->glyphs[i].x + rq->glyphs[i].x_advance);
+          line = rq->glyphs[i].line;
+          for (j = i; j != 0 && rq->glyphs[j].line == line; j--)
           {
             /* check if at the start of the line there is a space */
-            if (rq->text[rq->glyphs[j].cluster] == 32 && (current_line != rq->glyphs[j+1].line ))
+            if (rq->text[rq->glyphs[j].cluster] == 32 && (line != rq->glyphs[j+1].line ))
             {
-              int space_width = rq->glyphs[j].x_advance; /* save width of the space */
+              int space_width = rq->glyphs[j].x_advance;
 
-              for (j = i; j != 0 && rq->glyphs[j].line == current_line; j--) /* apply shift */
+              /* apply shift */
+              for (j = i; j != 0 && rq->glyphs[j].line == line; j--)
               {
                 rq->glyphs[j-1].x = rq->glyphs[j-1].x + space_width;
-                rq->glyphs[j-1].x += align_offset;
+                rq->glyphs[j-1].x += offset;
               }
             }
             else
             {
-              rq->glyphs[j].x += align_offset;
+              rq->glyphs[j].x += offset;
             }
           }
         }
@@ -1365,10 +1366,10 @@ _raqm_line_break (raqm_t *rq)
       {
         if (rq->glyphs[i].line != current_line)
         {
-          int align_offset = (rq->line_width - (rq->glyphs[i].x + rq->glyphs[i].x_advance)) / 2;
+          int offset = (rq->line_width - (rq->glyphs[i].x + rq->glyphs[i].x_advance)) / 2;
           current_line = rq->glyphs[i].line;
           for (j = i; j != 0 && rq->glyphs[j].line == current_line; j--)
-            rq->glyphs[j].x += align_offset;
+            rq->glyphs[j].x += offset;
         }
         i = j + 1;
       }
@@ -1384,7 +1385,7 @@ _raqm_line_break (raqm_t *rq)
         if (rq->glyphs[i].line != current_line)
         {
           int space_extension = 0;
-          int align_offset = rq->line_width - (rq->glyphs[i].x + rq->glyphs[i].x_advance);
+          int offset = rq->line_width - (rq->glyphs[i].x + rq->glyphs[i].x_advance);
           current_line = rq->glyphs[i].line;
 
           /* counting spaces in one line */
@@ -1396,14 +1397,14 @@ _raqm_line_break (raqm_t *rq)
 
           /* distributing align offset to all spaces */
           if (space_count == 0)
-            align_offset = 0;
+            offset = 0;
           else
-            align_offset = align_offset / space_count;
+            offset = offset / space_count;
           for (size_t k = j + 1; rq->glyphs[k].line == current_line; k++)
           {
             rq->glyphs[k].x += space_extension;
             if (rq->text[rq->glyphs[k].cluster] == 32) /* space */
-              space_extension += align_offset;
+              space_extension += offset;
           }
         }
         i = j + 1;
