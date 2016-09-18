@@ -1284,7 +1284,7 @@ _raqm_break_lines (raqm_t *rq, size_t glyph_count)
   for (size_t i = 0; i < glyph_count; i++)
   {
     rq->glyphs[i].line = line;
-    width += rq->glyphs[i].x_offset + rq->glyphs[i].x_advance;
+    width += rq->glyphs[i].x_advance;
 
     if (width > rq->line_width)
     {
