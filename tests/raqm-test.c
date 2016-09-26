@@ -1,5 +1,6 @@
 /*
  * Copyright © 2015 Information Technology Authority (ITA) <foss@ita.gov.om>
+ * Copyright © 2016 Khaled Hosny <khaledhosny@eglug.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +37,7 @@ static gchar *text = NULL;
 static gchar *features = NULL;
 static gchar *font = NULL;
 static gchar *fonts = NULL;
+static gchar *languages = NULL;
 static gint cluster = -1;
 static gint position = -1;
 static gchar **args = NULL;
@@ -44,6 +46,7 @@ static GOptionEntry entries[] =
   { "text", 0, 0, G_OPTION_ARG_STRING, &text, "The text to be displayed", "TEXT" },
   { "font", 0, 0, G_OPTION_ARG_STRING, &font, "The font file", "FONT" },
   { "fonts", 0, 0, G_OPTION_ARG_STRING, &fonts, "Font files and ranges for multi-fonts: <fontfile1> start:length, ...", "FONTS" },
+  { "languages", 0, 0, G_OPTION_ARG_STRING, &languages, "Text languages in the form: code;start:length,...", "LANGUAGES" },
   { "direction", 0, 0, G_OPTION_ARG_STRING, &direction, "The text direction", "DIR" },
   { "font-features", 0, 0, G_OPTION_ARG_STRING, &features, "The font features ", "FEATURES" },
   { "cluster", 0, 0, G_OPTION_ARG_INT, &cluster, "The glyph cluster ", "CLUSTER" },
@@ -101,27 +104,49 @@ main (int argc, char *argv[])
 
   if (fonts)
   {
-      gchar **list = g_strsplit (fonts, ",", -1);
-      for (gchar **p = list; p != NULL && *p != NULL; p++) {
-
-          gchar **sublist = g_strsplit (*p, " ", -1);
-          gchar **range;
-          int s, l;
-          assert (!FT_New_Face (library, sublist[0], 0, &face));
-          assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-          range = g_strsplit (sublist[1], ":", -1);
-          s = atoi(range[0]);
-          l = atoi(range[1]);
-          assert (raqm_set_freetype_face_range(rq, face, s, l));
-
-          g_strfreev (range);
-          g_strfreev (sublist);
-      }
-      g_strfreev (list);
-  } else {
-      assert (!FT_New_Face (library, font, 0, &face));
+    gchar **list = g_strsplit (fonts, ",", -1);
+    for (gchar **p = list; p != NULL && *p != NULL; p++)
+    {
+      gchar **sublist = g_strsplit (*p, " ", -1);
+      gchar **range;
+      int s, l;
+      assert (!FT_New_Face (library, sublist[0], 0, &face));
       assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-      assert (raqm_set_freetype_face (rq, face));
+      range = g_strsplit (sublist[1], ":", -1);
+      s = atoi(range[0]);
+      l = atoi(range[1]);
+      assert (raqm_set_freetype_face_range(rq, face, s, l));
+
+      g_strfreev (range);
+      g_strfreev (sublist);
+    }
+    g_strfreev (list);
+  } else {
+    assert (!FT_New_Face (library, font, 0, &face));
+    assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
+    assert (raqm_set_freetype_face (rq, face));
+  }
+
+  if (languages)
+  {
+    gchar **list = g_strsplit (languages, ",", -1);
+    for (gchar **p = list; p != NULL && *p != NULL; p++)
+    {
+      gchar **sublist = g_strsplit (*p, ";", -1);
+      gchar **range;
+      gchar *lang;
+      int start, length;
+
+      lang = sublist[0];
+      range = g_strsplit (sublist[1], ":", -1);
+      start = atoi(range[0]);
+      length = atoi(range[1]);
+      assert (raqm_set_language(rq, lang, start, length));
+
+      g_strfreev (range);
+      g_strfreev (sublist);
+    }
+    g_strfreev (list);
   }
 
   if (features)

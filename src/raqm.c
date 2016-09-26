@@ -1,5 +1,6 @@
 /*
  * Copyright © 2015 Information Technology Authority (ITA) <foss@ita.gov.om>
+ * Copyright © 2016 Khaled Hosny <khaledhosny@eglug.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -28,11 +29,11 @@
 #include <assert.h>
 #include <string.h>
 
+#include <fribidi.h>
 #include <hb.h>
 #include <hb-ft.h>
 
 #include "raqm.h"
-#include "reorder_runs.h"
 
 /**
  * SECTION:raqm
@@ -165,7 +166,13 @@
 typedef enum {
   RAQM_FLAG_NONE = 0,
   RAQM_FLAG_UTF8 = 1 << 0
-} raqm_flags_t;
+} _raqm_flags_t;
+
+typedef struct {
+  FT_Face       ftface;
+  hb_language_t lang;
+  hb_script_t   script;
+} _raqm_text_info;
 
 typedef struct _raqm_run raqm_run_t;
 
@@ -176,20 +183,18 @@ struct _raqm {
   char            *text_utf8;
   size_t           text_len;
 
+  _raqm_text_info *text_info;
+
   raqm_direction_t base_dir;
   raqm_direction_t resolved_dir;
 
   hb_feature_t    *features;
   size_t           features_len;
 
-  hb_script_t     *scripts;
-
-  FT_Face         *ftfaces;
-
   raqm_run_t      *runs;
   raqm_glyph_t    *glyphs;
 
-  raqm_flags_t     flags;
+  _raqm_flags_t    flags;
 };
 
 struct _raqm_run {
@@ -203,6 +208,65 @@ struct _raqm_run {
 
   raqm_run_t    *next;
 };
+
+static uint32_t
+_raqm_u8_to_u32_index (raqm_t   *rq,
+                       uint32_t  index);
+
+static bool
+_raqm_init_text_info (raqm_t *rq)
+{
+  hb_language_t default_lang;
+
+  if (rq->text_info)
+    return true;
+
+  rq->text_info = malloc (sizeof (_raqm_text_info) * rq->text_len);
+  if (!rq->text_info)
+    return false;
+
+  default_lang = hb_language_get_default ();
+  for (size_t i = 0; i < rq->text_len; i++)
+  {
+    rq->text_info[i].ftface = NULL;
+    rq->text_info[i].lang = default_lang;
+    rq->text_info[i].script = HB_SCRIPT_INVALID;
+  }
+
+  return true;
+}
+
+static void
+_raqm_free_text_info (raqm_t *rq)
+{
+  if (!rq->text_info)
+    return;
+
+  for (size_t i = 0; i < rq->text_len; i++)
+  {
+    if (rq->text_info[i].ftface)
+      FT_Done_Face (rq->text_info[i].ftface);
+  }
+
+  free (rq->text_info);
+  rq->text_info = NULL;
+}
+
+static bool
+_raqm_compare_text_info (_raqm_text_info a,
+                         _raqm_text_info b)
+{
+  if (a.ftface != b.ftface)
+    return false;
+
+  if (a.lang != b.lang)
+    return false;
+
+  if (a.script != b.script)
+    return false;
+
+  return true;
+}
 
 /**
  * raqm_create:
@@ -232,15 +296,13 @@ raqm_create (void)
   rq->text_utf8 = NULL;
   rq->text_len = 0;
 
+  rq->text_info = NULL;
+
   rq->base_dir = RAQM_DIRECTION_DEFAULT;
   rq->resolved_dir = RAQM_DIRECTION_DEFAULT;
 
   rq->features = NULL;
   rq->features_len = 0;
-
-  rq->scripts = NULL;
-
-  rq->ftfaces = NULL;
 
   rq->runs = NULL;
   rq->glyphs = NULL;
@@ -281,23 +343,10 @@ _raqm_free_runs (raqm_t *rq)
     runs = runs->next;
 
     hb_buffer_destroy (run->buffer);
+    hb_font_destroy (run->font);
     free (run);
   }
 }
-
-
-static void
-_raqm_free_ftfaces (raqm_t *rq)
-{
-  if (!rq->ftfaces)
-    return;
-  for (size_t i = 0; i < rq->text_len; i++)
-  {
-    if (rq->ftfaces[i])
-      FT_Done_Face (rq->ftfaces[i]);
-  }
-}
-
 
 /**
  * raqm_destroy:
@@ -316,9 +365,8 @@ raqm_destroy (raqm_t *rq)
     return;
 
   free (rq->text);
-  free (rq->scripts);
-  _raqm_free_ftfaces (rq);
-  free (rq->ftfaces);
+  free (rq->text_utf8);
+  _raqm_free_text_info (rq);
   _raqm_free_runs (rq);
   free (rq->glyphs);
   free (rq);
@@ -354,6 +402,11 @@ raqm_set_text (raqm_t         *rq,
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
   if (!rq->text)
     return false;
+
+  _raqm_free_text_info (rq);
+  if (!_raqm_init_text_info (rq))
+    return false;
+
   memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
 
   return true;
@@ -446,6 +499,63 @@ raqm_set_par_direction (raqm_t          *rq,
 }
 
 /**
+ * raqm_set_language:
+ * @rq: a #raqm_t.
+ * @lang: a BCP47 language code.
+ * @start: index of first character that should use @face.
+ * @len: number of characters using @face.
+ *
+ * Sets a [BCP47 language
+ * code](https://www.w3.org/International/articles/language-tags/) to be used
+ * for @len-number of characters staring at @start.  The @start and @len are
+ * input string array indices (i.e. counting bytes in UTF-8 and scaler values
+ * in UTF-32).
+ *
+ * This method can be used repeatedly to set different languages for different
+ * parts of the text.
+ *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
+ * Stability:
+ * Unstable
+ *
+ * Since: 0.2
+ */
+bool
+raqm_set_language (raqm_t       *rq,
+                   const char   *lang,
+                   size_t        start,
+                   size_t        len)
+{
+  hb_language_t language;
+  size_t end = start + len;
+
+  if (!rq || !rq->text_len)
+    return false;
+
+  if (rq->flags & RAQM_FLAG_UTF8)
+  {
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
+  }
+
+  if (start >= rq->text_len || end > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+
+  language = hb_language_from_string (lang, -1);
+  for (size_t i = start; i < end; i++)
+  {
+    rq->text_info[i].lang = language;
+  }
+
+  return true;
+}
+
+/**
  * raqm_add_font_feature:
  * @rq: a #raqm_t.
  * @feature: (transfer none): a font feature string.
@@ -505,6 +615,32 @@ _raqm_hb_ft_font_create_referenced (FT_Face face)
 # define HB_FT_FONT_CREATE(a) _raqm_hb_ft_font_create_referenced (a)
 #endif
 
+static bool
+_raqm_set_freetype_face (raqm_t *rq,
+                         FT_Face face,
+                         size_t  start,
+                         size_t  end)
+{
+  if (!rq || !rq->text_len)
+    return false;
+
+  if (start >= rq->text_len || end > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+
+  for (size_t i = start; i < end; i++)
+  {
+    if (rq->text_info[i].ftface)
+        FT_Done_Face (rq->text_info[i].ftface);
+    rq->text_info[i].ftface = face;
+    FT_Reference_Face (face);
+  }
+
+  return true;
+}
+
 /**
  * raqm_set_freetype_face:
  * @rq: a #raqm_t.
@@ -523,7 +659,7 @@ bool
 raqm_set_freetype_face (raqm_t *rq,
                         FT_Face face)
 {
-  return raqm_set_freetype_face_range (rq, face, 0, rq->text_len);
+  return _raqm_set_freetype_face (rq, face, 0, rq->text_len);
 }
 
 /**
@@ -534,8 +670,8 @@ raqm_set_freetype_face (raqm_t *rq,
  * @len: number of characters using @face.
  *
  * Sets an #FT_Face to be used for @len-number of characters staring at @start.
- * The @start and @len are UTF-32 character indices, regardless of the original
- * text encoding.
+ * The @start and @len are input string array indices (i.e. counting bytes in
+ * UTF-8 and scaler values in UTF-32).
  *
  * This method can be used repeatedly to set different faces for different
  * parts of the text. It is the responsibility of the client to make sure that
@@ -546,9 +682,6 @@ raqm_set_freetype_face (raqm_t *rq,
  * Return value:
  * %true if no errors happened, %false otherwise.
  *
- * Stability:
- * Unstable
- *
  * Since: 0.1
  */
 bool
@@ -557,27 +690,18 @@ raqm_set_freetype_face_range (raqm_t *rq,
                               size_t  start,
                               size_t  len)
 {
-  if (!rq || !rq->text_len || start >= rq->text_len)
+  size_t end = start + len;
+
+  if (!rq || !rq->text_len)
     return false;
 
-  if (start + len > rq->text_len)
-    return false;
-
-  if (!rq->ftfaces)
-    rq->ftfaces = calloc (sizeof (intptr_t), rq->text_len);
-  if (!rq->ftfaces)
-    return false;
-
-  for (size_t i = 0; i < len; i++)
+  if (rq->flags & RAQM_FLAG_UTF8)
   {
-    if (rq->ftfaces[start + i]) {
-        FT_Done_Face (rq->ftfaces[start + i]);
-    }
-    rq->ftfaces[start + i] = face;
-    FT_Reference_Face (face);
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
   }
 
-  return true;
+  return _raqm_set_freetype_face (rq, face, start, end);
 }
 
 static bool
@@ -602,12 +726,12 @@ _raqm_shape (raqm_t *rq);
 bool
 raqm_layout (raqm_t *rq)
 {
-  if (!rq || !rq->text_len || !rq->ftfaces)
+  if (!rq || !rq->text_len || !rq->text_info)
     return false;
 
   for (size_t i = 0; i < rq->text_len; i++)
   {
-      if (!rq->ftfaces[i])
+      if (!rq->text_info[i].ftface)
           return false;
   }
 
@@ -688,7 +812,7 @@ raqm_get_glyphs (raqm_t *rq,
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
-      rq->glyphs[count + i].ftface = rq->ftfaces[rq->glyphs[count + i].cluster];
+      rq->glyphs[count + i].ftface = rq->text_info[info[i].cluster].ftface;
 
       RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\tfont: %s\n",
           rq->glyphs[count + i].index, rq->glyphs[count + i].x_offset,
@@ -738,6 +862,112 @@ _raqm_hb_dir (raqm_t *rq, FriBidiLevel level)
   return dir;
 }
 
+typedef struct {
+  size_t pos;
+  size_t len;
+  FriBidiLevel level;
+} _raqm_bidi_run;
+
+static void
+_raqm_reverse_run (_raqm_bidi_run *run, const size_t len)
+{
+  assert (run);
+
+  for (size_t i = 0; i < len / 2; i++)
+  {
+    _raqm_bidi_run temp = run[i];
+    run[i] = run[len - 1 - i];
+    run[len - 1 - i] = temp;
+  }
+}
+
+static _raqm_bidi_run *
+_raqm_reorder_runs (const FriBidiCharType *types,
+                    const size_t len,
+                    const FriBidiParType base_dir,
+                    /* input and output */
+                    FriBidiLevel *levels,
+                    /* output */
+                    size_t *run_count)
+{
+  FriBidiLevel level;
+  FriBidiLevel last_level = -1;
+  FriBidiLevel max_level = 0;
+  size_t run_start = 0;
+  size_t run_index = 0;
+  _raqm_bidi_run *runs = NULL;
+  size_t count = 0;
+
+  if (len == 0)
+  {
+    *run_count = 0;
+    return NULL;
+  }
+
+  assert (types);
+  assert (levels);
+
+  /* L1. Reset the embedding levels of some chars:
+     4. any sequence of white space characters at the end of the line. */
+  for (int i = len - 1;
+       i >= 0 && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
+  {
+    levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
+  }
+
+  /* Find max_level of the line.  We don't reuse the paragraph
+   * max_level, both for a cleaner API, and that the line max_level
+   * may be far less than paragraph max_level. */
+  for (int i = len - 1; i >= 0; i--)
+  {
+    if (levels[i] > max_level)
+       max_level = levels[i];
+  }
+
+  for (size_t i = 0; i < len; i++)
+  {
+    if (levels[i] != last_level)
+      count++;
+
+    last_level = levels[i];
+  }
+
+  runs = malloc (sizeof (_raqm_bidi_run) * count);
+
+  while (run_start < len)
+  {
+    size_t run_end = run_start;
+    while (run_end < len && levels[run_start] == levels[run_end])
+    {
+      run_end++;
+    }
+
+    runs[run_index].pos = run_start;
+    runs[run_index].level = levels[run_start];
+    runs[run_index].len = run_end - run_start;
+    run_start = run_end;
+    run_index++;
+  }
+
+  /* L2. Reorder. */
+  for (level = max_level; level > 0; level--)
+  {
+    for (int i = count - 1; i >= 0; i--)
+    {
+      if (runs[i].level >= level)
+      {
+        int end = i;
+        for (i--; (i >= 0 && runs[i].level >= level); i--)
+            ;
+        _raqm_reverse_run (runs + i + 1, end - i);
+      }
+    }
+  }
+
+  *run_count = count;
+  return runs;
+}
+
 static bool
 _raqm_itemize (raqm_t *rq)
 {
@@ -749,10 +979,10 @@ _raqm_itemize (raqm_t *rq)
   FriBidiCharType types[rq->text_len];
   FriBidiLevel levels[rq->text_len];
 #endif
-  FriBidiRun *runs = NULL;
+  _raqm_bidi_run *runs = NULL;
   raqm_run_t *last;
   int max_level;
-  int run_count;
+  size_t run_count;
   bool ok = true;
 
 #ifdef RAQM_TESTING
@@ -806,31 +1036,24 @@ _raqm_itemize (raqm_t *rq)
     return false;
 
   /* Get the number of bidi runs */
-  run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
-                                    levels, NULL);
-
-  /* Populate bidi runs array */
-  runs = malloc (sizeof (FriBidiRun) * (size_t)run_count);
+  runs = _raqm_reorder_runs (types, rq->text_len, par_type, levels, &run_count);
   if (!runs)
     return false;
 
-  run_count = fribidi_reorder_runs (types, rq->text_len, par_type,
-                                    levels, runs);
-
 #ifdef RAQM_TESTING
-  RAQM_TEST ("Number of runs before script itemization: %d\n\n", run_count);
+  RAQM_TEST ("Number of runs before script itemization: %zu\n\n", run_count);
 
   RAQM_TEST ("Fribidi Runs:\n");
-  for (int i = 0; i < run_count; i++)
+  for (size_t i = 0; i < run_count; i++)
   {
-    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tlevel: %d\n",
+    RAQM_TEST ("run[%zu]:\t start: %zu\tlength: %zu\tlevel: %d\n",
                i, runs[i].pos, runs[i].len, runs[i].level);
   }
   RAQM_TEST ("\n");
 #endif
 
   last = NULL;
-  for (int i = 0; i < run_count; i++)
+  for (size_t i = 0; i < run_count; i++)
   {
     raqm_run_t *run = calloc (1, sizeof (raqm_run_t));
     if (!run)
@@ -847,13 +1070,12 @@ _raqm_itemize (raqm_t *rq)
     if (HB_DIRECTION_IS_BACKWARD (run->direction))
     {
       run->pos = runs[i].pos + runs[i].len - 1;
-      run->script = rq->scripts[run->pos];
-      run->font = HB_FT_FONT_CREATE (rq->ftfaces[run->pos]);
+      run->script = rq->text_info[run->pos].script;
+      run->font = HB_FT_FONT_CREATE (rq->text_info[run->pos].ftface);
       for (int j = runs[i].len - 1; j >= 0; j--)
       {
-        hb_script_t script = rq->scripts[runs[i].pos + j];
-        FT_Face face = rq->ftfaces[runs[i].pos + j];
-        if (script != run->script || face != rq->ftfaces[run->pos])
+        _raqm_text_info info = rq->text_info[runs[i].pos + j];
+        if (!_raqm_compare_text_info (rq->text_info[run->pos], info))
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -861,8 +1083,8 @@ _raqm_itemize (raqm_t *rq)
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
-          newrun->script = script;
-          newrun->font = HB_FT_FONT_CREATE (face);
+          newrun->script = info.script;
+          newrun->font = HB_FT_FONT_CREATE (info.ftface);
           run->next = newrun;
           run = newrun;
         }
@@ -876,13 +1098,12 @@ _raqm_itemize (raqm_t *rq)
     else
     {
       run->pos = runs[i].pos;
-      run->script = rq->scripts[run->pos];
-      run->font = HB_FT_FONT_CREATE (rq->ftfaces[run->pos]);
-      for (int j = 0; j < runs[i].len; j++)
+      run->script = rq->text_info[run->pos].script;
+      run->font = HB_FT_FONT_CREATE (rq->text_info[run->pos].ftface);
+      for (size_t j = 0; j < runs[i].len; j++)
       {
-        hb_script_t script = rq->scripts[runs[i].pos + j];
-        FT_Face face = rq->ftfaces[runs[i].pos + j];
-        if (script != run->script || face != rq->ftfaces[run->pos])
+        _raqm_text_info info = rq->text_info[runs[i].pos + j];
+        if (!_raqm_compare_text_info (rq->text_info[run->pos], info))
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
@@ -890,8 +1111,8 @@ _raqm_itemize (raqm_t *rq)
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
-          newrun->script = script;
-          newrun->font = HB_FT_FONT_CREATE (face);
+          newrun->script = info.script;
+          newrun->font = HB_FT_FONT_CREATE (info.ftface);
           run->next = newrun;
           run = newrun;
         }
@@ -908,17 +1129,17 @@ _raqm_itemize (raqm_t *rq)
   run_count = 0;
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
     run_count++;
-  RAQM_TEST ("Number of runs after script itemization: %d\n\n", run_count);
+  RAQM_TEST ("Number of runs after script itemization: %zu\n\n", run_count);
 
   run_count = 0;
   RAQM_TEST ("Final Runs:\n");
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
     SCRIPT_TO_STRING (run->script);
-    RAQM_TEST ("run[%d]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
+    RAQM_TEST ("run[%zu]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
                run_count++, run->pos, run->len,
                hb_direction_to_string (run->direction), buff,
-               rq->ftfaces[run->pos]->family_name);
+               rq->text_info[run->pos].ftface->family_name);
   }
   RAQM_TEST ("\n");
 #endif
@@ -934,7 +1155,7 @@ typedef struct {
   size_t       size;
   int         *pair_index;
   hb_script_t *scripts;
-} raqm_stack_t;
+} _raqm_stack_t;
 
 /* Special paired characters for script detection */
 static size_t paired_len = 34;
@@ -960,7 +1181,7 @@ static const FriBidiChar paired_chars[] =
 };
 
 static void
-_raqm_stack_free (raqm_stack_t *stack)
+_raqm_stack_free (_raqm_stack_t *stack)
 {
   free (stack->scripts);
   free (stack->pair_index);
@@ -968,11 +1189,11 @@ _raqm_stack_free (raqm_stack_t *stack)
 }
 
 /* Stack handling functions */
-static raqm_stack_t *
+static _raqm_stack_t *
 _raqm_stack_new (size_t max)
 {
-  raqm_stack_t *stack;
-  stack = calloc (1, sizeof (raqm_stack_t));
+  _raqm_stack_t *stack;
+  stack = calloc (1, sizeof (_raqm_stack_t));
   if (!stack)
     return NULL;
 
@@ -997,7 +1218,7 @@ _raqm_stack_new (size_t max)
 }
 
 static bool
-_raqm_stack_pop (raqm_stack_t *stack)
+_raqm_stack_pop (_raqm_stack_t *stack)
 {
   if (!stack->size)
   {
@@ -1011,7 +1232,7 @@ _raqm_stack_pop (raqm_stack_t *stack)
 }
 
 static hb_script_t
-_raqm_stack_top (raqm_stack_t *stack)
+_raqm_stack_top (_raqm_stack_t *stack)
 {
   if (!stack->size)
   {
@@ -1023,7 +1244,7 @@ _raqm_stack_top (raqm_stack_t *stack)
 }
 
 static bool
-_raqm_stack_push (raqm_stack_t      *stack,
+_raqm_stack_push (_raqm_stack_t      *stack,
             hb_script_t script,
             int         pi)
 {
@@ -1075,24 +1296,17 @@ _raqm_resolve_scripts (raqm_t *rq)
   int last_script_index = -1;
   int last_set_index = -1;
   hb_script_t last_script_value = HB_SCRIPT_INVALID;
-  raqm_stack_t *stack = NULL;
-
-  if (rq->scripts)
-    return true;
-
-  rq->scripts = malloc (sizeof (hb_script_t) * rq->text_len);
-  if (!rq->scripts)
-    return false;
+  _raqm_stack_t *stack = NULL;
 
   for (size_t i = 0; i < rq->text_len; ++i)
-    rq->scripts[i] = hb_unicode_script (hb_unicode_funcs_get_default (),
-                                        rq->text[i]);
+    rq->text_info[i].script = hb_unicode_script (
+        hb_unicode_funcs_get_default (), rq->text[i]);
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Before script detection:\n");
   for (size_t i = 0; i < rq->text_len; ++i)
   {
-    SCRIPT_TO_STRING (rq->scripts[i]);
+    SCRIPT_TO_STRING (rq->text_info[i].script);
     RAQM_TEST ("script for ch[%zu]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
@@ -1104,7 +1318,8 @@ _raqm_resolve_scripts (raqm_t *rq)
 
   for (int i = 0; i < (int) rq->text_len; i++)
   {
-    if (rq->scripts[i] == HB_SCRIPT_COMMON && last_script_index != -1)
+    if (rq->text_info[i].script == HB_SCRIPT_COMMON &&
+        last_script_index != -1)
     {
       int pair_index = get_pair_index (rq->text[i]);
       if (pair_index >= 0)
@@ -1112,9 +1327,9 @@ _raqm_resolve_scripts (raqm_t *rq)
         if (IS_OPEN (pair_index))
         {
           /* is a paired character */
-          rq->scripts[i] = last_script_value;
+          rq->text_info[i].script = last_script_value;
           last_set_index = i;
-          _raqm_stack_push (stack, rq->scripts[i], pair_index);
+          _raqm_stack_push (stack, rq->text_info[i].script, pair_index);
         }
         else
         {
@@ -1129,33 +1344,34 @@ _raqm_resolve_scripts (raqm_t *rq)
           }
           if (STACK_IS_NOT_EMPTY (stack))
           {
-            rq->scripts[i] = _raqm_stack_top (stack);
-            last_script_value = rq->scripts[i];
+            rq->text_info[i].script = _raqm_stack_top (stack);
+            last_script_value = rq->text_info[i].script;
             last_set_index = i;
           }
           else
           {
-            rq->scripts[i] = last_script_value;
+            rq->text_info[i].script = last_script_value;
             last_set_index = i;
           }
         }
       }
       else
       {
-        rq->scripts[i] = last_script_value;
+        rq->text_info[i].script = last_script_value;
         last_set_index = i;
       }
     }
-    else if (rq->scripts[i] == HB_SCRIPT_INHERITED && last_script_index != -1)
+    else if (rq->text_info[i].script == HB_SCRIPT_INHERITED &&
+             last_script_index != -1)
     {
-      rq->scripts[i] = last_script_value;
+      rq->text_info[i].script = last_script_value;
       last_set_index = i;
     }
     else
     {
       for (int j = last_set_index + 1; j < i; ++j)
-        rq->scripts[j] = rq->scripts[i];
-      last_script_value = rq->scripts[i];
+        rq->text_info[j].script = rq->text_info[i].script;
+      last_script_value = rq->text_info[i].script;
       last_script_index = i;
       last_set_index = i;
     }
@@ -1165,7 +1381,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   RAQM_TEST ("After script detection:\n");
   for (size_t i = 0; i < rq->text_len; ++i)
   {
-    SCRIPT_TO_STRING (rq->scripts[i]);
+    SCRIPT_TO_STRING (rq->text_info[i].script);
     RAQM_TEST ("script for ch[%zu]\t%s\n", i, buff);
   }
   RAQM_TEST ("\n");
@@ -1186,7 +1402,7 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_add_utf32 (run->buffer, rq->text, rq->text_len,
                          run->pos, run->len);
     hb_buffer_set_script (run->buffer, run->script);
-    hb_buffer_set_language (run->buffer, hb_language_get_default ());
+    hb_buffer_set_language (run->buffer, rq->text_info[run->pos].lang);
     hb_buffer_set_direction (run->buffer, run->direction);
     hb_shape_full (run->font, run->buffer, rq->features, rq->features_len,
                    NULL);
@@ -1254,7 +1470,7 @@ _raqm_in_hangul_syllable (hb_codepoint_t ch);
  * Return value:
  * %true if the process was successful, %false otherwise.
  *
- * Since: 0.1
+ * Since: 0.2
  */
 bool
 raqm_index_to_position (raqm_t *rq,
@@ -1343,7 +1559,7 @@ raqm_index_to_position (raqm_t *rq,
  * Return value:
  * %true if the process was successful, %false in case of error.
  *
- * Since: 0.1
+ * Since: 0.2
  */
 bool
 raqm_position_to_index (raqm_t *rq,
@@ -1453,9 +1669,9 @@ typedef enum
   RAQM_GRAPHEM_SPACING_MARK,
   RAQM_GRAPHEM_HANGUL_SYLLABLE,
   RAQM_GRAPHEM_OTHER
-} raqm_grapheme_t;
+} _raqm_grapheme_t;
 
-static raqm_grapheme_t
+static _raqm_grapheme_t
 _raqm_get_grapheme_break (hb_codepoint_t ch,
                           hb_unicode_general_category_t category);
 
@@ -1465,7 +1681,7 @@ _raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
 {
   hb_unicode_general_category_t l_category;
   hb_unicode_general_category_t r_category;
-  raqm_grapheme_t l_grapheme, r_grapheme;
+  _raqm_grapheme_t l_grapheme, r_grapheme;
 
   l_category = hb_unicode_general_category (hb_unicode_funcs_get_default (),
                                             l_char);
@@ -1495,11 +1711,11 @@ _raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
   return true; /*Otherwise, break everywhere. GB1, GB2, GB10*/
 }
 
-static raqm_grapheme_t
+static _raqm_grapheme_t
 _raqm_get_grapheme_break (hb_codepoint_t ch,
                           hb_unicode_general_category_t category)
 {
-  raqm_grapheme_t gb_type;
+  _raqm_grapheme_t gb_type;
 
   gb_type = RAQM_GRAPHEM_OTHER;
   switch ((int)category)
