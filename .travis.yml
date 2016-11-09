@@ -11,6 +11,11 @@ compiler:
   - gcc
   - clang
 
+matrix:
+  allow_failures:
+    - os: osx
+      compiler: gcc
+
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       sudo add-apt-repository ppa:as-bahanta/raqm -y;
