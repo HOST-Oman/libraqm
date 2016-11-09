@@ -35,10 +35,10 @@
 #include FT_FREETYPE_H
 
 #if defined(_WIN32) || defined(__WIN32__)
-#	ifdef LIBRAQM_STATIC
+#	ifdef RAQM_STATIC
 #		define RAQM_EXPORT
 #	else
-#		ifdef LIBRAQM_EXPORTS
+#		ifdef RAQM_EXPORTS
 #			define RAQM_EXPORT __declspec(dllexport)
 #		else
 #			define RAQM_EXPORT __declspec(dllimport)
