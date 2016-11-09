@@ -973,8 +973,8 @@ _raqm_itemize (raqm_t *rq)
 {
   FriBidiParType par_type = FRIBIDI_PAR_ON;
 #ifdef _MSC_VER
-  FriBidiCharType *types = _alloca (rq->text_len);
-  FriBidiLevel *levels = _alloca (rq->text_len);
+  FriBidiCharType *types = _alloca (sizeof(FriBidiCharType) * rq->text_len);
+  FriBidiLevel *levels = _alloca (sizeof(FriBidiLevel) * rq->text_len);
 #else
   FriBidiCharType types[rq->text_len];
   FriBidiLevel levels[rq->text_len];
