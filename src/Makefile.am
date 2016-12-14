@@ -24,6 +24,7 @@ libraqm_la_CPPFLAGS = \
     $(HARFBUZZ_CFLAGS) \
     $(FRIBIDI_CFLAGS) \
     $(WARN_CFLAGS) \
+    -DRAQM_EXPORTS \
     $(NULL)
 
 libraqm_test_la_SOURCES = $(libraqm_la_SOURCES)
