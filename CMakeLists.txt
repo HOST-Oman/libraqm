@@ -15,7 +15,7 @@ endif()
 
 #enable compiler warning for MSVC
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set(CMAKE_C_FLAGS "/W4 /wd4068")
+  set(CMAKE_C_FLAGS "/W4 /WX /wd4068")
 endif()
 
 #not working yet.. check
