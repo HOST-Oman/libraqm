@@ -12,6 +12,7 @@ configure_file (
 
 ############################
 
+if(NOT WIN32)
 INCLUDE(FindPkgConfig)
 PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
 FIND_PACKAGE(Freetype REQUIRED)
@@ -64,3 +65,4 @@ gtk_doc_add_module(libraqm
 #install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/grx/html DESTINATION ${CMAKE_INSTALL_DOCDIR})
 #INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/html DESTINATION share/gtk-doc/html/libhif)
 
+endif()

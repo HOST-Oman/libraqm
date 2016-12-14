@@ -45,9 +45,6 @@ endif(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 ##################################3
 
 
-INCLUDE(FindPkgConfig)
-PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
-
 # - Find the native FriBiDI includes and library
 #
 # This module defines
@@ -191,14 +188,12 @@ endif()
 
 #headers files
 set(HEADERS
-	reorder_runs.h
 	raqm.h
 )
 
 #source files
 set(SOURCES
-	reorder_runs.c
-	raqm.c	
+	raqm.c
 )
 
 

@@ -20,13 +20,6 @@ endif()
 
 
 
-#check GLIB module if exist
-#INCLUDE(FindPkgConfig)
-#PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
-
-
-
-
 #set the values of raqam.pc file
 set (prefix /usr/local)
 set (exec_prefix ................................)
