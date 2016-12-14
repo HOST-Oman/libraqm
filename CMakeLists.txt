@@ -6,17 +6,22 @@ project (raqm)
 
 ##############################3
 
-#enable compiler warning
+#enable compiler warning for GNU C
 if(CMAKE_COMPILER_IS_GNUCC)
 add_definitions (-Wall  -Wno-portability)
 #enable C99 mode
 add_definitions(-std=gnu99)
 endif()
 
-#not working yet.. check
-if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW) )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /wd4068")
+#enable compiler warning for MSVC
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(CMAKE_C_FLAGS "/W4 /wd4068")
 endif()
+
+#not working yet.. check
+#if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW) )
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /wd4068")
+#endif()
 
 
 
