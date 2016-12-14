@@ -27,10 +27,10 @@ Final Runs:
 run[0]:	 start: 0	length: 4	direction: ltr	script: Zyyy	font: Amiri
 
 Glyph information:
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 0	y_position: 0	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 748	y_position: 0	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 1496	y_position: 0	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 2244	y_position: 0	font: Amiri
 
 UTF-32 clusters: 00 01 02 03
 UTF-8 clusters:  00 04 08 12

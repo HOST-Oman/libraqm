@@ -29,10 +29,10 @@ run[1]:	 start: 1	length: 2	direction: rtl	script: Arab	font: DejaVu Sans
 run[2]:	 start: 0	length: 1	direction: rtl	script: Arab	font: Amiri
 
 Glyph information:
-glyph [2454]	x_offset: 0	y_offset: 0	x_advance: 1200	font: Amiri
-glyph [37]	x_offset: 0	y_offset: 0	x_advance: 570	font: DejaVu Sans
-glyph [42]	x_offset: 0	y_offset: 0	x_advance: 1130	font: DejaVu Sans
-glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 978	font: Amiri
+glyph [2454]	x_offset: 0	y_offset: 0	x_advance: 1200	x_position: 0	y_position: 0	font: Amiri
+glyph [37]	x_offset: 0	y_offset: 0	x_advance: 570	x_position: 1200	y_position: 0	font: DejaVu Sans
+glyph [42]	x_offset: 0	y_offset: 0	x_advance: 1130	x_position: 1770	y_position: 0	font: DejaVu Sans
+glyph [2040]	x_offset: 0	y_offset: 0	x_advance: 978	x_position: 2900	y_position: 0	font: Amiri
 
 UTF-32 clusters: 03 02 01 00
 UTF-8 clusters:  06 04 02 00

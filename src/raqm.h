@@ -31,6 +31,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -68,12 +69,33 @@ typedef enum
 } raqm_direction_t;
 
 /**
+ * raqm_alignment_t:
+ * @RAQM_ALIGNMENT_RIGHT: Paragraph is right aligned.
+ * @RAQM_ALIGNMENT_LEFT: Paragraph is left aligned.
+ * @RAQM_ALIGNMENT_CENTER: Paragraph is center aligned..
+ * @RAQM_ALIGNMENT_FULL: Paragraph is full justified.
+ *
+ * Base paragraph alignment, see raqm_set_par_alignment().
+ *
+ * Since: 0.2
+ */
+typedef enum
+{
+    RAQM_ALIGNMENT_RIGHT,
+    RAQM_ALIGNMENT_LEFT,
+    RAQM_ALIGNMENT_CENTER,
+    RAQM_ALIGNMENT_FULL,
+} raqm_alignment_t;
+
+/**
  * raqm_glyph_t:
  * @index: the index of the glyph in the font file.
  * @x_advance: the glyph advance width in horizontal text.
  * @y_advance: the glyph advance width in vertical text.
  * @x_offset: the horizontal movement of the glyph from the current point.
  * @y_offset: the vertical movement of the glyph from the current point.
+ * @x: the absolute x position of the glyph.
+ * @y: the absolute y position of the glyph.
  * @cluster: the index of original character in input text.
  * @ftface: the @FT_Face of the glyph.
  *
@@ -88,6 +110,11 @@ typedef struct raqm_glyph_t {
     int y_offset;
     uint32_t cluster;
     FT_Face ftface;
+    int x;
+    int y;
+    /*< private >*/
+    int visual_index;
+    int line;
 } raqm_glyph_t;
 
 raqm_t *
@@ -120,6 +147,10 @@ raqm_set_language (raqm_t       *rq,
                    size_t        len);
 
 bool
+raqm_set_par_alignment (raqm_t           *rq,
+                        raqm_alignment_t alignment);
+
+bool
 raqm_add_font_feature  (raqm_t     *rq,
                         const char *feature,
                         int         len);
@@ -133,6 +164,10 @@ raqm_set_freetype_face_range (raqm_t *rq,
                               FT_Face face,
                               size_t  start,
                               size_t  len);
+
+bool
+raqm_set_line_width (raqm_t *rq,
+                     int    width);
 
 bool
 raqm_layout (raqm_t *rq);

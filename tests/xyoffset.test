@@ -25,11 +25,11 @@ Final Runs:
 run[0]:	 start: 0	length: 3	direction: rtl	script: Arab	font: Aref Ruqaa
 
 Glyph information:
-glyph [4]	x_offset: 783	y_offset: 50	x_advance: 0	font: Aref Ruqaa
-glyph [6]	x_offset: 0	y_offset: 0	x_advance: 302	font: Aref Ruqaa
-glyph [4]	x_offset: 909	y_offset: 1075	x_advance: 0	font: Aref Ruqaa
-glyph [10]	x_offset: 0	y_offset: 868	x_advance: 432	font: Aref Ruqaa
-glyph [9]	x_offset: 0	y_offset: 1664	x_advance: 1054	font: Aref Ruqaa
+glyph [4]	x_offset: 783	y_offset: 50	x_advance: 0	x_position: 783	y_position: 50	font: Aref Ruqaa
+glyph [6]	x_offset: 0	y_offset: 0	x_advance: 302	x_position: 0	y_position: 0	font: Aref Ruqaa
+glyph [4]	x_offset: 909	y_offset: 1075	x_advance: 0	x_position: 1211	y_position: 1075	font: Aref Ruqaa
+glyph [10]	x_offset: 0	y_offset: 868	x_advance: 432	x_position: 302	y_position: 868	font: Aref Ruqaa
+glyph [9]	x_offset: 0	y_offset: 1664	x_advance: 1054	x_position: 734	y_position: 1664	font: Aref Ruqaa
 
 UTF-32 clusters: 02 02 01 01 00
 UTF-8 clusters:  04 04 02 02 00
