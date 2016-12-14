@@ -1,8 +1,0 @@
-Msys2:
-1. add this line "export PATH=/mingw64/bin:$PATH" to the bashrc file in the c/msys64/home/Admin
-2. run this command ""pacman -S --noconfirm autoconf automake libtool gtk-doc mingw-w64-x86_64-pkg-config mingw-w64-x86_64-harfbuzz mingw-w64-x86_64-fribidi mingw-w64-x86_64-freetype" in the msys2 bash
-3. run this command "pacman -S git make mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc" to download cmake and gcc 
-4. run this command  "set PKG_CONFIG_PATH=%PKG_CONFIG_PATH%:/mingw64/lib/pkgconfig" in msys2 bash
-6. Go to start>>control panal>>system>> edit the system environment variables>>Advanced>> Environment Variables then edit the path by adding "C:\msys64\usr\bin;C:\msys64\mingw64\bin;" 
-5. run this command "cmake.exe -G "MSYS Makefiles" .." then make for building the project
- 
