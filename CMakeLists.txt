@@ -5,6 +5,8 @@ cmake_minimum_required (VERSION 3.2)
 project (raqm)
 
 ##############################3
+#Set the custom CMake module directory where our include/lib finders are
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 #enable compiler warning for GNU C
 if(CMAKE_COMPILER_IS_GNUCC)
@@ -48,16 +50,24 @@ configure_file (
 #include subdirectories 
 include_directories ( 
 	${PROJECT_SOURCE_DIR}
-	${PROJECT_SOURCE_DIR}/docs
 	${PROJECT_SOURCE_DIR}/src
 	#${PROJECT_SOURCE_DIR}/m4
 )
 
-add_subdirectory (docs)
 add_subdirectory (src)
 #add_subdirectory (m4)
 
-
+# DOCUMENTATION
+option(build_docs "build the documentation" OFF)
+if (build_docs)
+    find_package(GtkDoc)
+    if(GTKDOC_FOUND)
+	    include_directories(${PROJECT_SOURCE_DIR}/docs)
+	    add_subdirectory (docs)
+    else()
+          message("gtkdoc was not found, API documentation can not be built.")
+  endif()
+endif()
 
 #TESTING
 option(unit_test "apply unit test" OFF)
@@ -287,28 +297,28 @@ set(SOURCES
 )
 
 
-option(static_lib "Create static library" OFF)
-if(static_lib)
+#option(static_lib "Create static library" OFF)
+#if(static_lib)
 #create static library
-add_library( raqm STATIC
-	${HEADERS}
-	${SOURCES}
-)
-else()
+#add_library( raqm STATIC
+#	${HEADERS}
+#	${SOURCES}
+#)
+#else()
 #create shared library
-add_library( raqm SHARED
-	${HEADERS}
-	${SOURCES}
-)
-endif()
+#add_library( raqm SHARED
+#	${HEADERS}
+#	${SOURCES}
+#)
+#endif()
 
 # link the libraries to the executable
-target_link_libraries (raqm
-	${FREETYPE_LIBRARIES}
-	${FRIBIDI_LIBRARY}
-	${GLIB_LIBRARY}
-	${HARFBUZZ_LIBRARIES}
-)
+#target_link_libraries (raqm
+#	${FREETYPE_LIBRARIES}
+#	${FRIBIDI_LIBRARY}
+#	${GLIB_LIBRARY}
+#	${HARFBUZZ_LIBRARIES}
+#)
 
 ############################################## GTK MAIL LISTING
 
@@ -327,10 +337,4 @@ target_link_libraries (raqm
 
 ###############################################
 
-# INSTALLING PART
 
-install(TARGETS raqm
-     RUNTIME DESTINATION bin COMPONENT libraries
-     LIBRARY DESTINATION lib COMPONENT libraries
-     ARCHIVE DESTINATION lib/static COMPONENT libraries)
-install (FILES raqm.h DESTINATION include)
