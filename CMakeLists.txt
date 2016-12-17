@@ -4,10 +4,6 @@ cmake_minimum_required (VERSION 3.2)
 # project name
 project (raqm)
 
-##############################3
-#Set the custom CMake module directory where our include/lib finders are
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
-
 #enable compiler warning for GNU C
 if(CMAKE_COMPILER_IS_GNUCC)
 add_definitions (-Wall  -Wno-portability)
@@ -19,12 +15,6 @@ endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set(CMAKE_C_FLAGS "/W4 /WX /wd4068")
 endif()
-
-#not working yet.. check
-#if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW) )
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /wd4068")
-#endif()
-
 
 
 #set the values of raqam.pc file
@@ -47,27 +37,6 @@ configure_file (
   )
 
 
-#include subdirectories 
-include_directories ( 
-	${PROJECT_SOURCE_DIR}
-	${PROJECT_SOURCE_DIR}/src
-	#${PROJECT_SOURCE_DIR}/m4
-)
-
-add_subdirectory (src)
-#add_subdirectory (m4)
-
-# DOCUMENTATION
-option(build_docs "build the documentation" OFF)
-if (build_docs)
-    find_package(GtkDoc)
-    if(GTKDOC_FOUND)
-	    include_directories(${PROJECT_SOURCE_DIR}/docs)
-	    add_subdirectory (docs)
-    else()
-          message("gtkdoc was not found, API documentation can not be built.")
-  endif()
-endif()
 
 #TESTING
 option(unit_test "apply unit test" OFF)
@@ -78,20 +47,6 @@ if(unit_test)
  add_subdirectory (tests)
 endif()
 
-#################################################3
-
-#Install configure file
-#install (FILES "${PROJECT_BINARY_DIR}/rarm.pc" DESTINATION ${path})
-
-
-#Install our READMEs etc.
-#INSTALL(FILES
-#	AUTHORS
-#	COPYING
-#	NEWS
-#	README
-#	DESTINATION ${path}
-#)
 
 #########################################
 
@@ -139,9 +94,6 @@ endif(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 
 ##################################3
 
-
-INCLUDE(FindPkgConfig)
-PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
 
 # - Find the native FriBiDI includes and library
 #
@@ -261,17 +213,6 @@ else()
 endif(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 ####################################
 
-# add the binary tree directory to the search path for include files
-INCLUDE_DIRECTORIES(
-	${CMAKE_BINARY_DIR}	
-	${CMAKE_CURRENT_BINARY_DIR} 
- 	${CMAKE_CURRENT_SOURCE_DIR}
-	${PROJECT_SOURCE_DIR}
-	${HARFBUZZ_INCLUDE_DIRS}
-	${GLIB_INCLUDE_DIRS}
-	
-)
-
 if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 INCLUDE_DIRECTORIES(
 	${FRIBIDI_INCLUDE_DIR}
@@ -281,60 +222,80 @@ else()
 INCLUDE_DIRECTORIES(
 	${FRIBIDI_INCLUDE_DIR}/fribidi
 	${FREETYPE_INCLUDE_DIR_freetype2}
+	${HARFBUZZ_INCLUDE_DIRS}
 )
 endif()
 
 #headers files
 set(HEADERS
-	reorder_runs.h
-	raqm.h
+	${PROJECT_SOURCE_DIR}/src/raqm.h
 )
 
 #source files
 set(SOURCES
-	reorder_runs.c
-	raqm.c	
+	${PROJECT_SOURCE_DIR}/src/raqm.c
 )
 
 
-#option(static_lib "Create static library" OFF)
-#if(static_lib)
+option(static_lib "Create static library" OFF)
+if(static_lib)
 #create static library
-#add_library( raqm STATIC
-#	${HEADERS}
-#	${SOURCES}
-#)
-#else()
+add_library( raqm STATIC
+	${HEADERS}
+	${SOURCES}
+)
+else()
 #create shared library
-#add_library( raqm SHARED
-#	${HEADERS}
-#	${SOURCES}
-#)
-#endif()
+add_library( raqm SHARED
+	${HEADERS}
+	${SOURCES}
+)
+endif()
 
 # link the libraries to the executable
-#target_link_libraries (raqm
-#	${FREETYPE_LIBRARIES}
-#	${FRIBIDI_LIBRARY}
-#	${GLIB_LIBRARY}
-#	${HARFBUZZ_LIBRARIES}
-#)
-
-############################################## GTK MAIL LISTING
-
-#set(exec_prefix /usr/local/)
-#find_package (GtkDoc REQUIRED)
-
-
-
-#gtk_doc_add_module(
-#      libraqm
-#      SOURCE ${CMAKE_SOURCE_DIR}/src 
-#      XML ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
-#)
-
+target_link_libraries (raqm
+	${FREETYPE_LIBRARIES}
+	${FRIBIDI_LIBRARY}
+	${GLIB_LIBRARY}
+	${HARFBUZZ_LIBRARIES}
+)
 
 
 ###############################################
 
+# DOCUMENTATION
+option(build_docs "build the documentation" OFF)
+if (build_docs)
+INCLUDE(FindPkgConfig)
+PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
+find_package(GtkDoc 1.25 REQUIRED)
+    if(GTKDOC_FOUND)
+    message("gtkdoc found, API documentation will be built.")
+  gtk_doc_add_module(raqm
+#                      SOURCE  ${CMAKE_SOURCE_DIR}/src
+		      SOURCE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
+                      XML ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
+                      LIBRARIES raqm
+#                       LIBRARY_DIRS ${FREETYPE_LIBRARIES} ${FRIBIDI_LIBRARY} ${HARFBUZZ_LIBRARIES} ${GLIB_LIBRARIES}
+                      )
 
+# Install the docs. (This assumes you're using the GNUInstallDirs CMake module
+# to set the CMAKE_INSTALL_DOCDIR variable correctly).
+#install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/html
+ #       DESTINATION ${CMAKE_INSTALL_DOCDIR})
+        
+    else()
+          message("gtkdoc was not found, API documentation can not be built.")
+  endif()
+  
+endif()
+
+###############################################
+
+# INSTALLING PART
+
+install(TARGETS raqm
+     RUNTIME DESTINATION bin COMPONENT libraries
+     LIBRARY DESTINATION lib COMPONENT libraries
+     ARCHIVE DESTINATION lib/static COMPONENT libraries)
+install (FILES raqm.h DESTINATION include)
