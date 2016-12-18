@@ -4,48 +4,30 @@ cmake_minimum_required (VERSION 3.2)
 # project name
 project (raqm)
 
-#enable compiler warning for GNU C
-if(CMAKE_COMPILER_IS_GNUCC)
-add_definitions (-Wall  -Wno-portability)
-#enable C99 mode
-add_definitions(-std=gnu99)
-endif()
-
-#enable compiler warning for MSVC
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set(CMAKE_C_FLAGS "/W4 /WX /wd4068")
+include(CheckCCompilerFlag)
+check_c_compiler_flag("-std=c99" C99_SUPPORTED)
+if (C99_SUPPORTED)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 endif()
 
 
-#set the values of raqam.pc file
-set (prefix /usr/local)
-set (exec_prefix ................................)
-set (libdir /lib)
-set (includedir /include)
-set (PACKAGE_NAME "Raqm")
-set (PACKAGE_VERSION 0.2.0)
-set (AX_PACKAGE_REQUIRES "freetype2 >= 12.0.6")  
-set (AX_PACKAGE_REQUIRES_PRIVATE "harfbuzz fribidi")
-#set (Cflags: -I${includedir} )
-#set (Libs: -L${libdir} -lraqm)
-
-
-# configure a file to pass some of the CMake settings to other file
-configure_file (
-  "${PROJECT_SOURCE_DIR}/raqm.pc.in"
-  "${PROJECT_BINARY_DIR}/raqm.pc"
-  )
-
-
-
-#TESTING
-option(unit_test "apply unit test" OFF)
-
-if(unit_test)
-# add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
- include_directories(${PROJECT_SOURCE_DIR}/tests)
- add_subdirectory (tests)
+ if(NOT RAQM_INSTALL_LIB_DIR)
+  set(RAQM_INSTALL_LIB_DIR "lib")
 endif()
+
+if(NOT RAQM_INSTALL_INCLUDE_DIR)
+  set(RAQM_INSTALL_INCLUDE_DIR "include")
+endif()
+
+
+#TESTING not supported yet
+# option(unit_test "apply unit test" OFF)
+# 
+# if(unit_test)
+# # add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
+#  include_directories(${PROJECT_SOURCE_DIR}/tests)
+#  add_subdirectory (tests)
+# endif()
 
 
 #########################################
@@ -260,42 +242,78 @@ target_link_libraries (raqm
 	${HARFBUZZ_LIBRARIES}
 )
 
+#enable compiler warning for GNU C
+if(CMAKE_COMPILER_IS_GNUCC)
+add_definitions (-Wall  -Wno-portability)
+endif()
 
+#enable compiler warning for MSVC
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(CMAKE_C_FLAGS "/W4 /WX /wd4068")
+endif()
 ###############################################
 
-# DOCUMENTATION
-option(build_docs "build the documentation" OFF)
-if (build_docs)
-INCLUDE(FindPkgConfig)
-PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
-find_package(GtkDoc 1.25 REQUIRED)
-    if(GTKDOC_FOUND)
-    message("gtkdoc found, API documentation will be built.")
-  gtk_doc_add_module(raqm
+# DOCUMENTATION not supported yet.
+# option(build_docs "build the documentation" OFF)
+# if (build_docs)
+# INCLUDE(FindPkgConfig)
+# # PKG_CHECK_MODULES(GLIB REQUIRED  glib-2.0)
+# find_package(GtkDoc 1.25 REQUIRED)
+#     if(GTKDOC_FOUND)
+#     message("gtkdoc found, API documentation will be built.")
+#     configure_file("version.xml.in" ${CMAKE_CURRENT_SOURCE_DIR}/version.xml)
+#   gtk_doc_add_module(raqm
 #                      SOURCE  ${CMAKE_SOURCE_DIR}/src
-		      SOURCE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
-                      XML ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
-                      LIBRARIES raqm
+# 		      SOURCE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
+#                       XML ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
+#                       LIBRARIES raqm
 #                       LIBRARY_DIRS ${FREETYPE_LIBRARIES} ${FRIBIDI_LIBRARY} ${HARFBUZZ_LIBRARIES} ${GLIB_LIBRARIES}
-                      )
+#                       )
 
 # Install the docs. (This assumes you're using the GNUInstallDirs CMake module
 # to set the CMAKE_INSTALL_DOCDIR variable correctly).
 #install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/html
  #       DESTINATION ${CMAKE_INSTALL_DOCDIR})
-        
-    else()
-          message("gtkdoc was not found, API documentation can not be built.")
-  endif()
+# 	    gtk_doc_add_module(
+# 		  raqm 
+# 		  SOURCE ${CMAKE_SOURCE_DIR}/src
+# 		  XML raqam-docs.xml
+# 		  LIBRARIES raqm
+# 	    )    
+#     else()
+#           message("gtkdoc was not found, API documentation can not be built.")
+#     endif()
+# endif()
   
-endif()
-
 ###############################################
 
 # INSTALLING PART
 
+
+#-----------------------------------------------------------------------------
+# pkgconfig support
+# enabled by default on Unix, disabled by default on other platforms
+if(UNIX)
+  option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" ON)
+else()
+  option(BUILD_PKGCONFIG_FILES "Build and install pkg-config files" OFF)
+endif()
+
+if(BUILD_PKGCONFIG_FILES)
+  configure_file(raqm.pc.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/raqm.pc @ONLY)
+  install( FILES ${CMAKE_CURRENT_BINARY_DIR}/raqm.pc DESTINATION ${RAQM_INSTALL_LIB_DIR}/pkgconfig )
+endif()
+
+
+
+# Install library
 install(TARGETS raqm
-     RUNTIME DESTINATION bin COMPONENT libraries
-     LIBRARY DESTINATION lib COMPONENT libraries
-     ARCHIVE DESTINATION lib/static COMPONENT libraries)
-install (FILES raqm.h DESTINATION include)
+  LIBRARY DESTINATION ${RAQM_INSTALL_LIB_DIR} COMPONENT Libraries
+  ARCHIVE DESTINATION ${RAQM_INSTALL_LIB_DIR} COMPONENT Libraries
+)
+
+# Install includes files
+install(FILES ${CMAKE_SOURCE_DIR}/src/raqm.h
+  DESTINATION ${RAQM_INSTALL_INCLUDE_DIR} COMPONENT Headers
+)
