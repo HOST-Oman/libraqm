@@ -20,16 +20,30 @@ if(NOT RAQM_INSTALL_INCLUDE_DIR)
   set(RAQM_INSTALL_INCLUDE_DIR "include")
 endif()
 
+option (WANT_DEBUG "enable debugging" OFF)
+if (WANT_DEBUG)
+    set(CMAKE_BUILD_TYPE Debug)
+    set (RAQM_DEBUG YES)
+    message( STATUS "debugging mode are enabled ...")
+endif()
 
 #TESTING not supported yet
-# option(unit_test "apply unit test" OFF)
-# 
-# if(unit_test)
-# # add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
-#  include_directories(${PROJECT_SOURCE_DIR}/tests)
-#  add_subdirectory (tests)
-# endif()
+option(UNIT_TEST "apply unit test" OFF)
 
+if(UNIT_TEST)
+    # add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
+    set (RAQM_TESTING ON)
+    include_directories(${PROJECT_SOURCE_DIR}/tests)
+    add_subdirectory (tests)
+    message( STATUS "RAQM_TESTING mode are enabled ...")
+endif()
+
+if (UNIT_TEST OR WANT_DEBUG)
+configure_file(
+	${CMAKE_SOURCE_DIR}/config.h.cmake
+	${CMAKE_SOURCE_DIR}/src/config.h
+)
+endif (UNIT_TEST OR WANT_DEBUG)
 
 #########################################
 

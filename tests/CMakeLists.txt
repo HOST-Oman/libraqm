@@ -26,7 +26,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}
  )
 
-add_subdirectory (fonts)
+# add_subdirectory (fonts)
 
 #enable C99 mode
 add_definitions(-std=c99)
@@ -77,12 +77,15 @@ set(TEST_SRCS
 #  /usr/local/include
 #  /usr/include
 #)
+ include_directories ("${PROJECT_SOURCE_DIR}")
+#  add_subdirectory (src)
+ set (EXTRA_LIBS ${EXTRA_LIBS} raqm)
 
 #find RAQM_LIBRARY
-FIND_LIBRARY(RAQM_LIBRARY
-  NAMES raqm
-  PATHS /usr/local/lib /usr/lib
-)
+# FIND_LIBRARY(RAQM_LIBRARY
+#   NAMES raqm
+#   PATHS /usr/local/lib /usr/lib
+# )
 
 #set(CMAKE_C_COMPILER_INIT gcc)
 #message("path : ${RAQM_LIBRARY}")
@@ -91,9 +94,10 @@ add_executable(raqm-test raqm-test.c)
 
 #link the executable file with libraries
 target_link_libraries(raqm-test 
-	${RAQM_LIBRARY} 
+# 	${RAQM_LIBRARY} 
 	${FREETYPE_LIBRARIES}
 	${GLIB_LIBRARIES}
+	${EXTRA_LIBS}
 	#${FRIBIDI_LIBRARY}
 	#${HARFBUZZ_LIBRARIES}	
 )
