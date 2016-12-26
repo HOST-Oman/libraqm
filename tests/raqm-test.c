@@ -28,152 +28,385 @@
 
 #include <assert.h>
 #include <locale.h>
-#include <glib.h>
-
 #include "raqm.h"
 
-static gchar *direction = NULL;
-static gchar *text = NULL;
-static gchar *features = NULL;
-static gchar *font = NULL;
-static gchar *fonts = NULL;
-static gchar *languages = NULL;
-static gint cluster = -1;
-static gint position = -1;
-static gchar **args = NULL;
-static GOptionEntry entries[] =
-{
-  { "text", 0, 0, G_OPTION_ARG_STRING, &text, "The text to be displayed", "TEXT" },
-  { "font", 0, 0, G_OPTION_ARG_STRING, &font, "The font file", "FONT" },
-  { "fonts", 0, 0, G_OPTION_ARG_STRING, &fonts, "Font files and ranges for multi-fonts: <fontfile1> start:length, ...", "FONTS" },
-  { "languages", 0, 0, G_OPTION_ARG_STRING, &languages, "Text languages in the form: code;start:length,...", "LANGUAGES" },
-  { "direction", 0, 0, G_OPTION_ARG_STRING, &direction, "The text direction", "DIR" },
-  { "font-features", 0, 0, G_OPTION_ARG_STRING, &features, "The font features ", "FEATURES" },
-  { "cluster", 0, 0, G_OPTION_ARG_INT, &cluster, "The glyph cluster ", "CLUSTER" },
-  { "position", 0, 0, G_OPTION_ARG_INT, &position, "The glyph position ", "POSITION" },
-  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, "Remaining arguments", "FONTFILE" },
-  { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
-};
 
 int
 main (int argc, char *argv[])
 {
-  FT_Library library;
-  FT_Face face;
+    const char *testname = NULL;
+    const char *direction = NULL;
+    const char *text = NULL;
+    const char *features = NULL;
+    const char *font = NULL;
+    const char *fonts = NULL;
+    const char *languages = NULL;
+    const char *tmpFont = NULL;
+    int cluster = -1;
+    int position = -1;
 
-  raqm_t *rq;
-  raqm_glyph_t *glyphs;
-  size_t count, start_index, index;
-  raqm_direction_t dir;
-  int x = 0, y = 0;
+    testname = argv[1];
 
-  GError *error = NULL;
-  GOptionContext *context;
-
-  setlocale (LC_ALL, "");
-  context = g_option_context_new ("- Test libraqm");
-  g_option_context_add_main_entries (context, entries, NULL);
-
-  if (!g_option_context_parse (context, &argc, &argv, &error))
-  {
-    g_print ("Option parsing failed: %s\n", error->message);
-    return 1;
-  }
-
-  g_option_context_free (context);
-
-  text = g_strcompress (text);
-
-  if (text == NULL || (font == NULL && fonts == NULL))
-  {
-    g_print ("Text or font is missing.\n\n%s",
-             g_option_context_get_help (context, TRUE, NULL));
-    return 1;
-  }
-
-  dir = RAQM_DIRECTION_DEFAULT;
-  if (direction && strcmp(direction, "rtl") == 0)
-    dir = RAQM_DIRECTION_RTL;
-  else if (direction && strcmp(direction, "ltr") == 0)
-    dir = RAQM_DIRECTION_LTR;
-
-  rq = raqm_create ();
-  assert (raqm_set_text_utf8 (rq, text, strlen (text)));
-  assert (raqm_set_par_direction (rq, dir));
-  assert (!FT_Init_FreeType (&library));
-
-  if (fonts)
-  {
-    gchar **list = g_strsplit (fonts, ",", -1);
-    for (gchar **p = list; p != NULL && *p != NULL; p++)
-    {
-      gchar **sublist = g_strsplit (*p, " ", -1);
-      gchar **range;
-      int s, l;
-      assert (!FT_New_Face (library, sublist[0], 0, &face));
-      assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-      range = g_strsplit (sublist[1], ":", -1);
-      s = atoi(range[0]);
-      l = atoi(range[1]);
-      assert (raqm_set_freetype_face_range(rq, face, s, l));
-
-      g_strfreev (range);
-      g_strfreev (sublist);
+    if (strcmp(testname, "test1.test") == 0){
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "عربي(English ) عربي";
     }
-    g_strfreev (list);
-  } else {
-    assert (!FT_New_Face (library, font, 0, &face));
-    assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-    assert (raqm_set_freetype_face (rq, face));
-  }
-
-  if (languages)
-  {
-    gchar **list = g_strsplit (languages, ",", -1);
-    for (gchar **p = list; p != NULL && *p != NULL; p++)
+    else if (strcmp(testname, "test1_LTR.test") == 0)
     {
-      gchar **sublist = g_strsplit (*p, ";", -1);
-      gchar **range;
-      gchar *lang;
-      int start, length;
-
-      lang = sublist[0];
-      range = g_strsplit (sublist[1], ":", -1);
-      start = atoi(range[0]);
-      length = atoi(range[1]);
-      assert (raqm_set_language(rq, lang, start, length));
-
-      g_strfreev (range);
-      g_strfreev (sublist);
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "عربي(English ) عربي";
+        direction = "ltr";
     }
-    g_strfreev (list);
-  }
+    else if (strcmp(testname, "test1_RTL.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "عربي(English ) عربي";
+        direction = "rtl";
+    }
+    else if (strcmp(testname, "test2.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "arabic عربي 123";
+    }
+    else if (strcmp(testname, "test2_LTR.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "arabic عربي 123";
+        direction = "ltr";
+    }
+    else if (strcmp(testname, "test2_RTL.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "arabic عربي 123";
+        direction = "rtl";
+    }
+    else if (strcmp(testname, "test3.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "arabic عربي 123 عمان english";
+    }
+    else if (strcmp(testname, "test3_LTR.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "arabic عربي 123 عمان english";
+        direction = "ltr";
+    }
+    else if (strcmp(testname, "test3_RTL.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "arabic عربي 123 عمان english";
+        direction = "rtl";
+    }
+    else if (strcmp(testname, "test4.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "بيت سالم مصلى عمان";
+    }
+    else if (strcmp(testname, "test4_LTR.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "بيت سالم مصلى عمان";
+        direction = "ltr";
+    }
+    else if (strcmp(testname, "test4_RTL.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "بيت سالم مصلى عمان";
+        direction = "rtl";
+    }
+    else if (strcmp(testname, "test5.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "aa (bb) aa";
+    }
+    else if (strcmp(testname, "test5_LTR.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "aa (bb) aa";
+        direction = "ltr";
+    }
+    else if (strcmp(testname, "test5_RTL.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "aa (bb) aa";
+        direction = "rtl";
+    }
+    else if (strcmp(testname, "cursor_position1.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "ömán عُمان";
+        cluster = 1;
+        position = 1000;
+    }
+    else if (strcmp(testname, "cursor_position2.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "ömán عُمان";
+        cluster = 10;
+        position = 6000;
+    }
+    else if (strcmp(testname, "cursor_position3.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "عمَان oman";
+        cluster = 0;
+        position = 7000;
+    }
+    else if (strcmp(testname, "cursor_position4.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "عمَان oman";
+        cluster = 4;
+        position = 5000;
+    }
+    else if (strcmp(testname, "cursor_position_GB3.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "om\r\nan";
+        cluster = 2;
+        position = 3000;
+    }
+    else if (strcmp(testname, "cursor_position_GB4.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "omanoman";
+        cluster = 3;
+        position = 4000;
+    }
+    else if (strcmp(testname, "cursor_position_GB5.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "omanoman";
+        cluster = 4;
+        position = 5000;
+    }
+    else if (strcmp(testname, "cursor_position_GB8a.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "\xf0\x9f\x87\xa6\xf0\x9f\x87\xa7\xf0\x9f\x87\xa8\xf0\x9f\x87\xa9";
+        cluster = 1;
+        position = 1000;
+    }
+    else if (strcmp(testname, "cursor_position_GB9.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "ömán عُمان";
+        cluster = 1;
+        position = 1000;
+    }
+    else if (strcmp(testname, "cursor_position_GB9a.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "अीअ";
+        cluster = 0;
+        position = 300;
+    }
+    else if (strcmp(testname, "scripts-backward.test") == 0)
+    {
+        font = "fonts/d46a2549d27c32605024201abf801bb9a9273da3.ttf";
+        text = "عربيעבריתأهلבריתمم(ُenglish ) مرحبا";
+        cluster = 0;
+        position = 300;
+    }
+    else if (strcmp(testname, "scripts-backward-ltr.test") == 0)
+    {
+        font = "fonts/d46a2549d27c32605024201abf801bb9a9273da3.ttf";
+        text = "عربيעבריתأهلבריתمم(ُenglish ) مرحبا";
+        direction = "ltr";
+    }
+    else if (strcmp(testname, "scripts-backward-rtl.test") == 0)
+    {
+        font = "fonts/d46a2549d27c32605024201abf801bb9a9273da3.ttf";
+        text = "عربيעבריתأهلבריתمم(ُenglish ) مرحبا";
+        direction = "rtl";
+    }
+    else if (strcmp(testname, "scripts-forward.test") == 0)
+    {
+        font = "fonts/d46a2549d27c32605024201abf801bb9a9273da3.ttf";
+        text = "abcd (αβγ) δабгд";
+        cluster = 0;
+        position = 300;
+    }
+    else if (strcmp(testname, "scripts-forward-ltr.test") == 0)
+    {
+        font = "fonts/d46a2549d27c32605024201abf801bb9a9273da3.ttf";
+        text = "abcd (αβγ) δабгд";
+        direction = "ltr";
+    }
+    else if (strcmp(testname, "scripts-forward-rtl.test") == 0)
+    {
+        font = "fonts/d46a2549d27c32605024201abf801bb9a9273da3.ttf";
+        text = "abcd (αβγ) δабгд";
+        direction = "rtl";
+    }
+    else if (strcmp(testname, "features-arabic.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "اللغة العربية";
+        features = "-fina,-init,-medi";
+    }
+    else if (strcmp(testname, "features-kerning.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "Linux Support";
+        features = "-kern";
+    }
+    else if (strcmp(testname, "features-ligature.test") == 0)
+    {
+        font = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+        text = "file is filling";
+        features = "-liga";
+    }
+    else if (strcmp(testname, "languages-sr.test") == 0)
+    {
+        font = "fonts/db17d357d9d813a863c3859d2f3af11faa0b39c7.ttf";
+        text = "тб";
+        direction = "ltr";
+        languages = "sr;0:4";
+    }
+    else if (strcmp(testname, "languages-sr-ru.test") == 0)
+    {
+        font = "fonts/db17d357d9d813a863c3859d2f3af11faa0b39c7.ttf";
+        text = "тбтб";
+        direction = "ltr";
+        languages = "sr;0:4,ru;4:4";
+    }
+    else if (strcmp(testname, "xyoffset.test") == 0)
+    {
+        font = "fonts/a22e097e7f3cefffd1a602674dff5108efa0eec2.ttf";
+        text = "حجج";
+    }
+    else if (strcmp(testname, "multi-fonts.test") == 0)
+    {
+        fonts = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf 0:12,fonts/sha1sum/a22e097e7f3cefffd1a602674dff5108efa0eec2.ttf 12:21";
+        text = "English اللغة العربية";
+    }
+    else if (strcmp(testname, "multi-fonts2.test") == 0)
+    {
+        fonts = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf 0:8,fonts/sha1sum/d46a2549d27c32605024201abf801bb9a9273da3.ttf 2:4";
+        text = "عربي";
+    }
+    else
+    {
+        fprintf(stderr, "Test Name is missing.\n\n");
+        fprintf(stderr, "usage: raqm-test testname\n");
+        return 1;
+    }
 
-  if (features)
-  {
-    gchar **list = g_strsplit (features, ",", -1);
-    for (gchar **p = list; p != NULL && *p != NULL; p++)
-      assert (raqm_add_font_feature (rq, *p, -1));
-    g_strfreev (list);
-  }
+    FT_Library library;
+    FT_Face face;
 
-  assert (raqm_layout (rq));
+    raqm_t *rq;
+    raqm_glyph_t *glyphs;
+    size_t count, start_index, index;
+    raqm_direction_t dir;
+    int x = 0, y = 0;
 
-  glyphs = raqm_get_glyphs (rq, &count);
-  assert (glyphs != NULL);
+    setlocale (LC_ALL, "");
 
-  if (cluster >= 0)
-  {
-    index = cluster;
-    assert (raqm_index_to_position (rq, &index, &x, &y));
-  }
-  
-  if (position)
-    assert (raqm_position_to_index (rq, position, 0, &start_index));
+    char *error = NULL;
 
-  raqm_destroy (rq);
-  FT_Done_Face (face);
-  FT_Done_FreeType (library);
+    if (text == NULL || (font == NULL && fonts == NULL))
+    {
+        if (text == NULL)
+            error = "Text";
+        else
+            error = "font[s]";
+        fprintf(stderr, "%s is missing.\n\n", error);
+        return 1;
+    }
+    dir = RAQM_DIRECTION_DEFAULT;
+    if (direction && strcmp(direction, "rtl") == 0)
+        dir = RAQM_DIRECTION_RTL;
+    else if (direction && strcmp(direction, "ltr") == 0)
+        dir = RAQM_DIRECTION_LTR;
 
-  return 0;
+    rq = raqm_create ();
+    assert (raqm_set_text_utf8 (rq, text, strlen (text)));
+    assert (raqm_set_par_direction (rq, dir));
+    assert (!FT_Init_FreeType (&library));
+
+    if (fonts)
+    {
+        if (strcmp(testname, "multi-fonts.test") == 0)
+        {
+            tmpFont = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+            assert (!FT_New_Face (library, tmpFont, 0, &face));
+            assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
+            assert (raqm_set_freetype_face_range(rq, face, 0, 12));
+
+            tmpFont = "fonts/a22e097e7f3cefffd1a602674dff5108efa0eec2.ttf";
+            assert (!FT_New_Face (library, tmpFont, 0, &face));
+            assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
+            assert (raqm_set_freetype_face_range(rq, face, 12, 21));
+
+        }
+        else if (strcmp(testname, "multi-fonts2.test") == 0)
+        {
+            tmpFont = "fonts/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf";
+            assert (!FT_New_Face (library, tmpFont, 0, &face));
+            assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
+            assert (raqm_set_freetype_face_range(rq, face, 0, 8));
+
+            tmpFont = "fonts/d46a2549d27c32605024201abf801bb9a9273da3.ttf";
+            assert (!FT_New_Face (library, tmpFont, 0, &face));
+            assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
+            assert (raqm_set_freetype_face_range(rq, face, 2, 4));
+        }
+
+    } else {
+        assert (!FT_New_Face (library, font, 0, &face));
+        assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
+        assert (raqm_set_freetype_face (rq, face));
+    }
+
+    if (languages)
+    {
+        if (strcmp(testname, "languages-sr.test") == 0)
+        {
+            assert (raqm_set_language(rq, "sr", 0, 4));
+        }
+        else if (strcmp(testname, "languages-sr-ru.test") == 0)
+        {
+            assert (raqm_set_language(rq, "sr", 0, 4));
+            assert (raqm_set_language(rq, "ru", 4, 4));
+        }
+    }
+
+    if (features)
+    {
+        if (strcmp(testname, "features-arabic.test") == 0)
+        {
+            assert (raqm_add_font_feature (rq, "-fina", -1));
+            assert (raqm_add_font_feature (rq, "-init", -1));
+            assert (raqm_add_font_feature (rq, "-medi", -1));
+        }
+        else if (strcmp(testname, "features-kerning.test") == 0)
+        {
+            assert (raqm_add_font_feature (rq, "-kern", -1));
+        }
+        else if (strcmp(testname, "features-ligature.test") == 0)
+        {
+            assert (raqm_add_font_feature (rq, "-liga", -1));
+        }
+    }
+    assert (raqm_layout (rq));
+
+    glyphs = raqm_get_glyphs (rq, &count);
+    assert (glyphs != NULL);
+
+    if (cluster >= 0)
+    {
+        index = cluster;
+        assert (raqm_index_to_position (rq, &index, &x, &y));
+    }
+
+    if (position)
+        assert (raqm_position_to_index (rq, position, 0, &start_index));
+
+    raqm_destroy (rq);
+    FT_Done_Face (face);
+    FT_Done_FreeType (library);
+
+    return 0;
 }

@@ -20,31 +20,7 @@ if(NOT RAQM_INSTALL_INCLUDE_DIR)
   set(RAQM_INSTALL_INCLUDE_DIR "include")
 endif()
 
-option (WANT_DEBUG "enable debugging" OFF)
-if (WANT_DEBUG)
-    set(CMAKE_BUILD_TYPE Debug)
-    set (RAQM_DEBUG YES)
-    message( STATUS "debugging mode are enabled ...")
-endif()
-
-#TESTING not supported yet
-option(UNIT_TEST "apply unit test" OFF)
-
-if(UNIT_TEST)
-    # add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
-    set (RAQM_TESTING ON)
-    include_directories(${PROJECT_SOURCE_DIR}/tests)
-    add_subdirectory (tests)
-    message( STATUS "RAQM_TESTING mode are enabled ...")
-endif()
-
-if (UNIT_TEST OR WANT_DEBUG)
-configure_file(
-	${CMAKE_SOURCE_DIR}/config.h.cmake
-	${CMAKE_SOURCE_DIR}/src/config.h
-)
-endif (UNIT_TEST OR WANT_DEBUG)
-
+set(RAQM_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 #########################################
 
 # - Locate FreeType library
@@ -214,6 +190,7 @@ if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 INCLUDE_DIRECTORIES(
 	${FRIBIDI_INCLUDE_DIR}
 	${FREETYPE_INCLUDE_DIR}
+	${HARFBUZZ_INCLUDE_DIRS}
 )
 else()
 INCLUDE_DIRECTORIES(
@@ -267,6 +244,33 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set(CMAKE_C_FLAGS "/W4 /WX /wd4068")
 endif()
 
+###############################################
+#UNIT TESTING
+
+option (WANT_DEBUG "enable debugging" OFF)
+if (WANT_DEBUG)
+    set(CMAKE_BUILD_TYPE Debug)
+    set (RAQM_DEBUG YES)
+    message( STATUS "debugging mode are enabled ...")
+endif()
+
+#TESTING not supported yet
+option(UNIT_TEST "apply unit test" OFF)
+
+if(UNIT_TEST)
+    # add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
+    set (RAQM_TESTING ON)
+    include_directories(${PROJECT_SOURCE_DIR}/tests)
+    add_subdirectory (tests)
+    message( STATUS "RAQM_TESTING mode are enabled ...")
+endif()
+
+if (UNIT_TEST OR WANT_DEBUG)
+configure_file(
+	${CMAKE_SOURCE_DIR}/config.h.cmake
+	${CMAKE_SOURCE_DIR}/src/config.h
+)
+endif (UNIT_TEST OR WANT_DEBUG)
 
 ###############################################
 # DOCUMENTATION
@@ -343,3 +347,4 @@ install(TARGETS raqm
 install(FILES ${CMAKE_SOURCE_DIR}/src/raqm.h
   DESTINATION ${RAQM_INSTALL_INCLUDE_DIR} COMPONENT Headers
 )
+
