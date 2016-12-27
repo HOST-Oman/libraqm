@@ -74,8 +74,10 @@ if (WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 		)
 	message("-- Found Fribidi: ${FRIBIDI_LIBRARY} ")
 else()
-	include(CheckFunctionExists)
+	 include(FindPkgConfig)
+	 pkg_check_modules(GLIB REQUIRED  glib-2.0)
 	set(FRIBIDI_FOUND "NO")
+	include(CheckFunctionExists)
 
 	find_path(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h
 		/usr/local/include
@@ -145,23 +147,24 @@ else()
 		message(STATUS "Harfbuzz Library Found OK:  ${HARFBUZZ_LIBRARIES} ")
 		INCLUDE(FindPackageHandleStandardArgs)
 		FIND_PACKAGE_HANDLE_STANDARD_ARGS(HarfBuzz DEFAULT_MSG HARFBUZZ_INCLUDE_DIRS HARFBUZZ_LIBRARIES)
-	ELSE ()
+	else ()
 		message(FATAL_ERROR "No harfbuzz Found")
-	ENDif()
+	endif()
 endif(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
 ####################################
 
 if(WIN32 AND NOT(MSYS OR CYGWIN OR MINGW))
-INCLUDE_DIRECTORIES(
+include_directories(
 	${FRIBIDI_INCLUDE_DIR}
 	${FREETYPE_INCLUDE_DIR}
 	${HARFBUZZ_INCLUDE_DIRS}
 )
 else()
-INCLUDE_DIRECTORIES(
+include_directories(
 	${FRIBIDI_INCLUDE_DIR}/fribidi
 	${FREETYPE_INCLUDE_DIR_freetype2}
 	${HARFBUZZ_INCLUDE_DIRS}
+	${GLIB_INCLUDE_DIRS}
 )
 endif()
 
