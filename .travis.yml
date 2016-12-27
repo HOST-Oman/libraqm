@@ -31,8 +31,7 @@ before_install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" -a "${CC}" == "gcc" ]; then export CC=gcc-4.8; fi
 
 script:
-  - mkdir build & cd build
-  - cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 ..
+  - cmake -DUNIT_TEST=1 -DWANT_DEBUG=1
   - make
   - make test
 
