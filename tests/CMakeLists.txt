@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
 
-
 file(GLOB_RECURSE fonts  fonts/sha1sum/*)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
@@ -19,7 +18,6 @@ add_executable(raqm-test raqm-test.c )
 
 include_directories(
 	${FREETYPE_INCLUDE_DIR}
-	${HEADERS}
 	${CMAKE_CURRENT_SOURCE_DIR}
  )
 
@@ -40,12 +38,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   target_compile_options(raqm-test INTERFACE  ${CMAKE_C_FLAGS})
 endif()
 
-file(COPY ${fonts} DESTINATION fonts)
-        
-
-
-
-enable_testing()
+file(COPY ${fonts} DESTINATION fonts) 
 
 file(GLOB_RECURSE tests_list *.test)
 foreach(test ${tests_list})
