@@ -243,14 +243,12 @@ endif (UNIT_TEST OR WANT_DEBUG)
 
 ###############################################
 # DOCUMENTATION
- option(enable-gtk-doc "build the documentation" OFF)
- if (enable-gtk-doc)
+ option(ENABLE_GTK_DOC "build the documentation" OFF)
+ if (ENABLE_GTK_DOC)
      INCLUDE(FindPkgConfig)
      find_package(GtkDoc 1.25 REQUIRED)
-
      if(GTKDOC_FOUND)
      	message(STATUS "gtkdoc found, API documentation will be built.")
-     	#configure_file(${CMAKE_SOURCE_DIR}/docs/version.xml.in version.xml @ONLY)
      	configure_file(${CMAKE_SOURCE_DIR}/docs/raqm-docs.cmake.xml.in
 			raqm-docs.xml @ONLY)
 	gtk_doc_add_module(raqm
