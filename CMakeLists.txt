@@ -162,7 +162,7 @@ include_directories(
 else()
 include_directories(
 	${FRIBIDI_INCLUDE_DIR}/fribidi
-	${FREETYPE_INCLUDE_DIR_freetype2}
+	${FREETYPE_INCLUDE_DIRS}
 	${HARFBUZZ_INCLUDE_DIRS}
 	${GLIB_INCLUDE_DIRS}
 )
