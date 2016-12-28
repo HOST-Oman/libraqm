@@ -265,6 +265,11 @@ option(ENABLE_GTK_DOC "build the documentation" OFF)
                     --module=raqm
                     --source-dir=${CMAKE_SOURCE_DIR}/src
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+            
+         add_custom_command(OUTPUT mkdir
+	 COMMAND ${CMAKE_COMMAND} 
+		  -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/html"
+	 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
         add_custom_command(OUTPUT doc-mkhtml
             COMMAND ${GTKDOC_MKHTML_EXE}
@@ -272,7 +277,7 @@ option(ENABLE_GTK_DOC "build the documentation" OFF)
                     ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html)
             
-	add_custom_target(docs DEPENDS doc-scan doc-mkdb doc-mkhtml)
+	add_custom_target(docs DEPENDS doc-scan doc-mkdb mkdir doc-mkhtml)
 
 	include(GNUInstallDirs)
 	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
