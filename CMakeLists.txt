@@ -272,7 +272,7 @@ option(ENABLE_GTK_DOC "build the documentation" OFF)
                     ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html)
             
-	add_custom_target(docs DEPENDS doc-scan doc-mkdb mkdir doc-mkhtml)
+	add_custom_target(docs DEPENDS doc-scan doc-mkdb doc-mkhtml)
 
 	include(GNUInstallDirs)
 	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
