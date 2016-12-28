@@ -1,5 +1,7 @@
 sudo: required # needed for trusty beta
 dist: trusty   # needed for HarfBuzz
+services:
+- docker
 
 os:
   - linux
@@ -18,9 +20,7 @@ matrix:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      sudo add-apt-repository ppa:as-bahanta/raqm -y;
-      sudo apt-get update -qq;
-      sudo apt-get install -y cmake libfreetype6-dev libharfbuzz-dev libfribidi-dev libglib2.0-dev gtk-doc-tools;
+      docker build -t raqm -f .dockerfile .
     fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
       brew update;
@@ -31,10 +31,13 @@ before_install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" -a "${CC}" == "gcc" ]; then export CC=gcc-4.8; fi
 
 script:
-  - cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1
-  - make
-  - make test
-  - make docs
+  - docker run -v `pwd`:/build raqm
+   sh -c "
+      cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1 &&
+      make  &&
+      make test &&
+      make docs
+    "
 
 after_success:
   - if [ "$TRAVIS_OS_NAME" == "linux" -a "$CC" == "gcc" -a "$TRAVIS_SECURE_ENV_VARS" == "true" ];
