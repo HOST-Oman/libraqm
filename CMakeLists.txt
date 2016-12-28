@@ -21,6 +21,8 @@ if(NOT RAQM_INSTALL_INCLUDE_DIR)
 endif()
 
 set(RAQM_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+
+add_definitions(-DHAVE_CONFIG_H)
 #########################################
 
 # - Locate FreeType library
@@ -235,10 +237,10 @@ if(UNIT_TEST)
 endif()
 
 if (UNIT_TEST OR WANT_DEBUG)
-configure_file(
-	${CMAKE_SOURCE_DIR}/config.h.cmake
-	${CMAKE_SOURCE_DIR}/src/config.h
-)
+  configure_file(
+	  ${CMAKE_SOURCE_DIR}/config.h.cmake
+	  ${CMAKE_SOURCE_DIR}/src/config.h
+  )
 endif (UNIT_TEST OR WANT_DEBUG)
 
 ###############################################
