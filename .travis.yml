@@ -20,7 +20,7 @@ matrix:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      docker build -t raqm -f .dockerfile .
+      docker build -t raqm -f .dockerfile .;
     fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
       brew update;
