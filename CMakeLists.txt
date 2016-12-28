@@ -236,12 +236,11 @@ if(UNIT_TEST)
     message( STATUS "RAQM_TESTING mode are enabled ...")
 endif()
 
-if (UNIT_TEST OR WANT_DEBUG)
-  configure_file(
+
+configure_file(
 	  ${CMAKE_SOURCE_DIR}/config.h.cmake
 	  ${CMAKE_SOURCE_DIR}/src/config.h
   )
-endif (UNIT_TEST OR WANT_DEBUG)
 
 ###############################################
 # DOCUMENTATION
