@@ -21,7 +21,7 @@ if(NOT RAQM_INSTALL_INCLUDE_DIR)
 endif()
 
 set(RAQM_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-
+SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 add_definitions(-DHAVE_CONFIG_H)
 #########################################
 
@@ -244,37 +244,43 @@ configure_file(
 
 ###############################################
 # DOCUMENTATION
- option(ENABLE_GTK_DOC "build the documentation" OFF)
+option(ENABLE_GTK_DOC "build the documentation" OFF)
  if (ENABLE_GTK_DOC)
      INCLUDE(FindPkgConfig)
-     find_package(GtkDoc 1.25 REQUIRED)
-     if(GTKDOC_FOUND)
+     find_package(GtkDoc REQUIRED)
+    if(GTKDOC_FOUND)
      	message(STATUS "gtkdoc found, API documentation will be built.")
      	configure_file(${CMAKE_SOURCE_DIR}/docs/raqm-docs.cmake.xml.in
 			raqm-docs.xml @ONLY)
-	gtk_doc_add_module(raqm
-	    XML
-		${CMAKE_CURRENT_BINARY_DIR}/raqm-docs.xml
-	    SOURCE
-		${CMAKE_CURRENT_SOURCE_DIR}
-		${CMAKE_SOURCE_DIR}/src
-	    SUFFIXES
-		"h"
-		"c"
-	    LIBRARIES
-		raqm
-	    LIBRARY_DIRS
-		${FREETYPE_LIBRARIES}
-		${FRIBIDI_LIBRARY}
-		${HARFBUZZ_LIBRARIES}
-		${GLIB_LIBRARIES}
-		)
+        add_custom_command(OUTPUT doc-scan
+            COMMAND ${GTKDOC_SCAN_EXE}
+                    --source-dir=${CMAKE_SOURCE_DIR}/src
+                    --module=raqm
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
+        add_custom_command(OUTPUT doc-mkdb
+            COMMAND ${GTKDOC_MKDB_EXE}
+                    --xml-mode
+                    --output-format=xml
+                    --module=raqm
+                    --source-dir=${CMAKE_SOURCE_DIR}/src
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+            
+         add_custom_command(OUTPUT mkdir
+	 COMMAND ${CMAKE_COMMAND} 
+		  -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/html"
+	 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-	add_custom_target (docs ALL DEPENDS doc-raqm)
+        add_custom_command(OUTPUT doc-mkhtml
+            COMMAND ${GTKDOC_MKHTML_EXE}
+                    raqm
+                    ${CMAKE_SOURCE_DIR}/docs/raqm-docs.xml
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html)
+            
+	add_custom_target(docs DEPENDS doc-scan doc-mkdb mkdir doc-mkhtml)
 
 	include(GNUInstallDirs)
-	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/raqm/html
+	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
 	DESTINATION ${CMAKE_INSTALL_DOCDIR})
      else()
            message(STATUS "gtkdoc was not found, API documentation can not be built.")
