@@ -10,6 +10,7 @@ install:
   - appveyor DownloadFile https://sourceforge.net/projects/omlx/files/raqm/raqm-cmake-deps-29-12-2016-x86-debug.zip
   - ps: Start-FileDownload 'https://github.com/robotology/ycm/releases/download/v0.2.2/YCM-0.2.2-win32.msi'
   - 7z x raqm-cmake-deps-29-12-2016-x86-debug.zip
+  - cd ..
   
 build:
 
