@@ -27,6 +27,11 @@ before_install:
       brew uninstall libtool && brew install libtool;
       brew install freetype harfbuzz fribidi glib gtk-doc;
       export XML_CATALOG_FILES="/usr/local/etc/xml/catalog";
+      ln -s /usr/local/bin/gtkdoc-scan /bin/;
+      ln -s /usr/local/gtkdoc-fixxref /bin/;
+      ln -s /usr/local/gtkdoc-scangobj /bin/;
+      ln -s /usr/local/gtkdoc-mkhtml /bin/;
+      ln -s /usr/local/gtkdoc-mkdb /bin/;
     fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" -a "${CC}" == "gcc" ]; then export CC=gcc-4.8; fi
 
@@ -41,11 +46,6 @@ script:
     ";
     fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-      ln -s /usr/local/bin/gtkdoc-scan /bin/;
-      ln -s /usr/local/gtkdoc-fixxref /bin/;
-      ln -s /usr/local/gtkdoc-scangobj /bin/;
-      ln -s /usr/local/gtkdoc-mkhtml /bin/;
-      ln -s /usr/local/gtkdoc-mkdb /bin/;
       cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1;
       make;
       make test;
