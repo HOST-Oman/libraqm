@@ -32,7 +32,7 @@ before_install:
 
 script:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-      docker run -v `pwd`:/build raqm;
+      docker run -v `pwd`:/build raqm
       sh -c "
       cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1 &&
       make  &&
@@ -41,7 +41,11 @@ script:
     ";
     fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-      which gtkdoc-scan
+      ln -s /usr/local/bin/gtkdoc-scan /bin/;
+      ln -s /usr/local/gtkdoc-fixxref /bin/;
+      ln -s /usr/local/gtkdoc-scangobj /bin/;
+      ln -s /usr/local/gtkdoc-mkhtml /bin/;
+      ln -s /usr/local/gtkdoc-mkdb /bin/;
       cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1;
       make;
       make test;
