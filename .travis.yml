@@ -46,10 +46,9 @@ script:
     ";
     fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-      cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1;
+      cmake -DUNIT_TEST=1 -DWANT_DEBUG=1;
       make;
       make test;
-      make docs;
    fi
 
 after_success:
