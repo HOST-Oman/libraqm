@@ -31,21 +31,21 @@ before_install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" -a "${CC}" == "gcc" ]; then export CC=gcc-4.8; fi
 
 script:
-- if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      - docker run -v `pwd`:/build raqm
+  - if [[ $TRAVIS_OS_NAME == 'linux'] ]; then
+      - docker run -v `pwd`:/build raqm;
       - sh -c "
       cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1 &&
       make  &&
       make test &&
       make docs
-    "
+    ";
     fi
-- if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-     - cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1;
-     - make;
-     - make test;
-     - make docs;
-    fi;
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      - cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DENABLE_GTK_DOC=1;
+      - make;
+      - make test;
+      - make docs;
+   fi
 
 after_success:
   - if [ "$TRAVIS_OS_NAME" == "linux" -a "$CC" == "gcc" -a "$TRAVIS_SECURE_ENV_VARS" == "true" ];
