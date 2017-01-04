@@ -1,5 +1,5 @@
-
-execute_process(COMMAND ${TEST_PROG} ${testname} 
+message(${testpath})
+execute_process(COMMAND ${TEST_PROG} ${testpath} 
 OUTPUT_FILE output.txt
 RESULT_VARIABLE HAD_ERROR
 ERROR_FILE error.txt
@@ -13,7 +13,7 @@ if(HAD_ERROR)
 endif()
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files
-    output.txt ${SOURCEDIR}/${testname}
+    output.txt ${SOURCEDIR}/${testname}.result
     RESULT_VARIABLE DIFFERENT)
 if(DIFFERENT)
 #     configure_file(output.txt ${SOURCEDIR}/expected.txt COPYONLY)
