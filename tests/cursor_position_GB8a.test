@@ -1,37 +1,4 @@
-Text is: 🇦🇧🇨🇩
-Direction is: DEFAULT
-
-Before script detection:
-script for ch[0]	Zyyy
-script for ch[1]	Zyyy
-script for ch[2]	Zyyy
-script for ch[3]	Zyyy
-
-After script detection:
-script for ch[0]	Zyyy
-script for ch[1]	Zyyy
-script for ch[2]	Zyyy
-script for ch[3]	Zyyy
-
-Number of runs before script itemization: 1
-
-Fribidi Runs:
-run[0]:	 start: 0	length: 4	level: 0
-
-Number of runs after script itemization: 1
-
-Final Runs:
-run[0]:	 start: 0	length: 4	direction: ltr	script: Zyyy	font: Amiri
-
-Glyph information:
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
-
-UTF-32 clusters: 00 01 02 03
-UTF-8 clusters:  00 04 08 12
-
-The position is 2992 at index 12
-
-The start-index is 4  at position 1000 
+font=fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
+text=🇦🇧🇨🇩
+cluster=1
+position=1000 
