@@ -16,7 +16,7 @@ build:
 
 build_script:
   # build the library 
-  - cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -Dstatic_lib=1
+  - cmake -DUNIT_TEST=1 -DWANT_DEBUG=1 -DSTATIC_LIB=1
   # build the library for Release and Debug
   - cmake --build . --config Debug 
   - ctest -C "Debug"

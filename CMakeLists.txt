@@ -181,8 +181,8 @@ set(SOURCES
 )
 
 
-option(static_lib "Create static library" OFF)
-if(static_lib)
+option(STATIC_LIB "Create static library" OFF)
+if(STATIC_LIB)
 #create static library
 add_library( raqm STATIC
 	${HEADERS}
@@ -315,4 +315,3 @@ install(TARGETS raqm
 install(FILES ${CMAKE_SOURCE_DIR}/src/raqm.h
   DESTINATION ${RAQM_INSTALL_INCLUDE_DIR} COMPONENT Headers
 )
-
