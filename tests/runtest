@@ -19,51 +19,18 @@ for filename in "$@"
 do
 	$reference || echo -ne "Testing $filename...\t"
 	$reference && filename=$srcdir/$filename
-
-	font=$(sed -n 1p $filename)
-	text=$(sed -n 2p $filename)
-	opts=$(sed -n 3p $filename)
-	expected=$(mktemp expected.XXXXXX)
-	tail -n +4 $filename > $expected
+	cat $filename > $expected
 
 	output=$(mktemp output.XXXXXX)
-	case $font in
-		*,* )
-			oldIFS=$IFS
-			IFS=","
-			fonts=
-			for f in $font
-			do
-				if [ x"$fonts" = x"" ]
-				then
-					fonts=$srcdir/$f
-				else
-					fonts=$fonts,$srcdir/$f
-				fi
-			done
-			IFS=$oldIFS
-			$testtool --text="$text" $opts --fonts="$fonts" > $output
-		;;
-		*)
-			$testtool --text="$text" $opts --font="$srcdir/$font" > $output
-		;;
-	esac
+	$testtool $filename > $output
 
-	if $reference
-	then
-		echo "$font" > $filename
-		echo "$text" >> $filename
-		echo "$opts" >> $filename
-		cat $output  >> $filename
-	else
-		result=$(diff -u $expected $output)
-		if test "x$result" != "x"
+	result=$(diff -u $expected $output)
+	if test "x$result" != "x"
 		then
 			fails=$((fails+1))
 			echo "The diff is:"
 			echo "$result"
 		fi
-	fi
 
 	rm -f $expected $output
 done

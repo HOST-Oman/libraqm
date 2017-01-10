@@ -1,0 +1,34 @@
+Text is: अीअ
+Direction is: DEFAULT
+
+Before script detection:
+script for ch[0]	Deva
+script for ch[1]	Deva
+script for ch[2]	Deva
+
+After script detection:
+script for ch[0]	Deva
+script for ch[1]	Deva
+script for ch[2]	Deva
+
+Number of runs before script itemization: 1
+
+Fribidi Runs:
+run[0]:	 start: 0	length: 3	level: 0
+
+Number of runs after script itemization: 1
+
+Final Runs:
+run[0]:	 start: 0	length: 3	direction: ltr	script: Deva	font: Amiri
+
+Glyph information:
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
+
+UTF-32 clusters: 00 00 02
+UTF-8 clusters:  00 00 06
+
+The position is 748 at index 0
+
+The start-index is 2  at position 300 
