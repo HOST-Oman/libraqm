@@ -9,6 +9,7 @@ raqm_set_par_direction
 raqm_set_language
 raqm_set_freetype_face
 raqm_set_freetype_face_range
+raqm_set_freetype_load_flags
 raqm_add_font_feature
 raqm_layout
 raqm_get_glyphs

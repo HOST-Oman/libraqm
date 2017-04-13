@@ -135,6 +135,10 @@ raqm_set_freetype_face_range (raqm_t *rq,
                               size_t  len);
 
 bool
+raqm_set_freetype_load_flags (raqm_t *rq,
+                              int flags);
+
+bool
 raqm_layout (raqm_t *rq);
 
 raqm_glyph_t *
