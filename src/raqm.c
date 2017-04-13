@@ -623,6 +623,8 @@ _raqm_create_hb_font (raqm_t *rq,
 #ifdef HAVE_HB_FT_FONT_SET_LOAD_FLAGS
   if (rq->ft_loadflags >= 0)
     hb_ft_font_set_load_flags (font, rq->ft_loadflags);
+#else
+  (void)rq;
 #endif
 
   return font;
