@@ -12,7 +12,7 @@ compiler:
   - clang
 
 matrix:
-  allow_failures:
+  exclude:
     - os: osx
       compiler: gcc
 
