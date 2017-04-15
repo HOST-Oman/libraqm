@@ -1293,6 +1293,10 @@ _raqm_break_lines (raqm_t *rq, size_t glyph_count)
   /* Find possible break points */
   bool *breaks = _raqm_find_line_breaks (rq);
 
+  /* Sort glyphs in logical order */
+  qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_logical_sort);
+
+  /* Do line breaking */
   for (size_t i = 0; i < glyph_count; i++)
   {
     rq->glyphs[i].line = line;
@@ -1327,6 +1331,9 @@ _raqm_break_lines (raqm_t *rq, size_t glyph_count)
       width = 0;
     }
   }
+
+  /* Then sort glyphs back in visual order */
+  qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_visual_sort);
 
   free (breaks);
 }
@@ -1384,14 +1391,8 @@ _raqm_line_break (raqm_t *rq)
   if (rq->line_width < 0)
     return true;
 
-  /* Sort glyphs in logical order */
-  qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_logical_sort);
-
   /* Do line breaking */
   _raqm_break_lines (rq, glyph_count);
-
-  /* Then sort glyphs back in visual order */
-  qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_visual_sort);
 
   /* calculating positions */
   current_line = 0;
