@@ -1560,12 +1560,16 @@ raqm_index_to_position (raqm_t *rq,
       *x += position[i].x_advance;
 
       if (run->direction == HB_DIRECTION_LTR)
+      {
         for (size_t j = i + 1; j < len && next_cluster == curr_cluster; j++)
           next_cluster = info[j].cluster;
+      }
       else
+      {
         for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
              j--)
           next_cluster = info[j].cluster;
+      }
 
       if (next_cluster == curr_cluster)
         next_cluster = run->pos + run->len;
