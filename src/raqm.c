@@ -1521,8 +1521,6 @@ raqm_index_to_position (raqm_t *rq,
                         int *x,
                         int *y)
 {
-  bool found = false;
-
   /* We don't currently support multiline, so y is always 0 */
   *y = 0;
   *x = 0;
@@ -1546,7 +1544,7 @@ raqm_index_to_position (raqm_t *rq,
     ++*index;
   }
 
-  for (raqm_run_t *run = rq->runs; run != NULL && !found; run = run->next)
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
     size_t len;
     hb_glyph_info_t *info;
@@ -1555,7 +1553,7 @@ raqm_index_to_position (raqm_t *rq,
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
 
-    for (size_t i = 0; i < len && !found; i++)
+    for (size_t i = 0; i < len; i++)
     {
       uint32_t curr_cluster = info[i].cluster;
       uint32_t next_cluster = curr_cluster;
@@ -1577,11 +1575,12 @@ raqm_index_to_position (raqm_t *rq,
         if (run->direction == HB_DIRECTION_RTL)
           *x -= position[i].x_advance;
         *index = curr_cluster;
-        found = true;
+        goto found;
       }
     }
   }
 
+found:
   if (rq->flags & RAQM_FLAG_UTF8)
     *index = _raqm_u32_to_u8_index (rq, *index);
   RAQM_TEST ("The position is %d at index %ld\n",*x ,*index);
