@@ -41,6 +41,7 @@ TEST_FILES = \
     languages-sr.test \
     languages-sr-ru.test \
     line-breaking-ltr.test \
+    line-breaking-rtl.test \
     multi-fonts.test \
     multi-fonts2.test \
     xyoffset.test \

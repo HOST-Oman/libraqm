@@ -1286,6 +1286,14 @@ _raqm_is_space_glyph (raqm_t *rq, int idx)
 }
 
 static bool
+_raqm_next_is_same_cluster (raqm_t *rq, size_t idx, size_t count)
+{
+  if (idx < count - 1)
+    return rq->glyphs[idx].cluster == rq->glyphs[idx + 1].cluster;
+  return false;
+}
+
+static bool
 _raqm_break_lines (raqm_t *rq, size_t glyph_count)
 {
   int width = 0;
@@ -1293,7 +1301,6 @@ _raqm_break_lines (raqm_t *rq, size_t glyph_count)
 
   /* Find possible break points */
   bool *breaks = calloc (rq->text_len, sizeof (bool));
-
   if (!breaks)
     return false;
 
@@ -1302,41 +1309,50 @@ _raqm_break_lines (raqm_t *rq, size_t glyph_count)
 
   /* Do line breaking */
 
+  /* Find possible line break points */
   if (!_raqm_find_line_breaks (rq, breaks))
     return false;
 
+  /* Select actual line break points */
   for (size_t i = 0; i < glyph_count; i++)
   {
+    size_t j;
+    int word_width = 0;
+
     rq->glyphs[i].line = line;
-    width += rq->glyphs[i].x_advance;
 
-    if (width > rq->line_width)
+    /* Calculate the width to next possible break */
+    for (j = i; j < glyph_count; j++)
     {
-      /* If the current glyph does not fit into the line, search backwards for
-       * the last line break. */
-      size_t j = 0;
-      size_t k = 0;
-      while (!breaks[rq->glyphs[i].cluster] && i != 0)
-        i--;
+      uint32_t cluster;
 
-      /* Don’t start lines with white space */
-      if (_raqm_is_space_glyph (rq, i + 1))
-      {
-        for (j = i + 1; _raqm_is_space_glyph (rq, j); j++)
-          rq->glyphs[j].line = line;
-        i = j - 1; /* skip those */
-      }
+      word_width += rq->glyphs[j].x_advance;
+      /* Add the width of all glyphs with the same cluster */
+      for (; _raqm_next_is_same_cluster (rq, j, glyph_count); j++)
+        word_width += rq->glyphs[j + 1].x_advance;
 
-      /* Handle glyphs belonging to the same character */
-      if (rq->glyphs[i + 1].cluster == rq->glyphs[i].cluster)
-      {
-        for (k = i + 1; rq->glyphs[k].cluster == rq->glyphs[i].cluster; k++)
-          rq->glyphs[j].line = line;
-        i = k - 1; /* skip those */
-      }
+      /* Find the last character index in this cluster */
+      if (j < glyph_count - 1)
+        cluster = rq->glyphs[j + 1].cluster - 1;
+      else
+        cluster = rq->glyphs[j].cluster;
 
+      if (breaks[cluster])
+        break;
+    }
+
+    if (width + word_width > rq->line_width)
+    {
+      /* Word does not fit, start a new line */
       line++;
       width = 0;
+    }
+    else
+    {
+      /* Word fits, append all glyph to the current line */
+      while (i < j && i < glyph_count - 1)
+        rq->glyphs[++i].line = line;
+      width += word_width;
     }
   }
 
