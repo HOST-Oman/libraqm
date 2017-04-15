@@ -1089,7 +1089,7 @@ typedef enum {
 } raqm_break_action_t;
 
 static bool *
-_raqm_find_line_break (raqm_t *rq)
+_raqm_find_line_breaks (raqm_t *rq)
 {
   size_t length = rq->text_len;
   int current_class;
@@ -1279,7 +1279,7 @@ _raqm_break_lines (raqm_t *rq, size_t glyph_count)
   int line = 0;
 
   /* Find possible break points */
-  bool *breaks = _raqm_find_line_break (rq);
+  bool *breaks = _raqm_find_line_breaks (rq);
 
   for (size_t i = 0; i < glyph_count; i++)
   {
