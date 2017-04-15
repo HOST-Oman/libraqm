@@ -1353,8 +1353,8 @@ _raqm_line_break (raqm_t *rq)
 {
   size_t count = 0;
   size_t glyph_count = 0;
-  int current_x = 0;
-  int current_line = 0;
+  int x = 0;
+  int line = 0;
 
   /* counting total glyphs */
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
@@ -1366,7 +1366,7 @@ _raqm_line_break (raqm_t *rq)
 
   /* populating glyphs */
   count = 0;
-  current_x = 0;
+  x = 0;
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
     size_t len;
@@ -1385,14 +1385,14 @@ _raqm_line_break (raqm_t *rq)
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
-      rq->glyphs[count + i].x = current_x + position[i].x_offset;
+      rq->glyphs[count + i].x = x + position[i].x_offset;
       rq->glyphs[count + i].y = position[i].y_offset;
       rq->glyphs[count + i].ftface =
         rq->text_info[rq->glyphs[count + i].cluster].ftface;
       rq->glyphs[count + i].visual_index = count + i;
       rq->glyphs[count + i].line = 0;
 
-      current_x += position[i].x_advance;
+      x += position[i].x_advance;
     }
 
     count += len;
@@ -1406,22 +1406,22 @@ _raqm_line_break (raqm_t *rq)
     return false;
 
   /* calculating positions */
-  current_line = 0;
-  current_x = 0;
+  line = 0;
+  x = 0;
   for (size_t i = 0; i < glyph_count; i++)
   {
     int leading = (-1) * (rq->text_info[rq->glyphs[i].cluster].ftface->ascender + abs (rq->text_info[rq->glyphs[i].cluster].ftface->descender));
 
-    if (rq->glyphs[i].line != current_line)
+    if (rq->glyphs[i].line != line)
     {
-      current_x = 0;
-      current_line = rq->glyphs[i].line;
+      x = 0;
+      line = rq->glyphs[i].line;
     }
 
-    rq->glyphs[i].x = current_x + rq->glyphs[i].x_offset;
-    rq->glyphs[i].y = rq->glyphs[i].y_offset + rq->glyphs[i].line * leading;
+    rq->glyphs[i].x = x + rq->glyphs[i].x_offset;
+    rq->glyphs[i].y = rq->glyphs[i].y_offset + line * leading;
 
-    current_x += rq->glyphs[i].x_advance;
+    x += rq->glyphs[i].x_advance;
   }
 
   /* handeling alighnment */
@@ -1430,7 +1430,7 @@ _raqm_line_break (raqm_t *rq)
     case RAQM_ALIGNMENT_RIGHT:
     {
       size_t j = 0;
-      int line = -1;
+      line = -1;
       for (size_t i = glyph_count - 1; i != 0; i--)
       {
         if (rq->glyphs[i].line != line)
@@ -1464,14 +1464,14 @@ _raqm_line_break (raqm_t *rq)
     case RAQM_ALIGNMENT_CENTER:
     {
       size_t j = 0;
-      current_line = -1;
+      line = -1;
       for (size_t i = glyph_count - 1; i != 0; i--)
       {
-        if (rq->glyphs[i].line != current_line)
+        if (rq->glyphs[i].line != line)
         {
           int offset = (rq->line_width - (rq->glyphs[i].x + rq->glyphs[i].x_advance)) / 2;
-          current_line = rq->glyphs[i].line;
-          for (j = i; j != 0 && rq->glyphs[j].line == current_line; j--)
+          line = rq->glyphs[i].line;
+          for (j = i; j != 0 && rq->glyphs[j].line == line; j--)
             rq->glyphs[j].x += offset;
         }
         i = j + 1;
@@ -1482,17 +1482,17 @@ _raqm_line_break (raqm_t *rq)
     {
       int space_count = 0;
       size_t j = 0;
-      current_line = -1;
+      line = -1;
       for (size_t i = glyph_count - 1; i != 0; i--)
       {
-        if (rq->glyphs[i].line != current_line)
+        if (rq->glyphs[i].line != line)
         {
           int space_extension = 0;
           int offset = rq->line_width - (rq->glyphs[i].x + rq->glyphs[i].x_advance);
-          current_line = rq->glyphs[i].line;
+          line = rq->glyphs[i].line;
 
           /* counting spaces in one line */
-          for (j = i; j != 0 && rq->glyphs[j].line == current_line; j--)
+          for (j = i; j != 0 && rq->glyphs[j].line == line; j--)
           {
             if (_raqm_is_space_glyph (rq, j))
               space_count++;
@@ -1503,7 +1503,7 @@ _raqm_line_break (raqm_t *rq)
             offset = 0;
           else
             offset = offset / space_count;
-          for (size_t k = j + 1; rq->glyphs[k].line == current_line; k++)
+          for (size_t k = j + 1; rq->glyphs[k].line == line; k++)
           {
             rq->glyphs[k].x += space_extension;
             if (_raqm_is_space_glyph (rq, k))
