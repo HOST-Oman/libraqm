@@ -1088,14 +1088,13 @@ typedef enum {
   RAQM_PROHIBITED_BREAK,                    /* ^ in table,  XX in array */
 } raqm_break_action_t;
 
-static bool *
-_raqm_find_line_breaks (raqm_t *rq)
+static bool
+_raqm_find_line_breaks (raqm_t *rq, bool *breaks)
 {
   size_t length = rq->text_len;
   int current_class;
   int next_class;
-  raqm_break_action_t *break_actions;
-  bool *line_breaks;
+  raqm_break_action_t *actions;
 
 /* Define some short-cuts for the table */
 #define oo RAQM_DIRECT_BREAK                /* '_' break allowed */
@@ -1142,14 +1141,15 @@ _raqm_find_line_breaks (raqm_t *rq)
 #undef CC
 #undef XX
 
-  line_breaks = malloc (sizeof (bool) * length);
-  memset (line_breaks, false, length);
-
   if (length < 2)
-    return line_breaks;
+    return true;
 
-  break_actions = malloc (sizeof (raqm_break_action_t) * length);
-  memset (break_actions, RAQM_PROHIBITED_BREAK, length);
+  actions = malloc (sizeof (raqm_break_action_t) * length);
+  if (!actions)
+    return false;
+
+  for (size_t i = 0; i < length; i++)
+    actions[i] = RAQM_PROHIBITED_BREAK;
 
   current_class = ucdn_get_resolved_linebreak_class (rq->text[0]);
   next_class    = ucdn_get_resolved_linebreak_class (rq->text[1]);
@@ -1181,7 +1181,7 @@ _raqm_find_line_breaks (raqm_t *rq)
     /* handle spaces explicitly */
     if (next_class == UCDN_LINEBREAK_CLASS_SP)
     {
-      break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
+      actions[i-1]  = RAQM_PROHIBITED_BREAK;
       continue;
     }
 
@@ -1189,47 +1189,47 @@ _raqm_find_line_breaks (raqm_t *rq)
         next_class == UCDN_LINEBREAK_CLASS_NL ||
         next_class == UCDN_LINEBREAK_CLASS_LF)
     {
-      break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
+      actions[i-1]  = RAQM_PROHIBITED_BREAK;
       current_class = UCDN_LINEBREAK_CLASS_BK;
       continue;
     }
 
     if (next_class == UCDN_LINEBREAK_CLASS_CR)
     {
-      break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
+      actions[i-1]  = RAQM_PROHIBITED_BREAK;
       current_class = UCDN_LINEBREAK_CLASS_CR;
       continue;
     }
 
     action = break_pairs[current_class][next_class];
-    break_actions[i - 1] = action;
+    actions[i - 1] = action;
     class = ucdn_get_resolved_linebreak_class (rq->text[i - 1]);
 
     switch (action)
     {
       case RAQM_INDIRECT_BREAK:
         if (class == UCDN_LINEBREAK_CLASS_SP)
-          break_actions[i - 1] = RAQM_INDIRECT_BREAK;
+          actions[i - 1] = RAQM_INDIRECT_BREAK;
         else
-          break_actions[i - 1] = RAQM_PROHIBITED_BREAK;
+          actions[i - 1] = RAQM_PROHIBITED_BREAK;
         break;
       case RAQM_COMBINING_PROHIBITED_BREAK:
-        break_actions[i - 1] = RAQM_COMBINING_PROHIBITED_BREAK;
+        actions[i - 1] = RAQM_COMBINING_PROHIBITED_BREAK;
         if (class != UCDN_LINEBREAK_CLASS_SP)
           continue;
         break;
       case RAQM_COMBINING_INDIRECT_BREAK:
-        break_actions[i - 1] = RAQM_PROHIBITED_BREAK;
+        actions[i - 1] = RAQM_PROHIBITED_BREAK;
         if (class == UCDN_LINEBREAK_CLASS_SP)
         {
-          break_actions[i - 1] = RAQM_PROHIBITED_BREAK;
+          actions[i - 1] = RAQM_PROHIBITED_BREAK;
           if (i > 1)
           {
             int class2 = ucdn_get_resolved_linebreak_class (rq->text[i - 2]);
             if (class2 == UCDN_LINEBREAK_CLASS_SP)
-              break_actions[i - 2] = RAQM_INDIRECT_BREAK;
+              actions[i - 2] = RAQM_INDIRECT_BREAK;
             else
-              break_actions[i - 2] = RAQM_DIRECT_BREAK;
+              actions[i - 2] = RAQM_DIRECT_BREAK;
           }
          }
         else
@@ -1246,14 +1246,15 @@ _raqm_find_line_breaks (raqm_t *rq)
 
   for (size_t i = 0; i < length; i++)
   {
-    if (break_actions[i] == RAQM_INDIRECT_BREAK || break_actions[i] == RAQM_DIRECT_BREAK )
-      line_breaks[i] = true;
+    if (actions[i] == RAQM_INDIRECT_BREAK || actions[i] == RAQM_DIRECT_BREAK)
+      breaks[i] = true;
     else
-      line_breaks[i] = false;
+      breaks[i] = false;
   }
 
-  free (break_actions);
-  return line_breaks;
+  free (actions);
+
+  return true;
 }
 
 static int
@@ -1284,19 +1285,26 @@ _raqm_is_space_glyph (raqm_t *rq, int idx)
   return ucdn_get_general_category (ch) == UCDN_GENERAL_CATEGORY_ZS;
 }
 
-static void
+static bool
 _raqm_break_lines (raqm_t *rq, size_t glyph_count)
 {
   int width = 0;
   int line = 0;
 
   /* Find possible break points */
-  bool *breaks = _raqm_find_line_breaks (rq);
+  bool *breaks = calloc (rq->text_len, sizeof (bool));
+
+  if (!breaks)
+    return false;
 
   /* Sort glyphs in logical order */
   qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_logical_sort);
 
   /* Do line breaking */
+
+  if (!_raqm_find_line_breaks (rq, breaks))
+    return false;
+
   for (size_t i = 0; i < glyph_count; i++)
   {
     rq->glyphs[i].line = line;
@@ -1336,6 +1344,8 @@ _raqm_break_lines (raqm_t *rq, size_t glyph_count)
   qsort (rq->glyphs, glyph_count, sizeof (raqm_glyph_t), _raqm_visual_sort);
 
   free (breaks);
+
+  return true;
 }
 
 static bool
@@ -1392,7 +1402,8 @@ _raqm_line_break (raqm_t *rq)
     return true;
 
   /* Do line breaking */
-  _raqm_break_lines (rq, glyph_count);
+  if (!_raqm_break_lines (rq, glyph_count))
+    return false;
 
   /* calculating positions */
   current_line = 0;
