@@ -776,7 +776,7 @@ raqm_set_freetype_load_flags (raqm_t *rq,
 }
 
 /**
- * raqm_set_line_width:
+ * raqm_set_width:
  * @rq: a #raqm_t.
  * @width: the line width.
  *
@@ -787,11 +787,11 @@ raqm_set_freetype_load_flags (raqm_t *rq,
  * Return value:
  * %true if no errors happened, %false otherwise.
  *
- * Since: 0.2
+ * Since: 0.3
  */
 bool
-raqm_set_line_width (raqm_t *rq,
-                     int     width)
+raqm_set_width (raqm_t *rq,
+                int     width)
 {
   if (!rq)
     return false;
@@ -802,21 +802,21 @@ raqm_set_line_width (raqm_t *rq,
 }
 
 /**
- * raqm_set_par_alignment:
+ * raqm_set_alignment:
  * @rq: a #raqm_t.
  * @alignment: the alignment of paragraph.
  *
  * Sets the paragraph alignment. By default text is left aligned. Has no effect
- * if line width is not set, see raqm_set_line_width().
+ * if line width is not set, see raqm_set_width().
  *
  * Return value:
  * %true if no errors happened, %false otherwise.
  *
- * Since: 0.2
+ * Since: 0.3
  */
 bool
-raqm_set_par_alignment (raqm_t           *rq,
-                        raqm_alignment_t  alignment)
+raqm_set_alignment (raqm_t           *rq,
+                    raqm_alignment_t  alignment)
 {
   if (!rq)
     return false;

@@ -160,7 +160,7 @@ main (int argc, char *argv[])
   }
 
   if (line_width >= 0)
-    assert (raqm_set_line_width (rq, line_width));
+    assert (raqm_set_width (rq, line_width));
 
   assert (raqm_layout (rq));
 
