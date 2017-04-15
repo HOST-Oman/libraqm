@@ -1095,7 +1095,6 @@ _raqm_find_line_breaks (raqm_t *rq)
   int current_class;
   int next_class;
   raqm_break_action_t *break_actions;
-  raqm_break_action_t current_action;
   bool *line_breaks;
 
 /* Define some short-cuts for the table */
@@ -1174,12 +1173,15 @@ _raqm_find_line_breaks (raqm_t *rq)
         next_class == UCDN_LINEBREAK_CLASS_LF);
        i++)
   {
+    raqm_break_action_t action;
+    int class;
+
     next_class = ucdn_get_resolved_linebreak_class (rq->text[i]);
 
     /* handle spaces explicitly */
     if (next_class == UCDN_LINEBREAK_CLASS_SP)
     {
-      break_actions[i-1]  = RAQM_PROHIBITED_BREAK;   /* apply rule LB 7: � SP */
+      break_actions[i-1]  = RAQM_PROHIBITED_BREAK;
       continue;
     }
 
@@ -1199,34 +1201,44 @@ _raqm_find_line_breaks (raqm_t *rq)
       continue;
     }
 
-    /* lookup pair table information in brkPairs[before, after] */
-    current_action = break_pairs[current_class][next_class];
-    break_actions[i-1] = current_action;
+    action = break_pairs[current_class][next_class];
+    break_actions[i - 1] = action;
+    class = ucdn_get_resolved_linebreak_class (rq->text[i - 1]);
 
-    if (current_action == RAQM_INDIRECT_BREAK)      /* resolve indirect break */
+    switch (action)
     {
-      if (ucdn_get_resolved_linebreak_class (rq->text[i-1]) == UCDN_LINEBREAK_CLASS_SP)          /* if context is A SP * B */
-        break_actions[i-1] = RAQM_INDIRECT_BREAK;   /* break opportunity */
-      else                                          /* else */
-        break_actions[i-1] = RAQM_PROHIBITED_BREAK; /* no break opportunity */
-    }
-    else if (current_action == RAQM_COMBINING_PROHIBITED_BREAK)             /* this is the case OP SP* CM */
-    {
-      break_actions[i-1] = RAQM_COMBINING_PROHIBITED_BREAK;     /* no break allowed */
-      if (ucdn_get_resolved_linebreak_class (rq->text[i-1]) != UCDN_LINEBREAK_CLASS_SP)
-        continue;                               /* apply rule 9: X CM* -> X */
-    }
-    else if (current_action == RAQM_COMBINING_INDIRECT_BREAK)               /* resolve combining mark break */
-    {
-      break_actions[i-1] = RAQM_PROHIBITED_BREAK;               /* don't break before CM */
-      if (ucdn_get_resolved_linebreak_class (rq->text[i-1]) == UCDN_LINEBREAK_CLASS_SP)
-      {
-        break_actions[i-1] = RAQM_PROHIBITED_BREAK;             /* legacy: keep SP CM together */
-        if (i > 1)
-          break_actions[i-2] = ((ucdn_get_resolved_linebreak_class (rq->text[i-2]) == UCDN_LINEBREAK_CLASS_SP) ? RAQM_INDIRECT_BREAK : RAQM_DIRECT_BREAK);
-       }
-      else                                     /* apply rule 9: X CM * -> X */
-        continue;
+      case RAQM_INDIRECT_BREAK:
+        if (class == UCDN_LINEBREAK_CLASS_SP)
+          break_actions[i - 1] = RAQM_INDIRECT_BREAK;
+        else
+          break_actions[i - 1] = RAQM_PROHIBITED_BREAK;
+        break;
+      case RAQM_COMBINING_PROHIBITED_BREAK:
+        break_actions[i - 1] = RAQM_COMBINING_PROHIBITED_BREAK;
+        if (class != UCDN_LINEBREAK_CLASS_SP)
+          continue;
+        break;
+      case RAQM_COMBINING_INDIRECT_BREAK:
+        break_actions[i - 1] = RAQM_PROHIBITED_BREAK;
+        if (class == UCDN_LINEBREAK_CLASS_SP)
+        {
+          break_actions[i - 1] = RAQM_PROHIBITED_BREAK;
+          if (i > 1)
+          {
+            int class2 = ucdn_get_resolved_linebreak_class (rq->text[i - 2]);
+            if (class2 == UCDN_LINEBREAK_CLASS_SP)
+              break_actions[i - 2] = RAQM_INDIRECT_BREAK;
+            else
+              break_actions[i - 2] = RAQM_DIRECT_BREAK;
+          }
+         }
+        else
+          continue;
+        break;
+      case RAQM_DIRECT_BREAK:
+      case RAQM_PROHIBITED_BREAK:
+      default:
+        break;
     }
 
     current_class = next_class;
