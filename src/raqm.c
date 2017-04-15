@@ -1369,8 +1369,37 @@ _raqm_align_text (raqm_t *rq, size_t glyph_count)
 {
   raqm_glyph_t *glyphs = rq->glyphs;
   int line_width = rq->line_width;
+  raqm_alignment_t alignment = rq->alignment;
+  raqm_alignment_t last_alignment = rq->alignment;
 
   switch (rq->alignment)
+  {
+    case RAQM_ALIGNMENT_START:
+      if (rq->resolved_dir == RAQM_DIRECTION_RTL)
+        alignment = RAQM_ALIGNMENT_RIGHT;
+      else
+        alignment = RAQM_ALIGNMENT_LEFT;
+      break;
+    case RAQM_ALIGNMENT_END:
+      if (rq->resolved_dir == RAQM_DIRECTION_RTL)
+        alignment = RAQM_ALIGNMENT_LEFT;
+      else
+        alignment = RAQM_ALIGNMENT_RIGHT;
+      break;
+    case RAQM_ALIGNMENT_JUSTIFY:
+      if (rq->resolved_dir == RAQM_DIRECTION_RTL)
+        last_alignment = RAQM_ALIGNMENT_RIGHT;
+      else
+        last_alignment = RAQM_ALIGNMENT_LEFT;
+      break;
+    case RAQM_ALIGNMENT_CENTER:
+    case RAQM_ALIGNMENT_RIGHT:
+    case RAQM_ALIGNMENT_LEFT:
+    default:
+      break;
+  }
+
+  switch (alignment)
   {
     case RAQM_ALIGNMENT_RIGHT:
     {
@@ -1428,6 +1457,7 @@ _raqm_align_text (raqm_t *rq, size_t glyph_count)
       int space_count = 0;
       size_t j = 0;
       int line = -1;
+      (void)last_alignment;
       for (size_t i = glyph_count - 1; i != 0; i--)
       {
         if (glyphs[i].line != line)
@@ -1459,6 +1489,11 @@ _raqm_align_text (raqm_t *rq, size_t glyph_count)
       }
       break;
     }
+    case RAQM_ALIGNMENT_START:
+    case RAQM_ALIGNMENT_END:
+      /* Should have been resolved earlier. */
+      assert(false);
+      break;
     case RAQM_ALIGNMENT_LEFT:
     default:
       break;

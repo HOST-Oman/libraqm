@@ -70,6 +70,12 @@ typedef enum
 
 /**
  * raqm_alignment_t:
+ * @RAQM_ALIGNMENT_START: Same as #RAQM_ALIGNMENT_RIGHT if paragraph direction
+ *                        is #RAQM_DIRECTION_RTL, same as #RAQM_ALIGNMENT_LEFT
+ *                        otherwise.
+ * @RAQM_ALIGNMENT_END: Same as #RAQM_ALIGNMENT_LEFT if paragraph direction is
+ *                      #RAQM_DIRECTION_RTL, same as #RAQM_ALIGNMENT_RIGHT
+ *                      otherwise.
  * @RAQM_ALIGNMENT_RIGHT: Paragraph is right aligned.
  * @RAQM_ALIGNMENT_LEFT: Paragraph is left aligned.
  * @RAQM_ALIGNMENT_CENTER: Paragraph is center aligned..
@@ -81,6 +87,8 @@ typedef enum
  */
 typedef enum
 {
+    RAQM_ALIGNMENT_START,
+    RAQM_ALIGNMENT_END,
     RAQM_ALIGNMENT_RIGHT,
     RAQM_ALIGNMENT_LEFT,
     RAQM_ALIGNMENT_CENTER,
