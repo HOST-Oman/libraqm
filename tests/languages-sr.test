@@ -23,8 +23,8 @@ Final Runs:
 run[0]:	 start: 0	length: 2	direction: ltr	script: Cyrl	font: DejaVu Serif
 
 Glyph information:
-glyph [5]	x_offset: 0	y_offset: 0	x_advance: 1940	x_position: 0	y_position: 0	font: DejaVu Serif
-glyph [4]	x_offset: 0	y_offset: 0	x_advance: 1233	x_position: 1940	y_position: 0	font: DejaVu Serif
+glyph [5]	x_offset: 0	y_offset: 0	x_advance: 1940	line: 00	font: DejaVu Serif
+glyph [4]	x_offset: 0	y_offset: 0	x_advance: 1233	line: 00	font: DejaVu Serif
 
 UTF-32 clusters: 00 01
 UTF-8 clusters:  00 02

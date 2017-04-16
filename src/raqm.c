@@ -926,11 +926,11 @@ raqm_get_glyphs (raqm_t *rq,
 
   for (size_t i = 0; i < *length; i++)
   {
-      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance:"
-                 " %d\tx_position: %d\ty_position: %d\tfont: %s\n",
+      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\t"
+                 "line: %02d\tfont: %s\n",
                  rq->glyphs[i].index, rq->glyphs[i].x_offset,
                  rq->glyphs[i].y_offset, rq->glyphs[i].x_advance,
-                 rq->glyphs[i].x, rq->glyphs[i].y,
+                 rq->glyphs[i].line,
                  rq->glyphs[i].ftface->family_name);
   }
 #endif

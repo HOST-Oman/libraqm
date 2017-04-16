@@ -28,11 +28,11 @@ run[0]:	 start: 1	length: 3	direction: rtl	script: Arab	font: Amiri
 run[1]:	 start: 0	length: 1	direction: rtl	script: Zinh	font: Amiri
 
 Glyph information:
-glyph [427]	x_offset: 0	y_offset: 0	x_advance: 0	font: Amiri
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
-glyph [389]	x_offset: 0	y_offset: 0	x_advance: 1897	font: Amiri
-glyph [782]	x_offset: 0	y_offset: 0	x_advance: 1392	font: Amiri
-glyph [427]	x_offset: -1245	y_offset: -430	x_advance: 0	font: Amiri
+glyph [427]	x_offset: 0	y_offset: 0	x_advance: 0	line: 00	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	line: 00	font: Amiri
+glyph [389]	x_offset: 0	y_offset: 0	x_advance: 1897	line: 00	font: Amiri
+glyph [782]	x_offset: 0	y_offset: 0	x_advance: 1392	line: 00	font: Amiri
+glyph [427]	x_offset: -1245	y_offset: -430	x_advance: 0	line: 00	font: Amiri
 
 UTF-32 clusters: 02 02 01 00 00
 UTF-8 clusters:  04 04 02 00 00

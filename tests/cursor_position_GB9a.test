@@ -25,9 +25,9 @@ Final Runs:
 run[0]:	 start: 0	length: 3	direction: ltr	script: Deva	font: Amiri
 
 Glyph information:
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 0	y_position: 0	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 748	y_position: 0	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 1496	y_position: 0	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Amiri
 
 UTF-32 clusters: 00 00 02
 UTF-8 clusters:  00 00 06

@@ -64,27 +64,27 @@ run[1]:	 start: 10	length: 11	direction: rtl	script: Arab	font: Aref Ruqaa
 run[2]:	 start: 8	length: 2	direction: rtl	script: Arab	font: Amiri
 
 Glyph information:
-glyph [40]	x_offset: 0	y_offset: 0	x_advance: 1174	x_position: 0	y_position: 0	font: Amiri
-glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	x_position: 1174	y_position: 0	font: Amiri
-glyph [74]	x_offset: 0	y_offset: 0	x_advance: 932	x_position: 2238	y_position: 0	font: Amiri
-glyph [79]	x_offset: 0	y_offset: 0	x_advance: 510	x_position: 3170	y_position: 0	font: Amiri
-glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540	x_position: 3680	y_position: 0	font: Amiri
-glyph [86]	x_offset: 0	y_offset: 0	x_advance: 738	x_position: 4220	y_position: 0	font: Amiri
-glyph [75]	x_offset: 0	y_offset: 0	x_advance: 1032	x_position: 4958	y_position: 0	font: Amiri
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	x_position: 5990	y_position: 0	font: Amiri
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 6590	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 7338	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 8086	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 8834	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 9582	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 10330	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 11078	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 11826	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 12574	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 13322	y_position: 0	font: Aref Ruqaa
-glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	x_position: 14070	y_position: 0	font: Aref Ruqaa
-glyph [2320]	x_offset: 0	y_offset: 0	x_advance: 360	x_position: 14818	y_position: 0	font: Amiri
-glyph [388]	x_offset: 0	y_offset: 0	x_advance: 446	x_position: 15178	y_position: 0	font: Amiri
+glyph [40]	x_offset: 0	y_offset: 0	x_advance: 1174	line: 00	font: Amiri
+glyph [81]	x_offset: 0	y_offset: 0	x_advance: 1064	line: 00	font: Amiri
+glyph [74]	x_offset: 0	y_offset: 0	x_advance: 932	line: 00	font: Amiri
+glyph [79]	x_offset: 0	y_offset: 0	x_advance: 510	line: 00	font: Amiri
+glyph [76]	x_offset: 0	y_offset: 0	x_advance: 540	line: 00	font: Amiri
+glyph [86]	x_offset: 0	y_offset: 0	x_advance: 738	line: 00	font: Amiri
+glyph [75]	x_offset: 0	y_offset: 0	x_advance: 1032	line: 00	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	line: 00	font: Amiri
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	line: 00	font: Aref Ruqaa
+glyph [2320]	x_offset: 0	y_offset: 0	x_advance: 360	line: 00	font: Amiri
+glyph [388]	x_offset: 0	y_offset: 0	x_advance: 446	line: 00	font: Amiri
 
 UTF-32 clusters: 00 01 02 03 04 05 06 07 20 19 18 17 16 15 14 13 12 11 10 09 08
 UTF-8 clusters:  00 01 02 03 04 05 06 07 31 29 27 25 23 21 19 18 16 14 12 10 08
