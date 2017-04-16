@@ -7,7 +7,6 @@ install:
   - call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
   - appveyor-retry C:\msys64\usr\bin\pacman -Syuu --needed --noconfirm --noprogressbar --ask=127
   - appveyor-retry C:\msys64\usr\bin\pacman -S --noconfirm autoconf automake libtool gtk-doc mingw-w64-x86_64-pkg-config mingw-w64-x86_64-harfbuzz mingw-w64-x86_64-fribidi mingw-w64-x86_64-freetype
-  - git submodule update --init --recursive
 
 build_script:
   - set CC=cccl
@@ -17,7 +16,7 @@ build_script:
   - bash -c "mv cccl /usr/bin"
   - bash -c "exec 0</dev/null; ./autogen.sh"
   - bash -c "exec 0</dev/null; ./configure"
-  - bash -c "exec 0</dev/null; make CFLAGS='/W4 /WX /wd4068 /wd4244'"
+  - bash -c "exec 0</dev/null; make CFLAGS='/W4 /WX /wd4068'"
 
 #test_script:
 #  - bash -c "make check"
