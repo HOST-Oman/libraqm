@@ -32,7 +32,7 @@ SCAN_OPTIONS=--rebuild-types
 
 # Header files or dirs to ignore when scanning. Use base file/dir names
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h private_code
-IGNORE_HFILES=reorder_runs.h ucdn
+IGNORE_HFILES=reorder_runs.h
 
 # Extra options to supply to gtkdoc-mkdb.
 # e.g. MKDB_OPTIONS=--xml-mode --output-format=xml

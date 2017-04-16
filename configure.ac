@@ -33,6 +33,7 @@ PKG_PROG_PKG_CONFIG([0.20])
 AX_PKG_CHECK_MODULES(FREETYPE, [freetype2 >= 12.0.6], [])
 AX_PKG_CHECK_MODULES(HARFBUZZ, [], harfbuzz)
 AX_PKG_CHECK_MODULES(FRIBIDI, [], fribidi)
+AX_PKG_CHECK_MODULES(UNIBREAK, [], libunibreak)
 PKG_CHECK_MODULES(GLIB, glib-2.0, have_glib=true, have_glib=false)
 
 _save_libs="$LIBS"

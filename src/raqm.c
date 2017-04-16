@@ -32,8 +32,8 @@
 #include <fribidi.h>
 #include <hb.h>
 #include <hb-ft.h>
+#include <linebreak.h>
 
-#include "ucdn/ucdn.h"
 #include "raqm.h"
 
 #if FRIBIDI_MAJOR_VERSION >= 1
@@ -1080,179 +1080,32 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   return runs;
 }
 
-typedef enum {
-  RAQM_DIRECT_BREAK = 0,                    /* _ in table,  oo in array */
-  RAQM_INDIRECT_BREAK,                      /* % in table,  SS in array */
-  RAQM_COMBINING_INDIRECT_BREAK,            /* # in table,  cc in array */
-  RAQM_COMBINING_PROHIBITED_BREAK,          /* @ in table   CC in array */
-  RAQM_PROHIBITED_BREAK,                    /* ^ in table,  XX in array */
-} raqm_break_action_t;
-
 static bool
-_raqm_find_line_breaks (raqm_t *rq, bool *breaks)
+_raqm_find_line_breaks (raqm_t *rq, bool *result)
 {
-  size_t length = rq->text_len;
-  int current_class;
-  int next_class;
-  raqm_break_action_t *actions;
+  char *breaks = NULL;
+  const char *lang;
 
-/* Define some short-cuts for the table */
-#define oo RAQM_DIRECT_BREAK                /* '_' break allowed */
-#define SS RAQM_INDIRECT_BREAK              /* '%' only break across space (aka 'indirect break' below) */
-#define cc RAQM_COMBINING_INDIRECT_BREAK    /* '#' indirect break for combining marks */
-#define CC RAQM_COMBINING_PROHIBITED_BREAK  /* '@' indirect break for combining marks */
-#define XX RAQM_PROHIBITED_BREAK            /* '^' no break allowed_BRK */
-
-  static raqm_break_action_t  break_pairs[][UCDN_LINEBREAK_CLASS_JT+1] = {
-    /*       1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27 */
-    /*       OP, CL, CL, QU, GL, NS, EX, SY, IS, PR, PO, NU, AL, ID, IN, HY, BA, BB, B2, ZW, CM, WJ, H2, H3, JL, JV, JT, = after class */
-    /*OP*/ { XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, XX, CC, XX, XX, XX, XX, XX, XX }, /* OP open */
-    /*CL*/ { oo, XX, XX, SS, SS, XX, XX, XX, XX, SS, SS, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* CL close */
-    /*CP*/ { oo, XX, XX, SS, SS, XX, XX, XX, XX, SS, SS, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* CL close */
-    /*QU*/ { XX, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, /* QU quotation */
-    /*GL*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, /* GL glue */
-    /*NS*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* NS no-start */
-    /*EX*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* EX exclamation/interrogation */
-    /*SY*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* SY Syntax (slash) */
-    /*IS*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* IS infix (numeric) separator */
-    /*PR*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, SS, oo, SS, SS, oo, oo, XX, cc, XX, SS, SS, SS, SS, SS }, /* PR prefix */
-    /*PO*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* NU numeric */
-    /*NU*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* AL alphabetic */
-    /*AL*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* AL alphabetic */
-    /*ID*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* ID ideograph (atomic) */
-    /*IN*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* IN inseparable */
-    /*HY*/ { oo, XX, XX, SS, oo, SS, XX, XX, XX, oo, oo, SS, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* HY hyphens and spaces */
-    /*BA*/ { oo, XX, XX, SS, oo, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* BA break after */
-    /*BB*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, /* BB break before */
-    /*B2*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, oo, oo, oo, oo, SS, SS, oo, XX, XX, cc, XX, oo, oo, oo, oo, oo }, /* B2 break either side, but not pair */
-    /*ZW*/ { oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, oo, XX, oo, oo, oo, oo, oo, oo, oo }, /* ZW zero width space */
-    /*CM*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, oo, SS, SS, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, oo }, /* CM combining mark */
-    /*WJ*/ { SS, XX, XX, SS, SS, SS, XX, XX, XX, SS, SS, SS, SS, SS, SS, SS, SS, SS, SS, XX, cc, XX, SS, SS, SS, SS, SS }, /* WJ word joiner */
-    /*H2*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, SS, SS }, /* Hangul 2 Jamo syllable */
-    /*H3*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, SS }, /* Hangul 3 Jamo syllable */
-    /*JL*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, SS, SS, SS, SS, oo }, /* Jamo Leading Consonant */
-    /*JV*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, SS, SS }, /* Jamo Vowel */
-    /*JT*/ { oo, XX, XX, SS, SS, SS, XX, XX, XX, oo, SS, oo, oo, oo, SS, SS, SS, oo, oo, XX, cc, XX, oo, oo, oo, oo, SS }, /* Jamo Trailing Consonant */
-  };
-
-#undef oo
-#undef SS
-#undef cc
-#undef CC
-#undef XX
-
-  if (length < 2)
-    return true;
-
-  actions = malloc (sizeof (raqm_break_action_t) * length);
-  if (!actions)
+  breaks = calloc (1, rq->text_len);
+  if (!breaks)
     return false;
 
-  for (size_t i = 0; i < length; i++)
-    actions[i] = RAQM_PROHIBITED_BREAK;
+  lang = hb_language_to_string (rq->text_info[0].lang);
 
-  current_class = ucdn_get_resolved_linebreak_class (rq->text[0]);
-  next_class    = ucdn_get_resolved_linebreak_class (rq->text[1]);
+  init_linebreak ();
+  set_linebreaks_utf32 (rq->text, rq->text_len, lang, breaks);
 
-  /* handle case where input starts with an LF */
-  if (current_class == UCDN_LINEBREAK_CLASS_LF)
-    current_class = UCDN_LINEBREAK_CLASS_BK;
-
-  /* treat NL like BK */
-  if (current_class == UCDN_LINEBREAK_CLASS_NL)
-    current_class = UCDN_LINEBREAK_CLASS_BK;
-
-  /* treat SP at start of input as if it followed WJ */
-  if (current_class == UCDN_LINEBREAK_CLASS_SP)
-    current_class = UCDN_LINEBREAK_CLASS_WJ;
-
-  /* loop over all pairs in the string up to a hard break or CRLF pair */
-  for (size_t i = 1;
-       (i < length) && (current_class != UCDN_LINEBREAK_CLASS_BK) &&
-       (current_class != UCDN_LINEBREAK_CLASS_CR ||
-        next_class == UCDN_LINEBREAK_CLASS_LF);
-       i++)
+  for (size_t i = 0; i < rq->text_len; i++)
   {
-    raqm_break_action_t action;
-    int class;
-
-    next_class = ucdn_get_resolved_linebreak_class (rq->text[i]);
-
-    /* handle spaces explicitly */
-    if (next_class == UCDN_LINEBREAK_CLASS_SP)
+    if (breaks[i] == LINEBREAK_MUSTBREAK || breaks[i] == LINEBREAK_ALLOWBREAK)
     {
-      actions[i-1]  = RAQM_PROHIBITED_BREAK;
-      continue;
+      result[i] = true;
     }
-
-    if (next_class == UCDN_LINEBREAK_CLASS_BK ||
-        next_class == UCDN_LINEBREAK_CLASS_NL ||
-        next_class == UCDN_LINEBREAK_CLASS_LF)
-    {
-      actions[i-1]  = RAQM_PROHIBITED_BREAK;
-      current_class = UCDN_LINEBREAK_CLASS_BK;
-      continue;
-    }
-
-    if (next_class == UCDN_LINEBREAK_CLASS_CR)
-    {
-      actions[i-1]  = RAQM_PROHIBITED_BREAK;
-      current_class = UCDN_LINEBREAK_CLASS_CR;
-      continue;
-    }
-
-    action = break_pairs[current_class][next_class];
-    actions[i - 1] = action;
-    class = ucdn_get_resolved_linebreak_class (rq->text[i - 1]);
-
-    switch (action)
-    {
-      case RAQM_INDIRECT_BREAK:
-        if (class == UCDN_LINEBREAK_CLASS_SP)
-          actions[i - 1] = RAQM_INDIRECT_BREAK;
-        else
-          actions[i - 1] = RAQM_PROHIBITED_BREAK;
-        break;
-      case RAQM_COMBINING_PROHIBITED_BREAK:
-        actions[i - 1] = RAQM_COMBINING_PROHIBITED_BREAK;
-        if (class != UCDN_LINEBREAK_CLASS_SP)
-          continue;
-        break;
-      case RAQM_COMBINING_INDIRECT_BREAK:
-        actions[i - 1] = RAQM_PROHIBITED_BREAK;
-        if (class == UCDN_LINEBREAK_CLASS_SP)
-        {
-          actions[i - 1] = RAQM_PROHIBITED_BREAK;
-          if (i > 1)
-          {
-            int class2 = ucdn_get_resolved_linebreak_class (rq->text[i - 2]);
-            if (class2 == UCDN_LINEBREAK_CLASS_SP)
-              actions[i - 2] = RAQM_INDIRECT_BREAK;
-            else
-              actions[i - 2] = RAQM_DIRECT_BREAK;
-          }
-         }
-        else
-          continue;
-        break;
-      case RAQM_DIRECT_BREAK:
-      case RAQM_PROHIBITED_BREAK:
-      default:
-        break;
-    }
-
-    current_class = next_class;
-  }
-
-  for (size_t i = 0; i < length; i++)
-  {
-    if (actions[i] == RAQM_INDIRECT_BREAK || actions[i] == RAQM_DIRECT_BREAK)
-      breaks[i] = true;
     else
-      breaks[i] = false;
+      result[i] = false;
   }
 
-  free (actions);
+  free (breaks);
 
   return true;
 }
@@ -1282,7 +1135,8 @@ static bool
 _raqm_is_space_glyph (raqm_t *rq, int idx)
 {
   uint32_t ch = rq->text[rq->glyphs[idx].cluster];
-  return ucdn_get_general_category (ch) == UCDN_GENERAL_CATEGORY_ZS;
+  return hb_unicode_general_category (hb_unicode_funcs_get_default (), ch) ==
+    HB_UNICODE_GENERAL_CATEGORY_SPACE_SEPARATOR;
 }
 
 static bool
@@ -1337,7 +1191,7 @@ _raqm_break_lines (raqm_t *rq, size_t glyph_count)
       else
         cluster = rq->glyphs[j].cluster;
 
-      if (breaks[cluster])
+      if (cluster < rq->text_len - 1 && breaks[cluster + 1])
         break;
     }
 
