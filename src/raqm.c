@@ -1447,6 +1447,7 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_set_script (run->buffer, run->script);
     hb_buffer_set_language (run->buffer, rq->text_info[run->pos].lang);
     hb_buffer_set_direction (run->buffer, run->direction);
+    hb_buffer_set_flags (run->buffer, HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT);
     hb_shape_full (run->font, run->buffer, rq->features, rq->features_len,
                    NULL);
   }

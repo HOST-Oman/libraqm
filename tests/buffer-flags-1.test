@@ -1,0 +1,38 @@
+fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
+َب َ
+--font-features=-fina,-init,-medi
+Text is: َب َ
+Direction is: DEFAULT
+
+Before script detection:
+script for ch[0]	Zinh
+script for ch[1]	Arab
+script for ch[2]	Zyyy
+script for ch[3]	Zinh
+
+After script detection:
+script for ch[0]	Zinh
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+
+Number of runs before script itemization: 1
+
+Fribidi Runs:
+run[0]:	 start: 0	length: 4	level: 1
+
+Number of runs after script itemization: 2
+
+Final Runs:
+run[0]:	 start: 1	length: 3	direction: rtl	script: Arab	font: Amiri
+run[1]:	 start: 0	length: 1	direction: rtl	script: Zinh	font: Amiri
+
+Glyph information:
+glyph [427]	x_offset: 0	y_offset: 0	x_advance: 0	font: Amiri
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 600	font: Amiri
+glyph [389]	x_offset: 0	y_offset: 0	x_advance: 1897	font: Amiri
+glyph [782]	x_offset: 0	y_offset: 0	x_advance: 1392	font: Amiri
+glyph [427]	x_offset: -1245	y_offset: -430	x_advance: 0	font: Amiri
+
+UTF-32 clusters: 02 02 01 00 00
+UTF-8 clusters:  04 04 02 00 00
