@@ -18,6 +18,17 @@ AX_COMPILER_FLAGS
 
 LT_INIT
 
+# Libtool version
+m4_define([_triplet], m4_split(AC_PACKAGE_VERSION, [[.]]))
+m4_define([_major],   m4_argn(1, _triplet))
+m4_define([_minor],   m4_argn(2, _triplet))
+m4_define([_micro],   m4_argn(3, _triplet))
+m4_define([_age],     m4_eval(_major*10000 + _minor*100))
+m4_define([_current], m4_eval(_major + _age))
+RAQM_LIBTOOL_VERSION=_current:_micro:_age
+AC_SUBST(RAQM_LIBTOOL_VERSION)
+
+
 PKG_PROG_PKG_CONFIG([0.20])
 AX_PKG_CHECK_MODULES(FREETYPE, [freetype2 >= 12.0.6], [])
 AX_PKG_CHECK_MODULES(HARFBUZZ, [], harfbuzz)

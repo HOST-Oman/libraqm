@@ -26,6 +26,10 @@ libraqm_la_CPPFLAGS = \
     $(WARN_CFLAGS) \
     $(NULL)
 
+libraqm_la_LDFLAGS = \
+    -version-info $(RAQM_LIBTOOL_VERSION) \
+    $(NULL)
+
 libraqm_test_la_SOURCES = $(libraqm_la_SOURCES)
 libraqm_test_la_LIBADD = $(libraqm_la_LIBADD)
 libraqm_test_la_CPPFLAGS = $(libraqm_la_CPPFLAGS) -DRAQM_TESTING
