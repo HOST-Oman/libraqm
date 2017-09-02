@@ -434,12 +434,9 @@ raqm_set_text_utf8 (raqm_t         *rq,
                     const char     *text,
                     size_t          len)
 {
-#ifdef _MSC_VER
-  uint32_t *unicode = _alloca (sizeof (uint32_t) * len);
-#else
-  uint32_t unicode[len];
-#endif
+  uint32_t *unicode;
   size_t ulen;
+  bool result = false;
 
   if (!rq || !text || !len)
     return false;
@@ -452,12 +449,19 @@ raqm_set_text_utf8 (raqm_t         *rq,
   if (!rq->text_utf8)
     return false;
 
+  unicode = calloc (len, sizeof(uint32_t));
+  if (!unicode)
+    goto fail;
+
   memcpy (rq->text_utf8, text, sizeof (char) * strlen (text));
 
   ulen = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
                                      text, len, unicode);
 
-  return raqm_set_text (rq, unicode, ulen);
+  result = raqm_set_text (rq, unicode, ulen);
+ fail:
+  free(unicode);
+  return result;
 }
 
 /**
