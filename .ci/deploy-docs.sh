@@ -2,6 +2,8 @@
 
 set -o errexit -o nounset
 
+if test "x$TRAVIS_SECURE_ENV_VARS" != "xtrue"; then exit; fi
+
 TAG="$(git describe --exact-match --match "v[0-9]*" HEAD 2>/dev/null || true)"
 
 if test "x$TAG" = x; then exit; fi

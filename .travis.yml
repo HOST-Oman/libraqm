@@ -1,47 +1,44 @@
-sudo: required # needed for trusty beta
-dist: trusty   # needed for HarfBuzz
-
-os:
-  - linux
-  - osx
+dist: trusty
 
 language: c
 
-compiler:
-  - gcc
-  - clang
-
 matrix:
-  exclude:
+  include:
+    - os: linux
+      script:
+        - ./autogen.sh
+        - ./configure --enable-gtk-doc
+        - make check
+        - make distcheck
+      after_success:
+        - bash .ci/deploy-docs.sh
+
+    - os: linux
+      compiler: clang
+      script:
+        - ./autogen.sh
+        - ./configure
+        - make check
+
     - os: osx
-      compiler: gcc
+      before_install:
+        - export HOMEBREW_NO_AUTO_UPDATE=1
+        - brew install freetype fribidi glib gtk-doc
+        - brew install --without-icu4c --without-glib --without-cairo
+                       --without-gobject-introspection --without-graphite2
+                       harfbuzz
+      script:
+        - ./autogen.sh
+        - ./configure
+        - make check
 
-before_install:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      sudo add-apt-repository ppa:as-bahanta/raqm -y;
-      sudo apt-get update -qq;
-      sudo apt-get install -y libfreetype6-dev libharfbuzz-dev libfribidi-dev libglib2.0-dev gtk-doc-tools;
-    fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-      brew install freetype fribidi glib gtk-doc;
-      brew install --without-icu4c --without-glib --without-gobject-introspection harfbuzz;
-      export XML_CATALOG_FILES="/usr/local/etc/xml/catalog";
-    fi;
-  - if [ "${TRAVIS_OS_NAME}" == "osx" -a "${CC}" == "gcc" ]; then export CC=gcc-4.8; fi
-
-script:
-  - ./autogen.sh
-  - ./configure --enable-gtk-doc
-  - make
-  - make check
-  - make distcheck
-
-after_success:
-  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$CC" == "gcc" -a "$TRAVIS_SECURE_ENV_VARS" == "true" ];
-      then bash .ci/deploy-docs.sh;
-    fi
-
-notifications:
-  email:
-    recipients:
-      - host-oman@googlegroups.com
+addons:
+  apt:
+    sources:
+      - sourceline: 'ppa:as-bahanta/raqm'
+    packages:
+      - libfreetype6-dev
+      - libharfbuzz-dev
+      - libfribidi-dev
+      - libglib2.0-dev
+      - gtk-doc-tools
