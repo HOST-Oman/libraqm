@@ -28,7 +28,7 @@ Raqm depends on the following libraries:
 To build the documentation you will also need:
 * [GTK-Doc][4]
 
-And the units tests require:
+To run the tests you will also need:
 * [GLib][5]
 
 To install dependencies on Ubuntu:
@@ -51,7 +51,7 @@ directory:
 
 To build the documentation, pass `--enable-gtk-doc` to the `configure` script.
 
-To run the units tests:
+To run the tests:
 
     $ make check
 
