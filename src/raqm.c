@@ -434,12 +434,9 @@ raqm_set_text_utf8 (raqm_t         *rq,
                     const char     *text,
                     size_t          len)
 {
-#ifdef _MSC_VER
-  uint32_t *unicode = _alloca (sizeof (uint32_t) * len);
-#else
-  uint32_t unicode[len];
-#endif
+  uint32_t *unicode;
   size_t ulen;
+  bool ok;
 
   if (!rq || !text || !len)
     return false;
@@ -452,12 +449,19 @@ raqm_set_text_utf8 (raqm_t         *rq,
   if (!rq->text_utf8)
     return false;
 
+  unicode = calloc (len, sizeof(uint32_t));
+  if (!unicode)
+    return false;
+
   memcpy (rq->text_utf8, text, sizeof (char) * strlen (text));
 
   ulen = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
                                      text, len, unicode);
 
-  return raqm_set_text (rq, unicode, ulen);
+  ok = raqm_set_text (rq, unicode, ulen);
+
+  free (unicode);
+  return ok;
 }
 
 /**
@@ -1015,13 +1019,8 @@ static bool
 _raqm_itemize (raqm_t *rq)
 {
   FriBidiParType par_type = FRIBIDI_PAR_ON;
-#ifdef _MSC_VER
-  FriBidiCharType *types = _alloca (sizeof (FriBidiCharType) * rq->text_len);
-  FriBidiLevel *levels = _alloca (sizeof (FriBidiLevel) * rq->text_len);
-#else
-  FriBidiCharType types[rq->text_len];
-  FriBidiLevel levels[rq->text_len];
-#endif
+  FriBidiCharType *types;
+  FriBidiLevel *levels;
   _raqm_bidi_run *runs = NULL;
   raqm_run_t *last;
   int max_level;
@@ -1046,6 +1045,11 @@ _raqm_itemize (raqm_t *rq)
       break;
   }
 #endif
+
+  types = calloc (rq->text_len, sizeof (FriBidiCharType));
+  levels = calloc (rq->text_len, sizeof (FriBidiLevel));
+  if (!types || !levels)
+    return false;
 
   if (rq->base_dir == RAQM_DIRECTION_RTL)
     par_type = FRIBIDI_PAR_RTL;
@@ -1073,15 +1077,24 @@ _raqm_itemize (raqm_t *rq)
   }
 
   if (max_level < 0)
-    return false;
+  {
+    ok = false;
+    goto done;
+  }
 
   if (!_raqm_resolve_scripts (rq))
-    return false;
+  {
+    ok = false;
+    goto done;
+  }
 
   /* Get the number of bidi runs */
   runs = _raqm_reorder_runs (types, rq->text_len, par_type, levels, &run_count);
   if (!runs)
-    return false;
+  {
+    ok = false;
+    goto done;
+  }
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Number of runs before script itemization: %zu\n\n", run_count);
@@ -1100,7 +1113,10 @@ _raqm_itemize (raqm_t *rq)
   {
     raqm_run_t *run = calloc (1, sizeof (raqm_run_t));
     if (!run)
-      return false;
+    {
+      ok = false;
+      goto done;
+    }
 
     if (!rq->runs)
       rq->runs = run;
@@ -1122,7 +1138,10 @@ _raqm_itemize (raqm_t *rq)
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
-            return false;
+          {
+            ok = false;
+            goto done;
+          }
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
@@ -1150,7 +1169,10 @@ _raqm_itemize (raqm_t *rq)
         {
           raqm_run_t *newrun = calloc (1, sizeof (raqm_run_t));
           if (!newrun)
-            return false;
+          {
+            ok = false;
+            goto done;
+          }
           newrun->pos = runs[i].pos + j;
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
@@ -1187,7 +1209,10 @@ _raqm_itemize (raqm_t *rq)
   RAQM_TEST ("\n");
 #endif
 
+done:
   free (runs);
+  free (types);
+  free (levels);
 
   return ok;
 }
@@ -1461,16 +1486,14 @@ _raqm_u32_to_u8_index (raqm_t   *rq,
                        uint32_t  index)
 {
   FriBidiStrIndex length;
-#ifdef _MSC_VER
-  char *output = _alloca ((sizeof (uint32_t) * index) + 1);
-#else
-  char output[(sizeof (uint32_t) * index) + 1];
-#endif
+  char *output = malloc ((sizeof (uint32_t) * index) + 1);
 
   length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8,
                                        rq->text,
                                        index,
                                        output);
+
+  free (output);
   return length;
 }
 
@@ -1480,16 +1503,14 @@ _raqm_u8_to_u32_index (raqm_t   *rq,
                        uint32_t  index)
 {
   FriBidiStrIndex length;
-#ifdef _MSC_VER
-  uint32_t *output = _alloca (sizeof (uint32_t) * (index + 1));
-#else
-  uint32_t output[index + 1];
-#endif
+  uint32_t *output = malloc (sizeof (uint32_t) * (index + 1));
 
   length = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
                                        rq->text_utf8,
                                        index,
                                        output);
+
+  free (output);
   return length;
 }
 
