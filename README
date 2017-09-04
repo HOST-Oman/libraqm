@@ -62,7 +62,7 @@ Once you have made a change that you are happy with, contribute it back, we’ll
 be happy to integrate it! Just fork the repository and make a pull request.
 
 Projects using Raqm
-===================
+-------------------
 
 1. [ImageMagick](https://github.com/ImageMagick/ImageMagick)
 2. [LibGD](https://github.com/libgd/libgd)
