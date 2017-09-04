@@ -95,23 +95,21 @@
  *                 raqm_set_par_direction (rq, dir) &&
  *                 raqm_layout (rq))
  *             {
- *               size_t count;
+ *               size_t count, i;
  *               raqm_glyph_t *glyphs = raqm_get_glyphs (rq, &count);
- *               if (glyphs != NULL)
- *               {
- *                 int i;
- *                 for (i = 0; i < count; i++)
- *                 {
- *                     printf ("gid#%d off: (%d, %d) adv: (%d, %d) idx: %d\n",
- *                             glyphs[i].index,
- *                             glyphs[i].x_offset,
- *                             glyphs[i].y_offset,
- *                             glyphs[i].x_advance,
- *                             glyphs[i].y_advance,
- *                             glyphs[i].cluster);
- *                 }
  *
- *                 ret = 0;
+ *               ret = !(glyphs != NULL || count == 0);
+ *
+ *               printf("glyph count: %zu\n", count);
+ *               for (i = 0; i < count; i++)
+ *               {
+ *                   printf ("gid#%d off: (%d, %d) adv: (%d, %d) idx: %d\n",
+ *                           glyphs[i].index,
+ *                           glyphs[i].x_offset,
+ *                           glyphs[i].y_offset,
+ *                           glyphs[i].x_advance,
+ *                           glyphs[i].y_advance,
+ *                           glyphs[i].cluster);
  *               }
  *             }
  *
