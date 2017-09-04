@@ -59,20 +59,22 @@
  *     const char *fontfile;
  *     const char *text;
  *     const char *direction;
+ *     const char *language;
  *     int ret = 1;
  *
  *     FT_Library library = NULL;
  *     FT_Face face = NULL;
  *
- *     if (argc < 4)
+ *     if (argc < 5)
  *     {
- *         printf ("Usage:\n FONT_FILE TEXT DIRECTION\n");
+ *         printf ("Usage: %s FONT_FILE TEXT DIRECTION LANG\n", argv[0]);
  *         return 1;
  *     }
  *
  *     fontfile =  argv[1];
  *     text = argv[2];
  *     direction = argv[3];
+ *     language = argv[4];
  *
  *     if (FT_Init_FreeType (&library) == 0)
  *     {
@@ -93,6 +95,7 @@
  *             if (raqm_set_text_utf8 (rq, text, strlen (text)) &&
  *                 raqm_set_freetype_face (rq, face) &&
  *                 raqm_set_par_direction (rq, dir) &&
+ *                 raqm_set_language (rq, language, 0, strlen (text)) &&
  *                 raqm_layout (rq))
  *             {
  *               size_t count, i;
