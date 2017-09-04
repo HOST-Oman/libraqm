@@ -386,12 +386,17 @@ raqm_set_text (raqm_t         *rq,
                const uint32_t *text,
                size_t          len)
 {
-  if (!rq || !text || !len)
+  if (!rq || !text)
     return false;
+
+  rq->text_len = len;
+
+  /* Empty string, don’t fail but do nothing */
+  if (!len)
+    return true;
 
   free (rq->text);
 
-  rq->text_len = len;
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
   if (!rq->text)
     return false;
@@ -427,8 +432,15 @@ raqm_set_text_utf8 (raqm_t         *rq,
   size_t ulen;
   bool ok;
 
-  if (!rq || !text || !len)
+  if (!rq || !text)
     return false;
+
+  /* Empty string, don’t fail but do nothing */
+  if (!len)
+  {
+    rq->text_len = len;
+    return true;
+  }
 
   RAQM_TEST ("Text is: %s\n", text);
 
@@ -528,8 +540,11 @@ raqm_set_language (raqm_t       *rq,
   hb_language_t language;
   size_t end = start + len;
 
-  if (!rq || !rq->text_len)
+  if (!rq)
     return false;
+
+  if (!rq->text_len)
+    return true;
 
   if (rq->flags & RAQM_FLAG_UTF8)
   {
@@ -629,8 +644,11 @@ _raqm_set_freetype_face (raqm_t *rq,
                          size_t  start,
                          size_t  end)
 {
-  if (!rq || !rq->text_len)
+  if (!rq)
     return false;
+
+  if (!rq->text_len)
+    return true;
 
   if (start >= rq->text_len || end > rq->text_len)
     return false;
@@ -700,8 +718,11 @@ raqm_set_freetype_face_range (raqm_t *rq,
 {
   size_t end = start + len;
 
-  if (!rq || !rq->text_len)
+  if (!rq)
     return false;
+
+  if (!rq->text_len)
+    return true;
 
   if (rq->flags & RAQM_FLAG_UTF8)
   {
@@ -762,7 +783,13 @@ _raqm_shape (raqm_t *rq);
 bool
 raqm_layout (raqm_t *rq)
 {
-  if (!rq || !rq->text_len || !rq->text_info)
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (!rq->text_info)
     return false;
 
   for (size_t i = 0; i < rq->text_len; i++)

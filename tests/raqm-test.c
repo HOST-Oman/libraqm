@@ -160,7 +160,7 @@ main (int argc, char *argv[])
   assert (raqm_layout (rq));
 
   glyphs = raqm_get_glyphs (rq, &count);
-  assert (glyphs != NULL);
+  assert (glyphs != NULL || count == 0);
 
   if (cluster >= 0)
   {

@@ -28,6 +28,7 @@ raqm_test_LDADD = \
 
 TEST_FILES = \
     buffer-flags-1.test \
+    empty-text.test \
     features-arabic.test \
     features-kerning.test \
     features-ligature.test \
