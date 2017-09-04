@@ -434,15 +434,15 @@ raqm_set_text_utf8 (raqm_t         *rq,
 
   rq->flags |= RAQM_FLAG_UTF8;
 
-  rq->text_utf8 = malloc (sizeof (char) * strlen (text));
+  rq->text_utf8 = malloc (sizeof (char) * len);
   if (!rq->text_utf8)
     return false;
 
-  unicode = calloc (len, sizeof(uint32_t));
+  unicode = malloc (sizeof (uint32_t) * len);
   if (!unicode)
     return false;
 
-  memcpy (rq->text_utf8, text, sizeof (char) * strlen (text));
+  memcpy (rq->text_utf8, text, sizeof (char) * len);
 
   ulen = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
                                      text, len, unicode);
