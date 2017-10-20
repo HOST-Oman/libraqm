@@ -1626,7 +1626,7 @@ raqm_index_to_position (raqm_t *rq,
 found:
   if (rq->flags & RAQM_FLAG_UTF8)
     *index = _raqm_u32_to_u8_index (rq, *index);
-  RAQM_TEST ("The position is %d at index %ld\n",*x ,*index);
+  RAQM_TEST ("The position is %d at index %zu\n",*x ,*index);
   return true;
 }
 
@@ -1710,7 +1710,7 @@ raqm_position_to_index (raqm_t *rq,
         }
         if (_raqm_allowed_grapheme_boundary (rq->text[*index],rq->text[*index + 1]))
         {
-          RAQM_TEST ("The start-index is %ld  at position %d \n", *index, x);
+          RAQM_TEST ("The start-index is %zu  at position %d \n", *index, x);
             return true;
         }
 
@@ -1724,7 +1724,7 @@ raqm_position_to_index (raqm_t *rq,
           }
           *index += 1;
         }
-        RAQM_TEST ("The start-index is %ld  at position %d \n", *index, x);
+        RAQM_TEST ("The start-index is %zu  at position %d \n", *index, x);
         return true;
       }
       else
@@ -1738,7 +1738,7 @@ raqm_position_to_index (raqm_t *rq,
   else
     *index = rq->text_len;
 
-  RAQM_TEST ("The start-index is %ld  at position %d \n", *index, x);
+  RAQM_TEST ("The start-index is %zu  at position %d \n", *index, x);
 
   return true;
 }
