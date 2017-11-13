@@ -1093,7 +1093,7 @@ _raqm_itemize (raqm_t *rq)
      rq->resolved_dir = RAQM_DIRECTION_RTL;
   }
 
-  if (max_level < 0)
+  if (max_level == 0)
   {
     ok = false;
     goto done;
