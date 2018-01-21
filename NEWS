@@ -1,3 +1,22 @@
+Overview of changes leading to 0.4.0
+Sunday January 21, 2018
+====================================
+
+Set begin-of-text and end-of-text HarfBuzz buffer flags.
+
+Dynamically allocate memory instead of using stack allocation for input text.
+
+Accept zero length text and do nothing instead of treating it as error.
+
+Overview of changes leading to 0.3.0
+Monday August 21, 2017
+====================================
+
+Fix stack corruption on MSVC.
+
+New API:
+* raqm_set_freetype_load_flags
+
 Overview of changes leading to 0.2.0
 Wednesday, August 25, 2016
 ====================================
