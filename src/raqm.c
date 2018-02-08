@@ -35,6 +35,10 @@
 
 #include "raqm.h"
 
+#if FRIBIDI_MAJOR_VERSION >= 1
+#define USE_FRIBIDI_EX_API
+#endif
+
 /**
  * SECTION:raqm
  * @title: Raqm
@@ -1037,6 +1041,9 @@ _raqm_itemize (raqm_t *rq)
 {
   FriBidiParType par_type = FRIBIDI_PAR_ON;
   FriBidiCharType *types;
+#ifdef USE_FRIBIDI_EX_API
+  FriBidiBracketType *btypes;
+#endif
   FriBidiLevel *levels;
   _raqm_bidi_run *runs = NULL;
   raqm_run_t *last;
@@ -1064,9 +1071,19 @@ _raqm_itemize (raqm_t *rq)
 #endif
 
   types = calloc (rq->text_len, sizeof (FriBidiCharType));
+#ifdef USE_FRIBIDI_EX_API
+  btypes = calloc (rq->text_len, sizeof (FriBidiBracketType));
+#endif
   levels = calloc (rq->text_len, sizeof (FriBidiLevel));
-  if (!types || !levels)
-    return false;
+  if (!types || !levels
+#ifdef USE_FRIBIDI_EX_API
+      || !btypes
+#endif
+      )
+  {
+    ok = false;
+    goto done;
+  }
 
   if (rq->base_dir == RAQM_DIRECTION_RTL)
     par_type = FRIBIDI_PAR_RTL;
@@ -1084,8 +1101,15 @@ _raqm_itemize (raqm_t *rq)
   else
   {
     fribidi_get_bidi_types (rq->text, rq->text_len, types);
+#ifdef USE_FRIBIDI_EX_API
+    fribidi_get_bracket_types (rq->text, rq->text_len, types, btypes);
+    max_level = fribidi_get_par_embedding_levels_ex (types, btypes,
+                                                     rq->text_len, &par_type,
+                                                     levels);
+#else
     max_level = fribidi_get_par_embedding_levels (types, rq->text_len,
                                                   &par_type, levels);
+#endif
 
    if (par_type == FRIBIDI_PAR_LTR)
      rq->resolved_dir = RAQM_DIRECTION_LTR;
@@ -1229,6 +1253,9 @@ _raqm_itemize (raqm_t *rq)
 done:
   free (runs);
   free (types);
+#ifdef USE_FRIBIDI_EX_API
+  free (btypes);
+#endif
   free (levels);
 
   return ok;
