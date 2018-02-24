@@ -5,8 +5,8 @@ install:
   - set PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;%PATH%
   - appveyor DownloadFile "https://raw.githubusercontent.com/swig/cccl/master/cccl"
   - call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
-  - appveyor-retry C:\msys64\usr\bin\pacman -Syuu --needed --noconfirm --noprogressbar --ask=127
-  - appveyor-retry C:\msys64\usr\bin\pacman -S --noconfirm autoconf automake libtool gtk-doc mingw-w64-x86_64-pkg-config mingw-w64-x86_64-harfbuzz mingw-w64-x86_64-fribidi mingw-w64-x86_64-freetype
+  - appveyor-retry pacman -Syuu --needed --noconfirm --noprogressbar --ask=127
+  - appveyor-retry pacman -S --noconfirm autoconf automake libtool gtk-doc mingw-w64-x86_64-pkg-config mingw-w64-x86_64-harfbuzz mingw-w64-x86_64-fribidi mingw-w64-x86_64-freetype
 
 build_script:
   - set CC=cccl
