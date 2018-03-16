@@ -96,6 +96,8 @@ main (int argc, char *argv[])
     dir = RAQM_DIRECTION_RTL;
   else if (direction && strcmp(direction, "ltr") == 0)
     dir = RAQM_DIRECTION_LTR;
+  else if (direction && strcmp(direction, "ttb") == 0)
+    dir = RAQM_DIRECTION_TTB;
 
   rq = raqm_create ();
   assert (raqm_set_text_utf8 (rq, text, strlen (text)));
