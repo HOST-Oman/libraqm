@@ -8,7 +8,7 @@ matrix:
       script:
         - ./autogen.sh
         - ./configure --enable-gtk-doc
-        - make check
+        - make check || (cat `find . -name '*.log'` && false)
         - make distcheck
       after_success:
         - bash .ci/deploy-docs.sh
@@ -18,7 +18,7 @@ matrix:
       script:
         - ./autogen.sh
         - ./configure
-        - make check
+        - make check || (cat `find . -name '*.log'` && false)
 
     - os: osx
       before_install:
@@ -30,7 +30,7 @@ matrix:
       script:
         - ./autogen.sh
         - ./configure
-        - make check
+        - make check || (cat `find . -name '*.log'` && false)
 
 addons:
   apt:
