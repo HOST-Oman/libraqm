@@ -4,6 +4,7 @@ os:
 install:
   - set PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;%PATH%
   - appveyor DownloadFile "https://raw.githubusercontent.com/swig/cccl/master/cccl"
+  - appveyor DownloadFile "https://github.com/adah1972/libunibreak/releases/download/libunibreak_4_0/libunibreak-4.0.tar.gz"
   - call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
   - appveyor-retry pacman -Syuu --needed --noconfirm --noprogressbar --ask=127
   - appveyor-retry pacman -S --noconfirm autoconf automake libtool gtk-doc mingw-w64-x86_64-pkg-config mingw-w64-x86_64-harfbuzz mingw-w64-x86_64-fribidi mingw-w64-x86_64-freetype
@@ -14,6 +15,9 @@ build_script:
   - set LD=cccl
   - set PKG_CONFIG_PATH=%PKG_CONFIG_PATH%:/mingw64/lib/pkgconfig
   - bash -c "mv cccl /usr/bin"
+  - bash -c "tar xf libunibreak-4.0.tar.gz && cd libunibreak-4.0 && ./configure --prefix=/usr/local && make && make install"
+  - set UNIBREAK_CFLAGS=-I/usr/local/include
+  - set UNIBREAK_LIBS="-L/usr/local/lib/ -lunibreak"
   - bash -c "exec 0</dev/null; ./autogen.sh"
   - bash -c "exec 0</dev/null; ./configure"
   - bash -c "exec 0</dev/null; make CFLAGS='/W4 /WX /wd4068'"

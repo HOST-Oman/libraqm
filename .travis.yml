@@ -6,6 +6,7 @@ matrix:
   include:
     - os: linux
       script:
+        - export UNIBREAK_CFLAGS=-I/usr/include UNIBREAK_LIBS=-lunibreak
         - ./autogen.sh
         - ./configure --enable-gtk-doc
         - make check
@@ -16,12 +17,15 @@ matrix:
     - os: linux
       compiler: clang
       script:
+        - export UNIBREAK_CFLAGS=-I/usr/include UNIBREAK_LIBS=-lunibreak
         - ./autogen.sh
         - ./configure
         - make check
 
     - os: osx
       before_install:
+        - wget https://github.com/adah1972/libunibreak/releases/download/libunibreak_4_0/libunibreak-4.0.tar.gz
+        - (tar xf libunibreak-4.0.tar.gz && cd libunibreak-4.0 && ./configure && make && sudo make install)
         - export HOMEBREW_NO_AUTO_UPDATE=1
         - brew install freetype fribidi glib gtk-doc
         - brew install --without-icu4c --without-glib --without-cairo
@@ -41,4 +45,5 @@ addons:
       - libharfbuzz-dev
       - libfribidi-dev
       - libglib2.0-dev
+      - libunibreak-dev
       - gtk-doc-tools

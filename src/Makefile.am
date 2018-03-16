@@ -16,6 +16,7 @@ libraqm_la_LIBADD = \
     $(FREETYPE_LIBS) \
     $(HARFBUZZ_LIBS) \
     $(FRIBIDI_LIBS) \
+    $(UNIBREAK_LIBS) \
     $(WARN_LDLAGS) \
     $(NULL)
 
@@ -23,6 +24,7 @@ libraqm_la_CPPFLAGS = \
     $(FREETYPE_CFLAGS) \
     $(HARFBUZZ_CFLAGS) \
     $(FRIBIDI_CFLAGS) \
+    $(UNIBREAK_CFLAGS) \
     $(WARN_CFLAGS) \
     $(NULL)
 
