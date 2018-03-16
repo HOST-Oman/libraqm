@@ -38,6 +38,7 @@ TEST_FILES = \
     direction-rtl-3.test \
     direction-rtl-4.test \
     direction-rtl-5.test \
+    direction-ttb-1.test \
     empty-text.test \
     features-arabic.test \
     features-kerning.test \

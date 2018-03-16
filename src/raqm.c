@@ -1093,7 +1093,7 @@ _raqm_itemize (raqm_t *rq)
   if (rq->base_dir == RAQM_DIRECTION_TTB)
   {
     /* Treat every thing as LTR in vertical text */
-    max_level = 0;
+    max_level = 1;
     memset (types, FRIBIDI_TYPE_LTR, rq->text_len);
     memset (levels, 0, rq->text_len);
     rq->resolved_dir = RAQM_DIRECTION_LTR;
