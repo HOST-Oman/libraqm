@@ -1530,7 +1530,7 @@ _raqm_u32_to_u8_index (raqm_t   *rq,
                        uint32_t  index)
 {
   FriBidiStrIndex length;
-  char *output = malloc ((sizeof (uint32_t) * index) + 1);
+  char *output = malloc ((sizeof (char) * 4 * index) + 1);
 
   length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8,
                                        rq->text,
