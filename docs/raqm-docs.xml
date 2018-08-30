@@ -6,16 +6,12 @@
 ]>
 <book id="index">
   <bookinfo>
-    <title>Reference manual</title>
+    <title>Raqm Reference Manual</title>
     <releaseinfo>
       This document is for Raqm &version;.
       <!--The latest version of this documentation can be found on-line at
-      <ulink role="online-location" url="http://[SERVER]/libharfbuzz/index.html">http://[SERVER]/libharfbuzz/</ulink>.-->
+      <ulink role="online-location" url="http://host-oman.github.io/libraqm/">http://host-oman.github.io/libraqm/</ulink>.-->
     </releaseinfo>
-    <title>Raqm Manual</title>
-    <abstract>
-      <title>Raqm</title>
-    </abstract>
   </bookinfo>
 
   <chapter>
