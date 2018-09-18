@@ -32,31 +32,49 @@
 
 #include "raqm.h"
 
-static gchar *direction = NULL;
-static gchar *text = NULL;
-static gchar *features = NULL;
-static gchar *font = NULL;
-static gchar *fonts = NULL;
-static gchar *languages = NULL;
-static gint cluster = -1;
-static gint position = -1;
-static gchar **args = NULL;
-static GOptionEntry entries[] =
+static char *text = NULL;
+static char *font = NULL;
+static char *fonts = NULL;
+static char *languages = NULL;
+static char *direction = NULL;
+static char *features = NULL;
+static int cluster = -1;
+static int position = -1;
+
+static bool
+parse_args (int argc, char **argv)
 {
-  { "text", 0, 0, G_OPTION_ARG_STRING, &text, "The text to be displayed", "TEXT" },
-  { "font", 0, 0, G_OPTION_ARG_STRING, &font, "The font file", "FONT" },
-  { "fonts", 0, 0, G_OPTION_ARG_STRING, &fonts, "Font files and ranges for multi-fonts: <fontfile1> start:length, ...", "FONTS" },
-  { "languages", 0, 0, G_OPTION_ARG_STRING, &languages, "Text languages in the form: code;start:length,...", "LANGUAGES" },
-  { "direction", 0, 0, G_OPTION_ARG_STRING, &direction, "The text direction", "DIR" },
-  { "font-features", 0, 0, G_OPTION_ARG_STRING, &features, "The font features ", "FEATURES" },
-  { "cluster", 0, 0, G_OPTION_ARG_INT, &cluster, "The glyph cluster ", "CLUSTER" },
-  { "position", 0, 0, G_OPTION_ARG_INT, &position, "The glyph position ", "POSITION" },
-  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &args, "Remaining arguments", "FONTFILE" },
-  { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
-};
+  int i = 1;
+  while (i < argc)
+  {
+    if (strcmp (argv[i], "--text") == 0)
+      text = argv[++i];
+    else if (strcmp (argv[i], "--font") == 0)
+      font = argv[++i];
+    else if (strcmp (argv[i], "--fonts") == 0)
+      fonts = argv[++i];
+    else if (strcmp (argv[i], "--languages") == 0)
+      languages = argv[++i];
+    else if (strcmp (argv[i], "--direction") == 0)
+      direction = argv[++i];
+    else if (strcmp (argv[i], "--font-features") == 0)
+      features = argv[++i];
+    else if (strcmp (argv[i], "--cluster") == 0)
+      cluster = atoi (argv[++i]);
+    else if (strcmp (argv[i], "--position") == 0)
+      position = atoi (argv[++i]);
+    else
+    {
+      fprintf (stderr, "Unknown option: %s\n", argv[i]);
+      return false;
+    }
+    i++;
+  }
+  return true;
+}
 
 int
-main (int argc, char *argv[])
+main (int argc, char **argv)
 {
   FT_Library library;
   FT_Face face;
@@ -67,27 +85,16 @@ main (int argc, char *argv[])
   raqm_direction_t dir;
   int x = 0, y = 0;
 
-  GError *error = NULL;
-  GOptionContext *context;
-
   setlocale (LC_ALL, "");
-  context = g_option_context_new ("- Test libraqm");
-  g_option_context_add_main_entries (context, entries, NULL);
 
-  if (!g_option_context_parse (context, &argc, &argv, &error))
-  {
-    g_print ("Option parsing failed: %s\n", error->message);
+  if (!parse_args(argc, argv))
     return 1;
-  }
-
-  g_option_context_free (context);
 
   text = g_strcompress (text);
 
   if (text == NULL || (font == NULL && fonts == NULL))
   {
-    g_print ("Text or font is missing.\n\n%s",
-             g_option_context_get_help (context, TRUE, NULL));
+    fprintf (stderr, "Text or font is missing.\n");
     return 1;
   }
 

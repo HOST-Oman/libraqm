@@ -42,10 +42,10 @@ do
 				fi
 			done
 			IFS=$oldIFS
-			$testtool --text="$text" $opts --fonts="$fonts" > $output
+			$testtool --text "$text" $opts --fonts "$fonts" > $output
 		;;
 		*)
-			$testtool --text="$text" $opts --font="$srcdir/$font" > $output
+			$testtool --text "$text" $opts --font "$srcdir/$font" > $output
 		;;
 	esac
 
