@@ -86,12 +86,12 @@ AM_TESTS_ENVIRONMENT = \
     export builddir; \
     $(NULL)
 
-TEST_LOG_COMPILER = sh $(srcdir)/runtest
+TEST_LOG_COMPILER = python $(srcdir)/runtest.py
 
 EXTRA_DIST = \
     $(TEST_FILES) \
     fonts/sha1sum \
-    runtest \
+    runtest.py \
     $(NULL)
 
 update-tests:
