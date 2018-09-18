@@ -28,7 +28,6 @@
 
 #include <assert.h>
 #include <locale.h>
-#include <glib.h>
 
 #include "raqm.h"
 
@@ -89,8 +88,6 @@ main (int argc, char **argv)
 
   if (!parse_args(argc, argv))
     return 1;
-
-  text = g_strcompress (text);
 
   if (text == NULL || (font == NULL && fonts == NULL))
   {

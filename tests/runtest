@@ -21,7 +21,7 @@ do
 	$reference && filename=$srcdir/$filename
 
 	font=$(sed -n 1p $filename)
-	text=$(sed -n 2p $filename)
+	text=$(sed -n 2p $filename | sed -e 's/\\n/\n/g' -e 's/\\r/\r/g')
 	opts=$(sed -n 3p $filename)
 	expected=$(mktemp expected.XXXXXX)
 	tail -n +4 $filename > $expected
