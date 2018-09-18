@@ -10,7 +10,6 @@ raqm_test_SOURCES = \
 raqm_test_CPPFLAGS = \
     -I$(top_srcdir)/src/ \
     -I$(top_builddir)/src/ \
-    $(GLIB_CFLAGS) \
     $(FREETYPE_CFLAGS) \
     $(HARFBUZZ_CFLAGS) \
     $(FRIBIDI_CFLAGS) \
@@ -19,7 +18,6 @@ raqm_test_CPPFLAGS = \
 
 raqm_test_LDADD = \
     $(top_builddir)/src/libraqm-test.la \
-    $(GLIB_LIBS) \
     $(FREETYPE_LIBS) \
     $(HARFBUZZ_LIBS) \
     $(FRIBIDI_LIBS) \
@@ -72,10 +70,8 @@ TEST_FILES = \
 
 # direction-ttb-1.test # Broken on Travis, probably old HarfBuzz/FreeType
 
-if HAVE_GLIB
 check_PROGRAMS += raqm-test
 TESTS += $(TEST_FILES)
-endif # HAVE_GLIB
 
 TEST_EXTENSIONS = \
     .test \

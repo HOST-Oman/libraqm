@@ -23,7 +23,7 @@ matrix:
     - os: osx
       before_install:
         - export HOMEBREW_NO_AUTO_UPDATE=1
-        - brew install freetype fribidi glib gtk-doc
+        - brew install freetype fribidi gtk-doc
         - brew install --without-icu4c --without-glib --without-cairo
                        --without-gobject-introspection --without-graphite2
                        harfbuzz
@@ -40,5 +40,4 @@ addons:
       - libfreetype6-dev
       - libharfbuzz-dev
       - libfribidi-dev
-      - libglib2.0-dev
       - gtk-doc-tools

@@ -28,17 +28,14 @@ Raqm depends on the following libraries:
 To build the documentation you will also need:
 * [GTK-Doc][4]
 
-To run the tests you will also need:
-* [GLib][5]
-
 To install dependencies on Ubuntu:
 
     sudo apt-get install libfreetype6-dev libharfbuzz-dev libfribidi-dev \
-                         libglib2.0-dev gtk-doc-tools
+                         gtk-doc-tools
 
 On Mac OS X you can use Homebrew:
 
-    brew install freetype harfbuzz fribidi glib gtk-doc
+    brew install freetype harfbuzz fribidi gtk-doc
     export XML_CATALOG_FILES="/usr/local/etc/xml/catalog" # for the docs
 
 Once you have the source code and the dependencies, you can proceed to build.
@@ -82,4 +79,3 @@ The following projects have patches to support complex text layout using Raqm:
 [2]: http://harfbuzz.org
 [3]: http://freetype.org
 [4]: http://www.gtk.org/gtk-doc
-[5]: https://wiki.gnome.org/Projects/GLib
