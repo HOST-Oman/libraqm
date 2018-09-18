@@ -34,11 +34,15 @@ do
 			fonts=
 			for f in $font
 			do
+				if [ x"$(basename $f .ttf)" != x"$f" ]
+				then
+					f=$srcdir/$f
+				fi
 				if [ x"$fonts" = x"" ]
 				then
-					fonts=$srcdir/$f
+					fonts=$f
 				else
-					fonts=$fonts,$srcdir/$f
+					fonts=$fonts,$f
 				fi
 			done
 			IFS=$oldIFS
