@@ -113,18 +113,15 @@ main (int argc, char **argv)
 
   if (fonts)
   {
-    gchar **list, **p;
-    p = list = g_strsplit (fonts, ",", -1);
-    while (p && *p)
+    for (char *tok = strtok (fonts, ","); tok; tok = strtok (NULL, ","))
     {
       int start, length;
-      assert (!FT_New_Face (library, *(p++), 0, &face));
+      assert (!FT_New_Face (library, tok, 0, &face));
       assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-      start = atoi (*(p++));
-      length = atoi (*(p++));
+      start = atoi (strtok (NULL, ","));
+      length = atoi (strtok (NULL, ","));
       assert (raqm_set_freetype_face_range(rq, face, start, length));
     }
-    g_strfreev (list);
   } else {
     assert (!FT_New_Face (library, font, 0, &face));
     assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
@@ -133,27 +130,19 @@ main (int argc, char **argv)
 
   if (languages)
   {
-    gchar **list, **p;
-    p = list = g_strsplit (languages, ",", -1);
-    while (p && *p)
+    for (char *tok = strtok (languages, ","); tok; tok = strtok (NULL, ","))
     {
-      char *lang;
       int start, length;
-      lang = *(p++);
-      start = atoi (*(p++));
-      length = atoi (*(p++));
-      assert (raqm_set_language(rq, lang, start, length));
+      start = atoi (strtok (NULL, ","));
+      length = atoi (strtok (NULL, ","));
+      assert (raqm_set_language(rq, tok, start, length));
     }
-    g_strfreev (list);
   }
 
   if (features)
   {
-    gchar **list, **p;
-    p = list = g_strsplit (features, ",", -1);
-    while (p && *p)
-      assert (raqm_add_font_feature (rq, *(p++), -1));
-    g_strfreev (list);
+    for (char *tok = strtok (features, ","); tok; tok = strtok (NULL, ","))
+      assert (raqm_add_font_feature (rq, tok, -1));
   }
 
   assert (raqm_layout (rq));
