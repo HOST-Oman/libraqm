@@ -113,21 +113,16 @@ main (int argc, char **argv)
 
   if (fonts)
   {
-    gchar **list = g_strsplit (fonts, ",", -1);
-    for (gchar **p = list; p != NULL && *p != NULL; p++)
+    gchar **list, **p;
+    p = list = g_strsplit (fonts, ",", -1);
+    while (p && *p)
     {
-      gchar **sublist = g_strsplit (*p, " ", -1);
-      gchar **range;
-      int s, l;
-      assert (!FT_New_Face (library, sublist[0], 0, &face));
+      int start, length;
+      assert (!FT_New_Face (library, *(p++), 0, &face));
       assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-      range = g_strsplit (sublist[1], ":", -1);
-      s = atoi(range[0]);
-      l = atoi(range[1]);
-      assert (raqm_set_freetype_face_range(rq, face, s, l));
-
-      g_strfreev (range);
-      g_strfreev (sublist);
+      start = atoi (*(p++));
+      length = atoi (*(p++));
+      assert (raqm_set_freetype_face_range(rq, face, start, length));
     }
     g_strfreev (list);
   } else {
@@ -138,31 +133,26 @@ main (int argc, char **argv)
 
   if (languages)
   {
-    gchar **list = g_strsplit (languages, ",", -1);
-    for (gchar **p = list; p != NULL && *p != NULL; p++)
+    gchar **list, **p;
+    p = list = g_strsplit (languages, ",", -1);
+    while (p && *p)
     {
-      gchar **sublist = g_strsplit (*p, ";", -1);
-      gchar **range;
-      gchar *lang;
+      char *lang;
       int start, length;
-
-      lang = sublist[0];
-      range = g_strsplit (sublist[1], ":", -1);
-      start = atoi(range[0]);
-      length = atoi(range[1]);
+      lang = *(p++);
+      start = atoi (*(p++));
+      length = atoi (*(p++));
       assert (raqm_set_language(rq, lang, start, length));
-
-      g_strfreev (range);
-      g_strfreev (sublist);
     }
     g_strfreev (list);
   }
 
   if (features)
   {
-    gchar **list = g_strsplit (features, ",", -1);
-    for (gchar **p = list; p != NULL && *p != NULL; p++)
-      assert (raqm_add_font_feature (rq, *p, -1));
+    gchar **list, **p;
+    p = list = g_strsplit (features, ",", -1);
+    while (p && *p)
+      assert (raqm_add_font_feature (rq, *(p++), -1));
     g_strfreev (list);
   }
 
