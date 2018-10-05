@@ -1,41 +1,33 @@
-dist: trusty
+dist: xenial
+sudo: true
 
 language: c
 
 matrix:
   include:
     - os: linux
-      script:
-        - ./autogen.sh
-        - ./configure --enable-gtk-doc
-        - make check || (cat `find . -name '*.log'` && false)
-        - make distcheck
       after_success:
         - bash .ci/deploy-docs.sh
 
     - os: linux
       compiler: clang
-      script:
-        - ./autogen.sh
-        - ./configure
-        - make check || (cat `find . -name '*.log'` && false)
 
     - os: osx
-      before_install:
+      install:
         - export HOMEBREW_NO_AUTO_UPDATE=1
-        - brew install freetype fribidi gtk-doc
-        - brew install --without-icu4c --without-glib --without-cairo
-                       --without-gobject-introspection --without-graphite2
-                       harfbuzz
-      script:
-        - ./autogen.sh
-        - ./configure
-        - make check || (cat `find . -name '*.log'` && false)
+        - export XML_CATALOG_FILES="/usr/local/etc/xml/catalog" # for the docs
+        - brew install freetype fribidi gtk-doc harfbuzz
+
+before_script:
+  - ./autogen.sh
+  - ./configure --enable-gtk-doc
+
+script:
+  - make check || (cat `find . -name '*.log'` && false)
+  - make distcheck
 
 addons:
   apt:
-    sources:
-      - sourceline: 'ppa:as-bahanta/raqm'
     packages:
       - libfreetype6-dev
       - libharfbuzz-dev
