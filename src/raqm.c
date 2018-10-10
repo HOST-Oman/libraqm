@@ -191,6 +191,7 @@ struct _raqm {
   _raqm_flags_t    flags;
 
   int              ft_loadflags;
+  int              invisible_glyph;
 };
 
 struct _raqm_run {
@@ -306,6 +307,7 @@ raqm_create (void)
   rq->flags = RAQM_FLAG_NONE;
 
   rq->ft_loadflags = -1;
+  rq->invisible_glyph = 0;
 
   return rq;
 }
@@ -763,6 +765,45 @@ raqm_set_freetype_load_flags (raqm_t *rq,
 
   rq->ft_loadflags = flags;
 
+  return true;
+}
+
+/**
+ * raqm_set_invisible_glyph:
+ * @rq: a #raqm_t.
+ * @gid: glyph id to use for invisible glyphs.
+ *
+ * Sets the glyph id to be used for invisible glyhphs.
+ *
+ * If @gid is negative, invisible glyphs will be suppressed from the output.
+ * This works on all versions of HarfBuzz.
+ *
+ * If @gid is zero, invisible glyphs will be rendered as space.
+ * This works on all versions of HarfBuzz.
+ *
+ * If @gid is a positive number, it will be used for invisible glyphs.
+ * This requires a version of HarfBuzz that has
+ * hb_buffer_set_invisible_glyph(). For older versions, the return value
+ * will be %false and the shaping behavior does not change.
+ *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
+ * Since: 0.6
+ */
+bool
+raqm_set_invisible_glyph (raqm_t *rq,
+                          int gid)
+{
+  if (!rq)
+    return false;
+
+#ifndef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
+  if (gid > 0)
+    return false;
+#endif
+
+  rq->invisible_glyph = gid;
   return true;
 }
 
@@ -1507,6 +1548,10 @@ _raqm_resolve_scripts (raqm_t *rq)
 static bool
 _raqm_shape (raqm_t *rq)
 {
+  hb_buffer_flags_t hb_buffer_flags = HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT;
+  if (rq->invisible_glyph < 0)
+    hb_buffer_flags |= HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES;
+
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
     run->buffer = hb_buffer_create ();
@@ -1516,7 +1561,13 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_set_script (run->buffer, run->script);
     hb_buffer_set_language (run->buffer, rq->text_info[run->pos].lang);
     hb_buffer_set_direction (run->buffer, run->direction);
-    hb_buffer_set_flags (run->buffer, HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT);
+    hb_buffer_set_flags (run->buffer, hb_buffer_flags);
+
+#ifdef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
+    if (rq->invisible_glyph > 0)
+      hb_buffer_set_invisible_glyph (run->buffer, rq->invisible_glyph);
+#endif
+
     hb_shape_full (run->font, run->buffer, rq->features, rq->features_len,
                    NULL);
   }
