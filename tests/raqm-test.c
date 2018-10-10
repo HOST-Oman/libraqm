@@ -92,7 +92,8 @@ has_requirement (char *req)
 #endif
 
   if (strcmp (req, "HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES") == 0)
-#ifdef HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
+#if defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) && \
+        HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
     return true;
 #else
     return false;

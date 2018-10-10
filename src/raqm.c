@@ -805,7 +805,8 @@ raqm_set_invisible_glyph (raqm_t *rq,
     return false;
 #endif
 
-#if !HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
+#if !defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) || \
+    !HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
   if (gid < 0)
     return false;
 #endif
@@ -1557,7 +1558,8 @@ _raqm_shape (raqm_t *rq)
 {
   hb_buffer_flags_t hb_buffer_flags = HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT;
 
-#if HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
+#if defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) && \
+    HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
   if (rq->invisible_glyph < 0)
     hb_buffer_flags |= HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES;
 #endif
