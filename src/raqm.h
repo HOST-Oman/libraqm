@@ -139,6 +139,10 @@ raqm_set_freetype_load_flags (raqm_t *rq,
                               int flags);
 
 bool
+raqm_set_invisible_glyph (raqm_t *rq,
+                          int gid);
+
+bool
 raqm_layout (raqm_t *rq);
 
 raqm_glyph_t *

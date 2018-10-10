@@ -1,0 +1,30 @@
+fonts/sha1sum/e4c7989e4c78dc2af43fd87ede6a6ba6cbf14cb5.ttf
+芦󠄂
+--direction ltr --invisible-glyph 0
+Text is: 芦󠄂
+Direction is: LTR
+
+Before script detection:
+script for ch[0]	Hani
+script for ch[1]	Zinh
+
+After script detection:
+script for ch[0]	Hani
+script for ch[1]	Hani
+
+Number of runs before script itemization: 1
+
+Fribidi Runs:
+run[0]:	 start: 0	length: 2	level: 0
+
+Number of runs after script itemization: 1
+
+Final Runs:
+run[0]:	 start: 0	length: 2	direction: ltr	script: Hani	font: OpenTypeTest CMAP 14
+
+Glyph information:
+glyph [1]	x_offset: 0	y_offset: 0	x_advance: 1000	font: OpenTypeTest CMAP 14
+glyph [5]	x_offset: 0	y_offset: 0	x_advance: 0	font: OpenTypeTest CMAP 14
+
+UTF-32 clusters: 00 00
+UTF-8 clusters:  00 00

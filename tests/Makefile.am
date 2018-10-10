@@ -65,7 +65,10 @@ TEST_FILES = \
     cursor_position_GB5.test \
     cursor_position_GB8a.test \
     cursor_position_GB9.test \
-    cursor_position_GB9a.test
+    cursor_position_GB9a.test \
+    invisible_glyph_hidden.test \
+    invisible_glyph_space.test \
+    invisible_glyph_explicit.test
     $(NULL)
 
 # direction-ttb-1.test # Broken on Travis, probably old HarfBuzz/FreeType

@@ -37,8 +37,13 @@ static char *fonts = NULL;
 static char *languages = NULL;
 static char *direction = NULL;
 static char *features = NULL;
+static char *require = NULL;
 static int cluster = -1;
 static int position = -1;
+static int invisible_glyph = 0;
+
+/* Special exit code, recognized by automake that we're skipping a test. */
+static const int skip_exit_status = 77;
 
 static bool
 parse_args (int argc, char **argv)
@@ -58,10 +63,14 @@ parse_args (int argc, char **argv)
       direction = argv[++i];
     else if (strcmp (argv[i], "--font-features") == 0)
       features = argv[++i];
+    else if (strcmp (argv[i], "--require") == 0)
+      require = argv[++i];
     else if (strcmp (argv[i], "--cluster") == 0)
       cluster = atoi (argv[++i]);
     else if (strcmp (argv[i], "--position") == 0)
       position = atoi (argv[++i]);
+    else if (strcmp (argv[i], "--invisible-glyph") == 0)
+      invisible_glyph = atoi (argv[++i]);
     else
     {
       fprintf (stderr, "Unknown option: %s\n", argv[i]);
@@ -70,6 +79,20 @@ parse_args (int argc, char **argv)
     i++;
   }
   return true;
+}
+
+static bool
+has_requirement (char *req)
+{
+  if (strcmp (req, "hb_buffer_set_invisible_glyph") == 0)
+#ifdef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
+    return true;
+#else
+    return false;
+#endif
+
+  fprintf (stderr, "Unknown requirement: %s\n", req);
+  return false;
 }
 
 int
@@ -93,6 +116,13 @@ main (int argc, char **argv)
   {
     fprintf (stderr, "Text or font is missing.\n");
     return 1;
+  }
+
+  if (require)
+  {
+    for (char *req = strtok (require, ","); req; req = strtok (NULL, ","))
+      if (!has_requirement (req))
+        return skip_exit_status;
   }
 
   dir = RAQM_DIRECTION_DEFAULT;
@@ -140,6 +170,11 @@ main (int argc, char **argv)
   {
     for (char *tok = strtok (features, ","); tok; tok = strtok (NULL, ","))
       assert (raqm_add_font_feature (rq, tok, -1));
+  }
+
+  if (invisible_glyph)
+  {
+    assert (raqm_set_invisible_glyph (rq, invisible_glyph));
   }
 
   assert (raqm_layout (rq));
