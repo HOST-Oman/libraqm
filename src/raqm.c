@@ -776,7 +776,9 @@ raqm_set_freetype_load_flags (raqm_t *rq,
  * Sets the glyph id to be used for invisible glyhphs.
  *
  * If @gid is negative, invisible glyphs will be suppressed from the output.
- * This works on all versions of HarfBuzz.
+ * This requires HarfBuzz 1.8.0 or later. If raqm is used with an earlier
+ * HarfBuzz version, the return value will be %false and the shaping behavior
+ * does not change.
  *
  * If @gid is zero, invisible glyphs will be rendered as space.
  * This works on all versions of HarfBuzz.
@@ -800,6 +802,11 @@ raqm_set_invisible_glyph (raqm_t *rq,
 
 #ifndef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
   if (gid > 0)
+    return false;
+#endif
+
+#ifndef HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
+  if (gid < 0)
     return false;
 #endif
 
@@ -1549,8 +1556,11 @@ static bool
 _raqm_shape (raqm_t *rq)
 {
   hb_buffer_flags_t hb_buffer_flags = HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT;
+
+#ifdef HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
   if (rq->invisible_glyph < 0)
     hb_buffer_flags |= HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES;
+#endif
 
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {

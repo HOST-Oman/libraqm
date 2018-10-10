@@ -91,6 +91,13 @@ has_requirement (char *req)
     return false;
 #endif
 
+  if (strcmp (req, "HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES") == 0)
+#ifdef HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
+    return true;
+#else
+    return false;
+#endif
+
   fprintf (stderr, "Unknown requirement: %s\n", req);
   return false;
 }
