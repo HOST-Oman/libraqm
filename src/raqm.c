@@ -1315,7 +1315,7 @@ typedef struct {
   size_t       capacity;
   size_t       size;
   int         *pair_index;
-  hb_script_t *scripts;
+  hb_script_t *script;
 } _raqm_stack_t;
 
 /* Special paired characters for script detection */
@@ -1344,7 +1344,7 @@ static const FriBidiChar paired_chars[] =
 static void
 _raqm_stack_free (_raqm_stack_t *stack)
 {
-  free (stack->scripts);
+  free (stack->script);
   free (stack->pair_index);
   free (stack);
 }
@@ -1358,8 +1358,8 @@ _raqm_stack_new (size_t max)
   if (!stack)
     return NULL;
 
-  stack->scripts = malloc (sizeof (hb_script_t) * max);
-  if (!stack->scripts)
+  stack->script = malloc (sizeof (hb_script_t) * max);
+  if (!stack->script)
   {
     _raqm_stack_free (stack);
     return NULL;
@@ -1401,13 +1401,13 @@ _raqm_stack_top (_raqm_stack_t *stack)
     return HB_SCRIPT_INVALID; /* XXX: check this */
   }
 
-  return stack->scripts[stack->size];
+  return stack->script[stack->size];
 }
 
 static bool
-_raqm_stack_push (_raqm_stack_t      *stack,
-            hb_script_t script,
-            int         pi)
+_raqm_stack_push (_raqm_stack_t *stack,
+                  hb_script_t    script,
+                  int            pair_index)
 {
   if (stack->size == stack->capacity)
   {
@@ -1416,14 +1416,14 @@ _raqm_stack_push (_raqm_stack_t      *stack,
   }
 
   stack->size++;
-  stack->scripts[stack->size] = script;
-  stack->pair_index[stack->size] = pi;
+  stack->script[stack->size] = script;
+  stack->pair_index[stack->size] = pair_index;
 
   return true;
 }
 
 static int
-get_pair_index (const FriBidiChar ch)
+_get_pair_index (const FriBidiChar ch)
 {
   int lower = 0;
   int upper = paired_len - 1;
@@ -1443,7 +1443,6 @@ get_pair_index (const FriBidiChar ch)
 }
 
 #define STACK_IS_EMPTY(script)     ((script)->size <= 0)
-#define STACK_IS_NOT_EMPTY(script) (! STACK_IS_EMPTY(script))
 #define IS_OPEN(pair_index)        (((pair_index) & 1) == 0)
 
 /* Resolve the script for each character in the input string, if the character
@@ -1456,12 +1455,12 @@ _raqm_resolve_scripts (raqm_t *rq)
 {
   int last_script_index = -1;
   int last_set_index = -1;
-  hb_script_t last_script_value = HB_SCRIPT_INVALID;
+  hb_script_t last_script = HB_SCRIPT_INVALID;
   _raqm_stack_t *stack = NULL;
+  hb_unicode_funcs_t* unicode_funcs = hb_unicode_funcs_get_default ();
 
   for (size_t i = 0; i < rq->text_len; ++i)
-    rq->text_info[i].script = hb_unicode_script (
-        hb_unicode_funcs_get_default (), rq->text[i]);
+    rq->text_info[i].script = hb_unicode_script (unicode_funcs, rq->text[i]);
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Before script detection:\n");
@@ -1479,16 +1478,15 @@ _raqm_resolve_scripts (raqm_t *rq)
 
   for (int i = 0; i < (int) rq->text_len; i++)
   {
-    if (rq->text_info[i].script == HB_SCRIPT_COMMON &&
-        last_script_index != -1)
+    if (rq->text_info[i].script == HB_SCRIPT_COMMON && last_script_index != -1)
     {
-      int pair_index = get_pair_index (rq->text[i]);
+      int pair_index = _get_pair_index (rq->text[i]);
       if (pair_index >= 0)
       {
         if (IS_OPEN (pair_index))
         {
           /* is a paired character */
-          rq->text_info[i].script = last_script_value;
+          rq->text_info[i].script = last_script;
           last_set_index = i;
           _raqm_stack_push (stack, rq->text_info[i].script, pair_index);
         }
@@ -1497,42 +1495,41 @@ _raqm_resolve_scripts (raqm_t *rq)
           /* is a close paired character */
           /* find matching opening (by getting the last even index for current
            * odd index) */
-          int pi = pair_index & ~1;
-          while (STACK_IS_NOT_EMPTY (stack) &&
-                 stack->pair_index[stack->size] != pi)
+          while (!STACK_IS_EMPTY (stack) &&
+                 stack->pair_index[stack->size] != (pair_index & ~1))
           {
             _raqm_stack_pop (stack);
           }
-          if (STACK_IS_NOT_EMPTY (stack))
+          if (!STACK_IS_EMPTY (stack))
           {
             rq->text_info[i].script = _raqm_stack_top (stack);
-            last_script_value = rq->text_info[i].script;
+            last_script = rq->text_info[i].script;
             last_set_index = i;
           }
           else
           {
-            rq->text_info[i].script = last_script_value;
+            rq->text_info[i].script = last_script;
             last_set_index = i;
           }
         }
       }
       else
       {
-        rq->text_info[i].script = last_script_value;
+        rq->text_info[i].script = last_script;
         last_set_index = i;
       }
     }
     else if (rq->text_info[i].script == HB_SCRIPT_INHERITED &&
              last_script_index != -1)
     {
-      rq->text_info[i].script = last_script_value;
+      rq->text_info[i].script = last_script;
       last_set_index = i;
     }
     else
     {
       for (int j = last_set_index + 1; j < i; ++j)
         rq->text_info[j].script = rq->text_info[i].script;
-      last_script_value = rq->text_info[i].script;
+      last_script = rq->text_info[i].script;
       last_script_index = i;
       last_set_index = i;
     }
@@ -1857,11 +1854,10 @@ _raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
   hb_unicode_general_category_t l_category;
   hb_unicode_general_category_t r_category;
   _raqm_grapheme_t l_grapheme, r_grapheme;
+  hb_unicode_funcs_t* unicode_funcs = hb_unicode_funcs_get_default ();
 
-  l_category = hb_unicode_general_category (hb_unicode_funcs_get_default (),
-                                            l_char);
-  r_category = hb_unicode_general_category (hb_unicode_funcs_get_default (),
-                                            r_char);
+  l_category = hb_unicode_general_category (unicode_funcs, l_char);
+  r_category = hb_unicode_general_category (unicode_funcs, r_char);
   l_grapheme = _raqm_get_grapheme_break (l_char, l_category);
   r_grapheme = _raqm_get_grapheme_break (r_char, r_category);
 
