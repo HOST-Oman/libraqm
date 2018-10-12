@@ -1535,6 +1535,17 @@ _raqm_resolve_scripts (raqm_t *rq)
     }
   }
 
+  /* Loop backwards and change any remaining Common or Inherit characters to
+   * take the script if the next character.
+   * https://github.com/HOST-Oman/libraqm/issues/95
+   */
+  for (int i = rq->text_len - 2; i >= 0;  --i)
+  {
+    if (rq->text_info[i].script == HB_SCRIPT_INHERITED ||
+        rq->text_info[i].script == HB_SCRIPT_COMMON)
+      rq->text_info[i].script = rq->text_info[i + 1].script;
+  }
+
 #ifdef RAQM_TESTING
   RAQM_TEST ("After script detection:\n");
   for (size_t i = 0; i < rq->text_len; ++i)

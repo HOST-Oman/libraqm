@@ -43,6 +43,7 @@ TEST_FILES = \
     scripts-backward.test \
     scripts-backward-ltr.test \
     scripts-backward-rtl.test \
+    scripts-common.test \
     scripts-forward.test \
     scripts-forward-ltr.test \
     scripts-forward-rtl.test \
