@@ -15,6 +15,7 @@ def cmd(command):
     p = subprocess.Popen(command, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     p.wait()
+    print(p.stderr.read().decode("utf-8"))
     return p.stdout.read().decode("utf-8").strip(), p.returncode
 
 

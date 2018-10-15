@@ -29,6 +29,8 @@
 #include <assert.h>
 #include <locale.h>
 
+#include <hb.h>
+
 #include "raqm.h"
 
 static char *text = NULL;
@@ -84,20 +86,12 @@ parse_args (int argc, char **argv)
 static bool
 has_requirement (char *req)
 {
-  if (strcmp (req, "hb_buffer_set_invisible_glyph") == 0)
-#ifdef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
-    return true;
-#else
-    return false;
-#endif
-
-  if (strcmp (req, "HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES") == 0)
-#if defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) && \
-        HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
-    return true;
-#else
-    return false;
-#endif
+  if (strcmp (req, "HB_") > 0)
+  {
+    long req_ver = strtol (req + strlen ("HB_"), NULL, 10);
+    long ver = HB_VERSION_MAJOR*10000 + HB_VERSION_MINOR*100 + HB_VERSION_MICRO;
+    return ver >= req_ver;
+  }
 
   if (strcmp (req, "FT_") > 0)
   {
