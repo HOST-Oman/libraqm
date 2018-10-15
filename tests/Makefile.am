@@ -36,6 +36,7 @@ TEST_FILES = \
     direction-rtl-3.test \
     direction-rtl-4.test \
     direction-rtl-5.test \
+    direction-ttb-1.test \
     empty-text.test \
     features-arabic.test \
     features-kerning.test \
@@ -72,7 +73,6 @@ TEST_FILES = \
     invisible_glyph_explicit.test
     $(NULL)
 
-# direction-ttb-1.test # Broken on Travis, probably old HarfBuzz/FreeType
 
 check_PROGRAMS += raqm-test
 TESTS += $(TEST_FILES)

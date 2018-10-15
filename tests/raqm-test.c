@@ -99,6 +99,14 @@ has_requirement (char *req)
     return false;
 #endif
 
+  if (strcmp (req, "FT_") > 0)
+  {
+    long req_ver = strtol (req + strlen ("FT_"), NULL, 16);
+    long ver = (FREETYPE_MAJOR * (1 << 16)) | (FREETYPE_MINOR * (1 << 8)) |
+               (FREETYPE_PATCH * (1 << 4));
+    return ver >= req_ver;
+  }
+
   fprintf (stderr, "Unknown requirement: %s\n", req);
   return false;
 }
