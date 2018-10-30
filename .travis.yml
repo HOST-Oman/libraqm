@@ -14,9 +14,7 @@ matrix:
 
     - os: osx
       install:
-        - export HOMEBREW_NO_AUTO_UPDATE=1
         - export XML_CATALOG_FILES="/usr/local/etc/xml/catalog" # for the docs
-        - brew install freetype fribidi gtk-doc harfbuzz
 
 before_script:
   - ./autogen.sh
@@ -33,3 +31,9 @@ addons:
       - libharfbuzz-dev
       - libfribidi-dev
       - gtk-doc-tools
+  homebrew:
+    packages:
+      - freetype
+      - fribidi
+      - gtk-doc
+      - harfbuzz
