@@ -1,0 +1,4 @@
+[wrap-git]
+directory=freetype
+url=https://github.com/centricular/freetype2.git
+revision=meson

@@ -25,10 +25,6 @@
 #ifndef _RAQM_H_
 #define _RAQM_H_
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <ft2build.h>

@@ -1,0 +1,4 @@
+option('docs',
+       description: 'Build API reference using GTK-Doc',
+       type: 'boolean',
+       value: false)

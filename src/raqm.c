@@ -22,10 +22,6 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <assert.h>
 #include <string.h>
 
@@ -628,14 +624,14 @@ _raqm_create_hb_font (raqm_t *rq,
 {
   hb_font_t *font;
 
-#ifdef HAVE_HB_FT_FONT_CREATE_REFERENCED
+#if HB_VERSION_ATLEAST(0,9,38)
   font = hb_ft_font_create_referenced (face);
 #else
   FT_Reference_Face (face);
   font = hb_ft_font_create (face, (hb_destroy_func_t) FT_Done_Face);
 #endif
 
-#ifdef HAVE_HB_FT_FONT_SET_LOAD_FLAGS
+#if HB_VERSION_ATLEAST(1,0,5)
   if (rq->ft_loadflags >= 0)
     hb_ft_font_set_load_flags (font, rq->ft_loadflags);
 #else
@@ -800,13 +796,12 @@ raqm_set_invisible_glyph (raqm_t *rq,
   if (!rq)
     return false;
 
-#ifndef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
+#if !HB_VERSION_ATLEAST(2,0,0)
   if (gid > 0)
     return false;
 #endif
 
-#if !defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) || \
-    !HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
+#if !HB_VERSION_ATLEAST(1,8,0)
   if (gid < 0)
     return false;
 #endif
@@ -1566,8 +1561,7 @@ _raqm_shape (raqm_t *rq)
 {
   hb_buffer_flags_t hb_buffer_flags = HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT;
 
-#if defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) && \
-    HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
+#if HB_VERSION_ATLEAST(1,8,0)
   if (rq->invisible_glyph < 0)
     hb_buffer_flags |= HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES;
 #endif
@@ -1583,7 +1577,7 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_set_direction (run->buffer, run->direction);
     hb_buffer_set_flags (run->buffer, hb_buffer_flags);
 
-#ifdef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
+#if HB_VERSION_ATLEAST(2,0,0)
     if (rq->invisible_glyph > 0)
       hb_buffer_set_invisible_glyph (run->buffer, rq->invisible_glyph);
 #endif
