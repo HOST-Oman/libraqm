@@ -24,6 +24,7 @@
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#undef HAVE_CONFIG_H  // Workaround for Fribidi 1.0.5 and earlier
 #endif
 
 #include <assert.h>
