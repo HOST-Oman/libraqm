@@ -5,7 +5,7 @@ Raqm
 [![Windows build](https://img.shields.io/appveyor/ci/HOSTOman/libraqm/master.svg)](https://ci.appveyor.com/project/HOSTOman/libraqm)
 
 Raqm is a small library that encapsulates the logic for complex text layout and
-provide a convenient API.
+provides a convenient API.
 
 It currently provides bidirectional text support (using [FriBiDi][1]), shaping
 (using [HarfBuzz][2]), and proper script itemization. As a result,
