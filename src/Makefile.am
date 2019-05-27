@@ -6,10 +6,12 @@ check_LTLIBRARIES = libraqm-test.la
 libraqm_la_SOURCES = \
     raqm.c \
     raqm.h \
+    raqm-version.h \
     $(NULL)
 
 include_HEADERS = \
     raqm.h \
+    raqm-version.h \
     $(NULL)
 
 libraqm_la_LIBADD = \

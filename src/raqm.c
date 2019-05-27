@@ -1974,3 +1974,107 @@ _raqm_in_hangul_syllable (hb_codepoint_t ch)
   (void)ch;
   return false;
 }
+
+/**
+ * raqm_version:
+ * @major: (out): Library major version component.
+ * @minor: (out): Library minor version component.
+ * @micro: (out): Library micro version component.
+ *
+ * Returns library version as three integer components.
+ *
+ * Since: 0.7
+ **/
+void
+raqm_version (unsigned int *major,
+              unsigned int *minor,
+              unsigned int *micro)
+{
+  *major = RAQM_VERSION_MAJOR;
+  *minor = RAQM_VERSION_MINOR;
+  *micro = RAQM_VERSION_MICRO;
+}
+
+/**
+ * raqm_version_string:
+ *
+ * Returns library version as a string with three components.
+ *
+ * Return value: library version string.
+ *
+ * Since: 0.7
+ **/
+const char *
+raqm_version_string (void)
+{
+  return RAQM_VERSION_STRING;
+}
+
+/**
+ * raqm_version_atleast:
+ * @major: Library major version component.
+ * @minor: Library minor version component.
+ * @micro: Library micro version component.
+ *
+ * Checks if library version is less than or equal the specified version.
+ *
+ * Return value:
+ * %true if library version is less than or equal the specfied version, %false
+ * otherwise.
+ *
+ * Since: 0.7
+ **/
+bool
+raqm_version_atleast (unsigned int major,
+                      unsigned int minor,
+                      unsigned int micro)
+{
+  return RAQM_VERSION_ATLEAST (major, minor, micro);
+}
+
+/**
+ * RAQM_VERSION_ATLEAST:
+ * @major: Library major version component.
+ * @minor: Library minor version component.
+ * @micro: Library micro version component.
+ *
+ * Checks if library version is less than or equal the specified version.
+ *
+ * Return value:
+ * %true if library version is less than or equal the specfied version, %false
+ * otherwise.
+ *
+ * Since: 0.7
+ **/
+
+/**
+ * RAQM_VERSION_STRING:
+ *
+ * Library version as a string with three components.
+ *
+ * Since: 0.7
+ **/
+
+/**
+ * RAQM_VERSION_MAJOR:
+ *
+ * Library major version component.
+ *
+ * Since: 0.7
+ **/
+
+/**
+ * RAQM_VERSION_MINOR:
+ *
+ * Library minor version component.
+ *
+ * Since: 0.7
+ **/
+
+/**
+ * RAQM_VERSION_MICRO:
+ *
+ * Library micro version component.
+ *
+ * Since: 0.7
+ **/

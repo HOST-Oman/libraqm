@@ -116,7 +116,19 @@ main (int argc, char **argv)
   raqm_direction_t dir;
   int x = 0, y = 0;
 
+  unsigned int major, minor, micro;
+
   setlocale (LC_ALL, "");
+
+  fprintf (stderr, "Raqm " RAQM_VERSION_STRING "\n");
+
+  raqm_version (&major, &minor, &micro);
+
+  assert (major == RAQM_VERSION_MAJOR);
+  assert (minor == RAQM_VERSION_MINOR);
+  assert (micro == RAQM_VERSION_MICRO);
+
+  assert (raqm_version_atleast (major, minor, micro));
 
   if (!parse_args(argc, argv))
     return 1;
