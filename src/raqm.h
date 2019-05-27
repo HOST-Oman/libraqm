@@ -24,6 +24,7 @@
 
 #ifndef _RAQM_H_
 #define _RAQM_H_
+#define _RAQM_H_IN_
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,6 +38,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "raqm-version.h"
 
 /**
  * raqm_t:
@@ -161,7 +164,22 @@ raqm_position_to_index (raqm_t *rq,
                         int y,
                         size_t *index);
 
+void
+raqm_version (unsigned int *major,
+              unsigned int *minor,
+              unsigned int *micro);
+
+const char *
+raqm_version_string (void);
+
+bool
+raqm_version_atleast (unsigned int major,
+                      unsigned int minor,
+                      unsigned int micro);
+
+
 #ifdef __cplusplus
 }
 #endif
+#undef _RAQM_H_IN_
 #endif /* _RAQM_H_ */
