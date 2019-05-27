@@ -20,7 +20,7 @@ before_script:
   - ./configure --enable-gtk-doc
 
 script:
-  - make check || (cat `find . -name '*.log'` && false)
+  - make check || (cat `find . -name 'test-suite.log'` && false)
   - make distcheck
 
 addons:
