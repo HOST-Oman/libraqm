@@ -1,3 +1,34 @@
+Overview of changes leading to 0.7.0
+Monday, May 27, 2019
+====================================
+
+New API:
+  * raqm_version
+  * raqm_version_string
+  * raqm_version_atleast
+  * RAQM_VERSION_MAJOR
+  * RAQM_VERSION_MICRO
+  * RAQM_VERSION_MINOR
+  * RAQM_VERSION_STRING
+  * RAQM_VERSION_ATLEAST
+
+Overview of changes leading to 0.6.0
+Sunday, May 5, 2019
+====================================
+
+Fix TTB direction regression from the previous release.
+
+Correctly detect script of Common and Inherite characters at start of text.
+
+Undef HAVE_CONFIG_H workaround, for older versions of Fribidi.
+
+Drop test suite dependency on GLib.
+
+Port test runner to Python instead of shell script.
+
+New API:
+* raqm_set_invisible_glyph()
+
 Overview of changes leading to 0.5.0
 Saturday, February 24, 2018
 ====================================
