@@ -627,10 +627,21 @@ static hb_font_t *
 _raqm_create_hb_font (raqm_t *rq,
                       FT_Face face)
 {
-  hb_font_t *font = hb_ft_font_create_referenced (face);
+  hb_font_t *font;
 
+#ifdef HAVE_HB_FT_FONT_CREATE_REFERENCED
+  font = hb_ft_font_create_referenced (face);
+#else
+  FT_Reference_Face (face);
+  font = hb_ft_font_create (face, (hb_destroy_func_t) FT_Done_Face);
+#endif
+
+#ifdef HAVE_HB_FT_FONT_SET_LOAD_FLAGS
   if (rq->ft_loadflags >= 0)
     hb_ft_font_set_load_flags (font, rq->ft_loadflags);
+#else
+  (void)rq;
+#endif
 
   return font;
 }
@@ -789,6 +800,17 @@ raqm_set_invisible_glyph (raqm_t *rq,
 {
   if (!rq)
     return false;
+
+#ifndef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
+  if (gid > 0)
+    return false;
+#endif
+
+#if !defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) || \
+    !HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
+  if (gid < 0)
+    return false;
+#endif
 
   rq->invisible_glyph = gid;
   return true;
@@ -1545,8 +1567,11 @@ _raqm_shape (raqm_t *rq)
 {
   hb_buffer_flags_t hb_buffer_flags = HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT;
 
+#if defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) && \
+    HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
   if (rq->invisible_glyph < 0)
     hb_buffer_flags |= HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES;
+#endif
 
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
@@ -1559,8 +1584,10 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_set_direction (run->buffer, run->direction);
     hb_buffer_set_flags (run->buffer, hb_buffer_flags);
 
+#ifdef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
     if (rq->invisible_glyph > 0)
       hb_buffer_set_invisible_glyph (run->buffer, rq->invisible_glyph);
+#endif
 
     hb_shape_full (run->font, run->buffer, rq->features, rq->features_len,
                    NULL);

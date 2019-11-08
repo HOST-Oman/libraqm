@@ -41,8 +41,18 @@ AC_SUBST(RAQM_LIBTOOL_VERSION)
 
 PKG_PROG_PKG_CONFIG([0.20])
 AX_PKG_CHECK_MODULES(FREETYPE, [freetype2 >= 12.0.6], [])
-AX_PKG_CHECK_MODULES(HARFBUZZ, [], harfbuzz >= 2.0.0)
+AX_PKG_CHECK_MODULES(HARFBUZZ, [], harfbuzz)
 AX_PKG_CHECK_MODULES(FRIBIDI, [], fribidi)
+
+_save_libs="$LIBS"
+_save_cflags="$CFLAGS"
+LIBS="$LIBS $HARFBUZZ_LIBS $FRIBIDI_LIBS"
+CFLAGS="$CFLAGS $HARFBUZZ_CFLAGS $FRIBIDI_CFLAGS"
+AC_CHECK_FUNCS(hb_ft_font_create_referenced hb_ft_font_set_load_flags hb_buffer_set_invisible_glyph)
+AC_CHECK_DECLS([HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES],,,[[#include <hb.h>]])
+
+LIBS="$_save_libs"
+CFLAGS="$_save_cflags"
 
 GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
 
