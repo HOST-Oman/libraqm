@@ -627,21 +627,10 @@ static hb_font_t *
 _raqm_create_hb_font (raqm_t *rq,
                       FT_Face face)
 {
-  hb_font_t *font;
+  hb_font_t *font = hb_ft_font_create_referenced (face);
 
-#ifdef HAVE_HB_FT_FONT_CREATE_REFERENCED
-  font = hb_ft_font_create_referenced (face);
-#else
-  FT_Reference_Face (face);
-  font = hb_ft_font_create (face, (hb_destroy_func_t) FT_Done_Face);
-#endif
-
-#ifdef HAVE_HB_FT_FONT_SET_LOAD_FLAGS
   if (rq->ft_loadflags >= 0)
     hb_ft_font_set_load_flags (font, rq->ft_loadflags);
-#else
-  (void)rq;
-#endif
 
   return font;
 }
