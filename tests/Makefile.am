@@ -90,7 +90,7 @@ AM_TESTS_ENVIRONMENT = \
     export builddir; \
     $(NULL)
 
-TEST_LOG_COMPILER = python $(srcdir)/runtest.py
+TEST_LOG_COMPILER = python3 $(srcdir)/runtest.py
 
 EXTRA_DIST = \
     $(TEST_FILES) \
