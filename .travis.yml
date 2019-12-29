@@ -37,3 +37,4 @@ addons:
       - fribidi
       - gtk-doc
       - harfbuzz
+      - python
