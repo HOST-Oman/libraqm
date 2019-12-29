@@ -422,7 +422,7 @@ raqm_set_text (raqm_t         *rq,
  * raqm_set_text_utf8:
  * @rq: a #raqm_t.
  * @text: a UTF-8 encoded text string.
- * @len: the length of @text.
+ * @len: the length of @text in UTF-8 bytes.
  *
  * Same as raqm_set_text(), but for text encoded in UTF-8 encoding.
  *
