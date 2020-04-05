@@ -17,6 +17,11 @@ The documentation can be accessed on the web at:
 Raqm (Arabic: رَقْم) is writing, also number or digit and the Arabic word for
 digital (رَقَمِيّ) shares the same root, so it is a play on “digital writing”.
 
+Check whether your `pillow` package contains `raqm`
+```python
+    from PIL import features
+    print (features.check('raqm'))  #it will give false if raqm is not present
+```
 Building
 --------
 
@@ -56,6 +61,11 @@ To run the tests:
 
     $ make check
 
+At last verif your installation
+```python
+from PIL import features
+print (features.check('raqm'))   #it will now give true
+```
 Contributing
 ------------
 
