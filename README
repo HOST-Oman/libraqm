@@ -81,7 +81,7 @@ im.show()
 ```
     
 2. install tar file from releases
-If you downloaded the release tarball, you shouldn’t run ```./autogen.sh``` at all, just run steps ```./configure``` directly.
+If you downloaded the release tarball, you shouldn’t run `./autogen.sh` at all, just run steps `./configure` directly.
 
 3. for ubuntu >=18.04, you can install package directly-
 The requirements for libraqm are:
