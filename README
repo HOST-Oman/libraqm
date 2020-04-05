@@ -58,27 +58,6 @@ To run the tests:
     $ make check
     
     sudo ldconfig This step was needed!
-
-Run the following test script: (Make sure the fonts are installed sudo apt install fonts-indic)
-
-```python
-
-from PIL import Image, ImageFont, ImageDraw
-
-im = Image.new("RGB",(160, 160))
-draw = ImageDraw.Draw(im)
-
-font_telugu = ImageFont.truetype("/usr/share/fonts/truetype/fonts-telu-extra/Pothana2000.ttf",50)
-text_telugu = "నిత్య"
-
-font_hindi = ImageFont.truetype("/usr/share/fonts/truetype/Gargi/Gargi.ttf",50)
-text_hindi = "नित्य"
-
-draw.text((10, 10), text_telugu, font=font_telugu)
-draw.text((10, 90), text_hindi, font=font_hindi)
-im.show()
-
-```
     
 2. install tar file from releases
 If you downloaded the release tarball, you shouldn’t run `./autogen.sh` at all, just run steps `./configure` directly.
