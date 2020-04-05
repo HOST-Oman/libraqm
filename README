@@ -17,10 +17,11 @@ The documentation can be accessed on the web at:
 Raqm (Arabic: رَقْم) is writing, also number or digit and the Arabic word for
 digital (رَقَمِيّ) shares the same root, so it is a play on “digital writing”.
 
+
 Building
 --------
-
-Raqm depends on the following libraries:
+One of the following methods can be used for building Raqm:
+1. Raqm depends on the following libraries:
 * [FreeType][3]
 * [HarfBuzz][2]
 * [FriBiDi][1]
@@ -43,9 +44,9 @@ On Mac OS X you can use Homebrew:
     export XML_CATALOG_FILES="/usr/local/etc/xml/catalog" # for the docs
 
 Once you have the source code and the dependencies, you can proceed to build.
-To do that, run the customary sequence of commands in the source code
-directory:
-
+To do that, run the customary sequence of commands in the source code directory (configure file is not found in the package, The key was to run autogen.sh before):
+    
+    $ ./autogen.sh
     $ ./configure
     $ make
     $ make install
@@ -55,6 +56,50 @@ To build the documentation, pass `--enable-gtk-doc` to the `configure` script.
 To run the tests:
 
     $ make check
+    
+    sudo ldconfig This step was needed!
+
+Run the following test script: (Make sure the fonts are installed sudo apt install fonts-indic)
+
+```python
+
+from PIL import Image, ImageFont, ImageDraw
+
+im = Image.new("RGB",(160, 160))
+draw = ImageDraw.Draw(im)
+
+font_telugu = ImageFont.truetype("/usr/share/fonts/truetype/fonts-telu-extra/Pothana2000.ttf",50)
+text_telugu = "నిత్య"
+
+font_hindi = ImageFont.truetype("/usr/share/fonts/truetype/Gargi/Gargi.ttf",50)
+text_hindi = "नित्य"
+
+draw.text((10, 10), text_telugu, font=font_telugu)
+draw.text((10, 90), text_hindi, font=font_hindi)
+im.show()
+
+```
+    
+2. install tar file from releases
+If you downloaded the release tarball, you shouldn’t run ```./autogen.sh``` at all, just run steps ```./configure``` directly.
+
+3. for ubuntu >=18.04, you can install package directly-
+The requirements for libraqm are:
+```
+libc6	>= 2.14
+libfreetype6	>= 2.4.2
+libfribidi0	>= 1.0.0
+libharfbuzz0b	>= 2.1.1
+```
+Install the raqm package
+Update the package index:
+```
+    sudo apt-get update
+```
+Install libraqm0 deb package:
+```
+sudo apt-get install libraqm0
+```
 
 Contributing
 ------------
