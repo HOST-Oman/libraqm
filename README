@@ -46,7 +46,8 @@ Once you have the source code and the dependencies, you can proceed to build.
 To do that, run the customary sequence of commands in the source code
 directory:
 
-    $ ./configure
+    $ ./autogen.sh
+    $ ./configure --disable-Werror
     $ make
     $ make install
 
