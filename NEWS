@@ -1,3 +1,11 @@
+Overview of changes leading to 0.7.1
+Sunday, November 22, 2020
+====================================
+
+Require HarfBuzz >= 2.0.0
+
+Build and documentation fixes.
+
 Overview of changes leading to 0.7.0
 Monday, May 27, 2019
 ====================================
