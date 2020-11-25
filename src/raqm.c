@@ -215,6 +215,7 @@ static bool
 _raqm_init_text_info (raqm_t *rq)
 {
   hb_language_t default_lang;
+  size_t i;
 
   if (rq->text_info)
     return true;
@@ -224,7 +225,7 @@ _raqm_init_text_info (raqm_t *rq)
     return false;
 
   default_lang = hb_language_get_default ();
-  for (size_t i = 0; i < rq->text_len; i++)
+  for (i = 0; i < rq->text_len; i++)
   {
     rq->text_info[i].ftface = NULL;
     rq->text_info[i].lang = default_lang;
@@ -237,10 +238,12 @@ _raqm_init_text_info (raqm_t *rq)
 static void
 _raqm_free_text_info (raqm_t *rq)
 {
+  size_t i;
+
   if (!rq->text_info)
     return;
 
-  for (size_t i = 0; i < rq->text_len; i++)
+  for (i = 0; i < rq->text_len; i++)
   {
     if (rq->text_info[i].ftface)
       FT_Done_Face (rq->text_info[i].ftface);
@@ -546,6 +549,7 @@ raqm_set_language (raqm_t       *rq,
                    size_t        len)
 {
   hb_language_t language;
+  size_t i;
   size_t end = start + len;
 
   if (!rq)
@@ -567,7 +571,7 @@ raqm_set_language (raqm_t       *rq,
     return false;
 
   language = hb_language_from_string (lang, -1);
-  for (size_t i = start; i < end; i++)
+  for (i = start; i < end; i++)
   {
     rq->text_info[i].lang = language;
   }
@@ -641,6 +645,8 @@ _raqm_set_freetype_face (raqm_t *rq,
                          size_t  start,
                          size_t  end)
 {
+  size_t i;
+
   if (!rq)
     return false;
 
@@ -653,7 +659,7 @@ _raqm_set_freetype_face (raqm_t *rq,
   if (!rq->text_info)
     return false;
 
-  for (size_t i = start; i < end; i++)
+  for (i = start; i < end; i++)
   {
     if (rq->text_info[i].ftface)
         FT_Done_Face (rq->text_info[i].ftface);
@@ -827,6 +833,8 @@ _raqm_shape (raqm_t *rq);
 bool
 raqm_layout (raqm_t *rq)
 {
+  size_t i;
+
   if (!rq)
     return false;
 
@@ -836,7 +844,7 @@ raqm_layout (raqm_t *rq)
   if (!rq->text_info)
     return false;
 
-  for (size_t i = 0; i < rq->text_len; i++)
+  for (i = 0; i < rq->text_len; i++)
   {
       if (!rq->text_info[i].ftface)
           return false;
@@ -874,6 +882,9 @@ raqm_glyph_t *
 raqm_get_glyphs (raqm_t *rq,
                  size_t *length)
 {
+  size_t i;
+  raqm_run_t *run;
+
   size_t count = 0;
 
   if (!rq || !rq->runs || !length)
@@ -883,7 +894,7 @@ raqm_get_glyphs (raqm_t *rq,
     return NULL;
   }
 
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  for (run = rq->runs; run != NULL; run = run->next)
     count += hb_buffer_get_length (run->buffer);
 
   *length = count;
@@ -901,7 +912,7 @@ raqm_get_glyphs (raqm_t *rq,
   RAQM_TEST ("Glyph information:\n");
 
   count = 0;
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  for (run = rq->runs; run != NULL; run = run->next)
   {
     size_t len;
     hb_glyph_info_t *info;
@@ -911,7 +922,7 @@ raqm_get_glyphs (raqm_t *rq,
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
 
-    for (size_t i = 0; i < len; i++)
+    for (i = 0; i < len; i++)
     {
       rq->glyphs[count + i].index = info[i].codepoint;
       rq->glyphs[count + i].cluster = info[i].cluster;
@@ -934,18 +945,18 @@ raqm_get_glyphs (raqm_t *rq,
   {
 #ifdef RAQM_TESTING
     RAQM_TEST ("\nUTF-32 clusters:");
-    for (size_t i = 0; i < count; i++)
+    for (i = 0; i < count; i++)
       RAQM_TEST (" %02d", rq->glyphs[i].cluster);
     RAQM_TEST ("\n");
 #endif
 
-    for (size_t i = 0; i < count; i++)
+    for (i = 0; i < count; i++)
       rq->glyphs[i].cluster = _raqm_u32_to_u8_index (rq,
                                                      rq->glyphs[i].cluster);
 
 #ifdef RAQM_TESTING
     RAQM_TEST ("UTF-8 clusters: ");
-    for (size_t i = 0; i < count; i++)
+    for (i = 0; i < count; i++)
       RAQM_TEST (" %02d", rq->glyphs[i].cluster);
     RAQM_TEST ("\n");
 #endif
@@ -978,9 +989,11 @@ typedef struct {
 static void
 _raqm_reverse_run (_raqm_bidi_run *run, const size_t len)
 {
+  size_t i;
+
   assert (run);
 
-  for (size_t i = 0; i < len / 2; i++)
+  for (i = 0; i < len / 2; i++)
   {
     _raqm_bidi_run temp = run[i];
     run[i] = run[len - 1 - i];
@@ -997,6 +1010,7 @@ _raqm_reorder_runs (const FriBidiCharType *types,
                     /* output */
                     size_t *run_count)
 {
+  size_t i;
   FriBidiLevel level;
   FriBidiLevel last_level = -1;
   FriBidiLevel max_level = 0;
@@ -1016,8 +1030,7 @@ _raqm_reorder_runs (const FriBidiCharType *types,
 
   /* L1. Reset the embedding levels of some chars:
      4. any sequence of white space characters at the end of the line. */
-  for (int i = len - 1;
-       i >= 0 && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); i--)
+  for (i = len; i-- > 0 && FRIBIDI_IS_EXPLICIT_OR_BN_OR_WS (types[i]); )
   {
     levels[i] = FRIBIDI_DIR_TO_LEVEL (base_dir);
   }
@@ -1025,13 +1038,13 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   /* Find max_level of the line.  We don't reuse the paragraph
    * max_level, both for a cleaner API, and that the line max_level
    * may be far less than paragraph max_level. */
-  for (int i = len - 1; i >= 0; i--)
+  for (i = len; i-- > 0; )
   {
     if (levels[i] > max_level)
        max_level = levels[i];
   }
 
-  for (size_t i = 0; i < len; i++)
+  for (i = 0; i < len; i++)
   {
     if (levels[i] != last_level)
       count++;
@@ -1059,14 +1072,16 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   /* L2. Reorder. */
   for (level = max_level; level > 0; level--)
   {
-    for (int i = count - 1; i >= 0; i--)
+    for (i = count; i-- > 0; )
     {
       if (runs[i].level >= level)
       {
         int end = i;
-        for (i--; (i >= 0 && runs[i].level >= level); i--)
+        for (; (i > 0 && runs[i - 1].level >= level); i--)
             ;
-        _raqm_reverse_run (runs + i + 1, end - i);
+        _raqm_reverse_run (runs + i, end - i + 1);
+        if (i-- == 0)
+          break;
       }
     }
   }
@@ -1078,6 +1093,8 @@ _raqm_reorder_runs (const FriBidiCharType *types,
 static bool
 _raqm_itemize (raqm_t *rq)
 {
+  size_t i, j;
+  raqm_run_t *run;
   FriBidiParType par_type = FRIBIDI_PAR_ON;
   FriBidiCharType *types;
 #ifdef USE_FRIBIDI_EX_API
@@ -1180,7 +1197,7 @@ _raqm_itemize (raqm_t *rq)
   RAQM_TEST ("Number of runs before script itemization: %zu\n\n", run_count);
 
   RAQM_TEST ("Fribidi Runs:\n");
-  for (size_t i = 0; i < run_count; i++)
+  for (i = 0; i < run_count; i++)
   {
     RAQM_TEST ("run[%zu]:\t start: %zu\tlength: %zu\tlevel: %d\n",
                i, runs[i].pos, runs[i].len, runs[i].level);
@@ -1189,7 +1206,7 @@ _raqm_itemize (raqm_t *rq)
 #endif
 
   last = NULL;
-  for (size_t i = 0; i < run_count; i++)
+  for (i = 0; i < run_count; i++)
   {
     raqm_run_t *run = calloc (1, sizeof (raqm_run_t));
     if (!run)
@@ -1211,7 +1228,7 @@ _raqm_itemize (raqm_t *rq)
       run->pos = runs[i].pos + runs[i].len - 1;
       run->script = rq->text_info[run->pos].script;
       run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface);
-      for (int j = runs[i].len - 1; j >= 0; j--)
+      for (j = runs[i].len; j-- > 0; )
       {
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
         if (!_raqm_compare_text_info (rq->text_info[run->pos], info))
@@ -1242,7 +1259,7 @@ _raqm_itemize (raqm_t *rq)
       run->pos = runs[i].pos;
       run->script = rq->text_info[run->pos].script;
       run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface);
-      for (size_t j = 0; j < runs[i].len; j++)
+      for (j = 0; j < runs[i].len; j++)
       {
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
         if (!_raqm_compare_text_info (rq->text_info[run->pos], info))
@@ -1272,13 +1289,13 @@ _raqm_itemize (raqm_t *rq)
 
 #ifdef RAQM_TESTING
   run_count = 0;
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  for (run = rq->runs; run != NULL; run = run->next)
     run_count++;
   RAQM_TEST ("Number of runs after script itemization: %zu\n\n", run_count);
 
   run_count = 0;
   RAQM_TEST ("Final Runs:\n");
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  for (run = rq->runs; run != NULL; run = run->next)
   {
     SCRIPT_TO_STRING (run->script);
     RAQM_TEST ("run[%zu]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
@@ -1443,18 +1460,19 @@ _get_pair_index (const FriBidiChar ch)
 static bool
 _raqm_resolve_scripts (raqm_t *rq)
 {
-  int last_script_index = -1;
-  int last_set_index = -1;
+  size_t i, j;
+  size_t next_script_index = 0;
+  size_t next_set_index = 0;
   hb_script_t last_script = HB_SCRIPT_INVALID;
   _raqm_stack_t *stack = NULL;
   hb_unicode_funcs_t* unicode_funcs = hb_unicode_funcs_get_default ();
 
-  for (size_t i = 0; i < rq->text_len; ++i)
+  for (i = 0; i < rq->text_len; ++i)
     rq->text_info[i].script = hb_unicode_script (unicode_funcs, rq->text[i]);
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("Before script detection:\n");
-  for (size_t i = 0; i < rq->text_len; ++i)
+  for (i = 0; i < rq->text_len; ++i)
   {
     SCRIPT_TO_STRING (rq->text_info[i].script);
     RAQM_TEST ("script for ch[%zu]\t%s\n", i, buff);
@@ -1466,9 +1484,9 @@ _raqm_resolve_scripts (raqm_t *rq)
   if (!stack)
     return false;
 
-  for (int i = 0; i < (int) rq->text_len; i++)
+  for (i = 0; i < rq->text_len; i++)
   {
-    if (rq->text_info[i].script == HB_SCRIPT_COMMON && last_script_index != -1)
+    if (rq->text_info[i].script == HB_SCRIPT_COMMON && next_script_index != 0)
     {
       int pair_index = _get_pair_index (rq->text[i]);
       if (pair_index >= 0)
@@ -1477,7 +1495,7 @@ _raqm_resolve_scripts (raqm_t *rq)
         {
           /* is a paired character */
           rq->text_info[i].script = last_script;
-          last_set_index = i;
+          next_set_index = i + 1;
           _raqm_stack_push (stack, rq->text_info[i].script, pair_index);
         }
         else
@@ -1494,34 +1512,34 @@ _raqm_resolve_scripts (raqm_t *rq)
           {
             rq->text_info[i].script = _raqm_stack_top (stack);
             last_script = rq->text_info[i].script;
-            last_set_index = i;
+            next_set_index = i + 1;
           }
           else
           {
             rq->text_info[i].script = last_script;
-            last_set_index = i;
+            next_set_index = i + 1;
           }
         }
       }
       else
       {
         rq->text_info[i].script = last_script;
-        last_set_index = i;
+        next_set_index = i + 1;
       }
     }
     else if (rq->text_info[i].script == HB_SCRIPT_INHERITED &&
-             last_script_index != -1)
+             next_script_index != 0)
     {
       rq->text_info[i].script = last_script;
-      last_set_index = i;
+      next_set_index = i + 1;
     }
     else
     {
-      for (int j = last_set_index + 1; j < i; ++j)
+      for (j = next_set_index; j < i; ++j)
         rq->text_info[j].script = rq->text_info[i].script;
       last_script = rq->text_info[i].script;
-      last_script_index = i;
-      last_set_index = i;
+      next_script_index = i + 1;
+      next_set_index = i + 1;
     }
   }
 
@@ -1529,7 +1547,7 @@ _raqm_resolve_scripts (raqm_t *rq)
    * take the script if the next character.
    * https://github.com/HOST-Oman/libraqm/issues/95
    */
-  for (int i = rq->text_len - 2; i >= 0;  --i)
+  for (i = rq->text_len - 1; i-- > 0; )
   {
     if (rq->text_info[i].script == HB_SCRIPT_INHERITED ||
         rq->text_info[i].script == HB_SCRIPT_COMMON)
@@ -1538,7 +1556,7 @@ _raqm_resolve_scripts (raqm_t *rq)
 
 #ifdef RAQM_TESTING
   RAQM_TEST ("After script detection:\n");
-  for (size_t i = 0; i < rq->text_len; ++i)
+  for (i = 0; i < rq->text_len; ++i)
   {
     SCRIPT_TO_STRING (rq->text_info[i].script);
     RAQM_TEST ("script for ch[%zu]\t%s\n", i, buff);
@@ -1554,6 +1572,7 @@ _raqm_resolve_scripts (raqm_t *rq)
 static bool
 _raqm_shape (raqm_t *rq)
 {
+  raqm_run_t *run;
   hb_buffer_flags_t hb_buffer_flags = HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT;
 
 #if defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) && \
@@ -1562,7 +1581,7 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_flags |= HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES;
 #endif
 
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  for (run = rq->runs; run != NULL; run = run->next)
   {
     run->buffer = hb_buffer_create ();
 
@@ -1648,6 +1667,8 @@ raqm_index_to_position (raqm_t *rq,
                         int *x,
                         int *y)
 {
+  size_t i, j;
+  raqm_run_t *run;
   /* We don't currently support multiline, so y is always 0 */
   *y = 0;
   *x = 0;
@@ -1671,7 +1692,7 @@ raqm_index_to_position (raqm_t *rq,
     ++*index;
   }
 
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  for (run = rq->runs; run != NULL; run = run->next)
   {
     size_t len;
     hb_glyph_info_t *info;
@@ -1680,7 +1701,7 @@ raqm_index_to_position (raqm_t *rq,
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
 
-    for (size_t i = 0; i < len; i++)
+    for (i = 0; i < len; i++)
     {
       uint32_t curr_cluster = info[i].cluster;
       uint32_t next_cluster = curr_cluster;
@@ -1688,13 +1709,12 @@ raqm_index_to_position (raqm_t *rq,
 
       if (run->direction == HB_DIRECTION_LTR)
       {
-        for (size_t j = i + 1; j < len && next_cluster == curr_cluster; j++)
+        for (j = i + 1; j < len && next_cluster == curr_cluster; j++)
           next_cluster = info[j].cluster;
       }
       else
       {
-        for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
-             j--)
+        for (j = i; i != 0 && j-- > 0 && next_cluster == curr_cluster; )
           next_cluster = info[j].cluster;
       }
 
@@ -1740,6 +1760,8 @@ raqm_position_to_index (raqm_t *rq,
                         int y,
                         size_t *index)
 {
+  size_t i, j;
+  raqm_run_t *run;
   int delta_x = 0, current_x = 0;
   (void)y;
 
@@ -1757,7 +1779,7 @@ raqm_position_to_index (raqm_t *rq,
 
   RAQM_TEST ("\n");
 
-  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  for (run = rq->runs; run != NULL; run = run->next)
   {
     size_t len;
     hb_glyph_info_t *info;
@@ -1766,7 +1788,7 @@ raqm_position_to_index (raqm_t *rq,
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
  
-    for (size_t i = 0; i < len; i++)
+    for (i = 0; i < len; i++)
     {
       delta_x = position[i].x_advance;
       if (x < (current_x + delta_x))
@@ -1784,11 +1806,10 @@ raqm_position_to_index (raqm_t *rq,
           uint32_t curr_cluster = info[i].cluster;
           uint32_t next_cluster = curr_cluster;
           if (run->direction == HB_DIRECTION_LTR)
-            for (size_t j = i + 1; j < len && next_cluster == curr_cluster; j++)
+            for (j = i + 1; j < len && next_cluster == curr_cluster; j++)
               next_cluster = info[j].cluster;
           else
-          for (int j = i - 1; i != 0 && j >= 0 && next_cluster == curr_cluster;
-                 j--)
+          for (j = i; i != 0 && j-- > 0 && next_cluster == curr_cluster; )
               next_cluster = info[j].cluster;
 
           if (next_cluster == curr_cluster)
