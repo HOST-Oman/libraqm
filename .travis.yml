@@ -14,7 +14,16 @@ matrix:
     - os: osx
       install:
         - export XML_CATALOG_FILES="/usr/local/etc/xml/catalog" # for the docs
+    #powerjobs
+    - os: linux
+      arch: ppc64le
+      after_success:
+        - bash .ci/deploy-docs.sh
 
+    - os: linux
+      arch: ppc64le
+      compiler: clang
+   
 before_script:
   - ./autogen.sh
   - ./configure --enable-gtk-doc
