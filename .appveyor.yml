@@ -1,25 +1,23 @@
 os:
-  - Visual Studio 2015
+  - Visual Studio 2017
+
+environment:
+  matrix:
+    - ARCH: x86
+      PYTHON: "C:\\Python37"
+    - ARCH: x64
+      PYTHON: "C:\\Python37-x64"
+
 
 install:
-  - set PATH=C:\msys64\usr\bin;C:\msys64\mingw64\bin;%PATH%
-  - appveyor DownloadFile "https://raw.githubusercontent.com/swig/cccl/master/cccl"
-  - call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %PLATFORM%
-  - appveyor-retry pacman -Syuu --needed --noconfirm --noprogressbar --ask=127
-  - appveyor-retry pacman -S --noconfirm autoconf automake libtool gtk-doc mingw-w64-x86_64-pkg-config mingw-w64-x86_64-harfbuzz mingw-w64-x86_64-fribidi mingw-w64-x86_64-freetype
+  - set PATH=%cd%;%PYTHON%;%PYTHON%\Scripts;%PATH%
+  - pip install meson ninja
+
+  - call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %ARCH%
 
 build_script:
-  - set CC=cccl
-  - set CXX=cccl
-  - set LD=cccl
-  - set PKG_CONFIG_PATH=%PKG_CONFIG_PATH%:/mingw64/lib/pkgconfig
-  - bash -c "mv cccl /usr/bin"
-  - bash -c "exec 0</dev/null; ./autogen.sh"
-  - bash -c "exec 0</dev/null; ./configure"
-  - bash -c "exec 0</dev/null; make CFLAGS='/W4 /WX /wd4068'"
+  - meson build
+  - ninja -C build
 
-#test_script:
-#  - bash -c "make check"
-
-# disable automatic tests
-test: off
+test_script:
+  - ninja -C build test
