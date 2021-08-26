@@ -8,10 +8,11 @@ import sys
 SKIP_EXIT_STATUS = 77
 
 def cmd(command):
+    print(command)
     p = subprocess.Popen(command, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, text=True)
     out, err = p.communicate()
-    print(err)
+    print(f"Error:\n{err}")
     return out.strip(), p.returncode
 
 
@@ -55,7 +56,10 @@ for filename in sys.argv[3:]:
     if ret == SKIP_EXIT_STATUS:
         # platform is missing a requirement to run the test, eg. old HarfBuzz
         skips += 1
-    elif ret or actual != expected:
+    elif ret:
+        print(f"Error code returned: {ret}")
+        fails += 1
+    elif actual != expected:
         print(diff(expected, actual))
         fails += 1
 
