@@ -1,0 +1,4 @@
+[wrap-git]
+directory=harfbuzz
+url=https://github.com/harfbuzz/harfbuzz.git
+revision=2.9.0
