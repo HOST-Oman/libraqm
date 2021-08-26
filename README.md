@@ -1,8 +1,7 @@
 Raqm
 ====
 
-[![Linux & macOS build](https://travis-ci.org/HOST-Oman/libraqm.svg?branch=master)](https://travis-ci.org/HOST-Oman/libraqm)
-[![Windows build](https://img.shields.io/appveyor/ci/HOSTOman/libraqm/master.svg)](https://ci.appveyor.com/project/HOSTOman/libraqm)
+[![Build](https://github.com/HOST-Oman/libraqm/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/HOST-Oman/libraqm/actions)
 
 Raqm is a small library that encapsulates the logic for complex text layout and
 provides a convenient API.
