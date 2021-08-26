@@ -43,6 +43,39 @@ static int invisible_glyph = 0;
 /* Special exit code, recognized by automake that we're skipping a test. */
 static const int skip_exit_status = 77;
 
+static char*
+encode_bytes (const char *bytes)
+{
+  char *s = (char *) bytes;
+  char *p;
+  char *ret = (char *) malloc (strlen (bytes) + 1);
+  char *r = ret;
+
+  while (s && *s)
+  {
+    while (*s && strchr (" ", *s))
+      s++;
+    if (!*s)
+      break;
+
+    errno = 0;
+    unsigned char b = strtoul (s, &p, 16);
+    if (errno || s == p)
+    {
+      free (ret);
+      return NULL;
+    }
+
+    *r++ = b;
+
+    s = p;
+  }
+
+  *r = '\0';
+
+  return ret;
+}
+
 static bool
 parse_args (int argc, char **argv)
 {
@@ -50,7 +83,9 @@ parse_args (int argc, char **argv)
   while (i < argc)
   {
     if (strcmp (argv[i], "--text") == 0)
-      text = argv[++i];
+      text = strdup (argv[++i]);
+    else if (strcmp (argv[i], "--bytes") == 0)
+      text = encode_bytes (argv[++i]);
     else if (strcmp (argv[i], "--font") == 0)
       font = argv[++i];
     else if (strcmp (argv[i], "--fonts") == 0)
@@ -208,6 +243,7 @@ main (int argc, char **argv)
   if (position)
     assert (raqm_position_to_index (rq, position, 0, &start_index));
 
+  free (text);
   raqm_destroy (rq);
   FT_Done_Face (face);
   FT_Done_FreeType (library);

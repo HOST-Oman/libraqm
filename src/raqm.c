@@ -450,8 +450,6 @@ raqm_set_text_utf8 (raqm_t         *rq,
     return true;
   }
 
-  RAQM_TEST ("Text is: %s\n", text);
-
   rq->flags |= RAQM_FLAG_UTF8;
 
   rq->text_utf8 = malloc (sizeof (char) * len);
