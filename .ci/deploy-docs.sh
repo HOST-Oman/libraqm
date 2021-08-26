@@ -14,7 +14,7 @@ rm -rf $DOCSDIR || exit
 mkdir $DOCSDIR
 cd $DOCSDIR
 
-cp ../docs/html/* .
+cp ../build/docs/html/* .
 
 git init
 git config user.name "Travis CI"

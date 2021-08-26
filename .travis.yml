@@ -12,29 +12,27 @@ matrix:
       compiler: clang
 
     - os: osx
-      install:
+      before_install:
         - export XML_CATALOG_FILES="/usr/local/etc/xml/catalog" # for the docs
 
+install:
+  - pip3 install meson ninja
+
 before_script:
-  - ./autogen.sh
-  - ./configure --enable-gtk-doc
+  - meson -Ddocs=true build
 
 script:
-  - make check || (cat `find . -name 'test-suite.log'` && false)
-  - make distcheck
+  - ninja -C build
+  - ninja -C build test
 
 addons:
   apt:
     packages:
-      - libfreetype6-dev
-      - libharfbuzz-dev
-      - libfribidi-dev
       - gtk-doc-tools
+      - python3-pip
+      - python3-setuptools
   homebrew:
     update: true
     packages:
-      - freetype
-      - fribidi
       - gtk-doc
-      - harfbuzz
       - python
