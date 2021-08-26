@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+    - name: Install Python Dependencies
+      run: pip install --upgrade meson ninja
+    - name: MSVC Setup
+      if: matrix.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+    - name: Meson Setup on Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        # This dir contains a pkg-config which meson will happily use and later fail, so remove it
+        $env:path = ($env:path.Split(';') | Where-Object { $_ -ne 'C:\Strawberry\perl\bin' }) -join ';'
+        meson build
+    - if: matrix.os != 'windows-latest'
+      name: Meson Setup
+      run: meson build
+    - name: Build
+      run: ninja -C build
+    - name: Test
+      run: ninja -C build test
