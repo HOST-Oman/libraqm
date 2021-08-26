@@ -1,11 +1,8 @@
-from __future__ import print_function
-
 import ast
 import difflib
 import os
 import subprocess
 import sys
-import io
 
 # Special exit code that tells automake that a test has been skipped,
 # eg. when we needs a newer HarfBuzz version than what is available.
@@ -26,16 +23,15 @@ def diff(expected, actual):
     return "".join(diff)
 
 
-srcdir = os.environ.get("srcdir", ".")
-builddir = os.environ.get("builddir", ".")
-testtool = os.path.join(builddir, "raqm-test")
+srcdir = sys.argv[1]
+testtool = sys.argv[2]
 
 fails = 0
 skips = 0
-for filename in sys.argv[1:]:
+for filename in sys.argv[3:]:
     print("Testing %s..." % filename)
 
-    with io.open(filename, newline="") as fp:
+    with open(filename, newline="") as fp:
         lines = [l.strip("\n") for l in fp.readlines()]
     font = lines[0]
     text = ast.literal_eval("'%s'" % lines[1])

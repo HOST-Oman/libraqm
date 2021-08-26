@@ -81,16 +81,7 @@ TEST_EXTENSIONS = \
     .test \
     $(NULL)
 
-AM_TESTS_ENVIRONMENT = \
-    EXEEXT="$(EXEEXT)"; \
-    export EXEEXT; \
-    srcdir="$(srcdir)"; \
-    export srcdir; \
-    builddir="$(builddir)"; \
-    export builddir; \
-    $(NULL)
-
-TEST_LOG_COMPILER = python3 $(srcdir)/runtest.py
+TEST_LOG_COMPILER = python3 $(srcdir)/runtest.py $(srcdir) $(builddir)/raqm-test
 
 EXTRA_DIST = \
     $(TEST_FILES) \
