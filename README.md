@@ -34,8 +34,7 @@ To install dependencies on Fedora:
 
 To install dependencies on Ubuntu:
 
-    sudo apt-get install libfreetype6-dev libharfbuzz-dev libfribidi-dev \
-                         meson gtk-doc-tools
+    sudo apt-get install libfreetype6-dev libharfbuzz-dev libfribidi-dev meson gtk-doc-tools
 
 On Mac OS X you can use Homebrew:
 
