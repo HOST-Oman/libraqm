@@ -13,6 +13,12 @@ if harfbuzz.type_name() == 'internal' or \
   cc.has_header_symbol('hb.h', 'HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES', dependencies : harfbuzz)
   config_h.set('HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES', 1)
 endif
+if cc.get_argument_syntax() == 'msvc'
+  library_type = get_option('default_library')
+  if library_type == 'shared' or library_type == 'both'
+    config_h.set('RAQM_API', '__declspec (dllexport)')
+  endif
+endif
 configure_file(output : 'config.h', configuration : config_h)
 
 version_h = configuration_data()
