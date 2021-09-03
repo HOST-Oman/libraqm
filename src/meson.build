@@ -30,7 +30,13 @@ version_h.set('RAQM_VERSION', meson.project_version())
 configure_file(
   input : 'raqm-version.h.in',
   output : 'raqm-version.h',
-  configuration : version_h)
+  configuration : version_h,
+  install: true,
+  install_dir: join_paths(get_option('includedir'))
+)
+
+raqm_headers = files('raqm.h')
+install_headers(raqm_headers)
 
 libraqm = library(
   'raqm',
