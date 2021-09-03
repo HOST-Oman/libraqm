@@ -8,10 +8,40 @@ project('raqm', 'c',
 
 raqm_version = meson.project_version().split('.')
 
-freetype = dependency('freetype2', version : '>= 12.0.6',
-                      fallback : ['freetype2', 'freetype_dep'],
-                      default_options : ['png=disabled', 'bzip2=disabled',
-                                         'zlib=disabled', 'harfbuzz=disabled'])
+cc = meson.get_compiler('c')
+
+# FreeType version ([libtool,    actual] from its docs/VERSIONS.TXT)
+#                  ([pkg-config, cmake])
+freetype_version = ['12.0.6', '2.4.2']
+
+# Set freetype as a dummy, for now
+freetype = dependency('', required: false)
+
+if cc.get_argument_syntax() == 'msvc'
+  freetype = dependency('freetype', version : '>= @0@'.format(freetype_version[1]),
+                        method: 'cmake',
+                        required: false)
+
+  if not freetype.found()
+    freetype_lib = cc.find_library('freetype',
+                                   has_headers: ['freetype/freetype.h'],
+                                   required: false)
+    if cc.has_function('FT_Reference_Face', dependencies : freetype_lib)
+      freetype = freetype_lib
+    else
+      message('Your FreeType2 installation is too old, falling back...')
+    endif
+  endif
+endif
+
+if not freetype.found()
+  freetype = dependency('freetype2', version : '>= @0@'.format(freetype_version[0]),
+                        method: 'pkg-config',
+                        fallback : ['freetype2', 'freetype_dep'],
+                        default_options : ['png=disabled', 'bzip2=disabled',
+                                           'zlib=disabled', 'harfbuzz=disabled'])
+endif
+
 harfbuzz = dependency('harfbuzz', version : '>= 1.7.2',
                       fallback : ['harfbuzz', 'libharfbuzz_dep'],
                       default_options : ['freetype=enabled',
