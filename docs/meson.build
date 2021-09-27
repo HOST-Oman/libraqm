@@ -6,14 +6,20 @@ endif
 
 version_xml = configure_file(input : 'version.xml.in',
                              output : 'version.xml',
-                             configuration : conf)
+                             configuration : version_h)
 
 gnome = import('gnome')
 gnome.gtkdoc(
   'raqm',
   main_xml : 'raqm-docs.xml',
-  src_dir : join_paths(meson.source_root(), 'src'),
+  src_dir : [
+    join_paths(meson.source_root(), 'src'),
+    join_paths(meson.build_root(), 'src'),
+  ],
+  ignore_headers : ['config.h'],
   content_files : [version_xml],
   mkdb_args : ['--xml-mode', '--output-format=xml'],
   install : true,
+  scan_args : ['--ignore-decorators=RAQM_API'],
+  check : true,
 )

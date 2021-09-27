@@ -27,4 +27,6 @@ RAQM_VERSION_STRING
 raqm_t
 raqm_direction_t
 raqm_glyph_t
+<SUBSECTION Private>
+RAQM_API
 </SECTION>
