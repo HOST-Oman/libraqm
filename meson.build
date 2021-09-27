@@ -1,5 +1,5 @@
 project('raqm', 'c',
-  version : '0.7.0',
+  version : '0.7.2',
   default_options : [
     'c_std=c99',
     'cpp_std=c++11',
