@@ -48,7 +48,7 @@ directory:
     $ ninja -C build
     $ ninja -C build install
 
-To build the documentation, pass `-Ddocs=enable` to the `meson`.
+To build the documentation, pass `-Ddocs=true` to the `meson`.
 
 To run the tests:
 
