@@ -30,15 +30,19 @@
 #include <assert.h>
 #include <string.h>
 
+#ifdef RAQM_SHEENBIDI
+#include <SheenBidi.h>
+#else
 #include <fribidi.h>
+#if FRIBIDI_MAJOR_VERSION >= 1
+#define USE_FRIBIDI_EX_API
+#endif
+#endif
+
 #include <hb.h>
 #include <hb-ft.h>
 
 #include "raqm.h"
-
-#if FRIBIDI_MAJOR_VERSION >= 1
-#define USE_FRIBIDI_EX_API
-#endif
 
 /**
  * SECTION:raqm
@@ -156,6 +160,15 @@
     buff[4] = '\0';
 #else
 # define RAQM_TEST(...)
+#endif
+
+#define RAQM_BIDI_LEVEL_IS_RTL(level) \
+    ((level) & 1)
+
+#ifdef RAQM_SHEENBIDI
+  typedef SBLevel _raqm_bidi_level_t;
+#else
+  typedef FriBidiLevel _raqm_bidi_level_t;
 #endif
 
 typedef enum {
@@ -1000,13 +1013,13 @@ static bool
 _raqm_resolve_scripts (raqm_t *rq);
 
 static hb_direction_t
-_raqm_hb_dir (raqm_t *rq, FriBidiLevel level)
+_raqm_hb_dir (raqm_t *rq, _raqm_bidi_level_t level)
 {
   hb_direction_t dir = HB_DIRECTION_LTR;
 
   if (rq->base_dir == RAQM_DIRECTION_TTB)
       dir = HB_DIRECTION_TTB;
-  else if (FRIBIDI_LEVEL_IS_RTL (level))
+  else if (RAQM_BIDI_LEVEL_IS_RTL(level))
       dir = HB_DIRECTION_RTL;
 
   return dir;
@@ -1015,9 +1028,92 @@ _raqm_hb_dir (raqm_t *rq, FriBidiLevel level)
 typedef struct {
   size_t pos;
   size_t len;
-  FriBidiLevel level;
+  _raqm_bidi_level_t level;
 } _raqm_bidi_run;
 
+#ifdef RAQM_SHEENBIDI
+static _raqm_bidi_run *
+_raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
+{
+  SBLevel base_level = SBLevelDefaultLTR;
+  _raqm_bidi_run *runs = NULL;
+
+  if (rq->base_dir == RAQM_DIRECTION_TTB)
+  {
+    *run_count = 1;
+    rq->resolved_dir = RAQM_DIRECTION_LTR;
+    runs = malloc (sizeof (_raqm_bidi_run));
+
+    if (runs)
+    {
+      runs->pos = 0;
+      runs->len = rq->text_len;
+      runs->level = 0;
+    }
+  }
+  else
+  {
+    const SBRun *sheenbidi_runs;
+    SBAlgorithmRef bidiAlgorithm;
+    SBParagraphRef firstParagraph;
+    SBLineRef paragraphLine;
+
+    if (rq->base_dir == RAQM_DIRECTION_RTL)
+      base_level = 1;
+    else if (rq->base_dir == RAQM_DIRECTION_LTR)
+      base_level = 0;
+
+    SBCodepointSequence codepointSequence =
+    {
+      SBStringEncodingUTF32,
+      (void *) rq->text,
+      rq->text_len,
+    };
+
+    /* paragraph */
+    bidiAlgorithm = SBAlgorithmCreate (&codepointSequence);
+
+    firstParagraph = SBAlgorithmCreateParagraph (bidiAlgorithm,
+                                                 0,
+                                                 INT32_MAX,
+                                                 base_level);
+
+    SBUInteger paragraphLength = SBParagraphGetLength (firstParagraph);
+
+    /* lines */
+    paragraphLine = SBParagraphCreateLine (firstParagraph,
+                                           0,
+                                           paragraphLength);
+
+    *run_count = SBLineGetRunCount (paragraphLine);
+
+    if (SBParagraphGetBaseLevel (firstParagraph) == 0)
+      rq->resolved_dir = RAQM_DIRECTION_LTR;
+    else
+      rq->resolved_dir = RAQM_DIRECTION_RTL;
+
+    runs = malloc (sizeof (_raqm_bidi_run) * (*run_count));
+
+    if (runs)
+    {
+      sheenbidi_runs = SBLineGetRunsPtr(paragraphLine);
+
+      for (size_t i = 0; i < (*run_count); ++i)
+      {
+        runs[i].pos = sheenbidi_runs[i].offset;
+        runs[i].len = sheenbidi_runs[i].length;
+        runs[i].level = sheenbidi_runs[i].level;
+      }
+    }
+
+    SBLineRelease (paragraphLine);
+    SBParagraphRelease (firstParagraph);
+    SBAlgorithmRelease (bidiAlgorithm);
+  }
+
+  return runs;
+}
+#else
 static void
 _raqm_reverse_run (_raqm_bidi_run *run, const size_t len)
 {
@@ -1118,52 +1214,31 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   return runs;
 }
 
-static bool
-_raqm_itemize (raqm_t *rq)
+static _raqm_bidi_run *
+_raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
 {
   FriBidiParType par_type = FRIBIDI_PAR_ON;
+  _raqm_bidi_run *runs = NULL;
+
   FriBidiCharType *types;
+  _raqm_bidi_level_t *levels;
+  int max_level = 0;
 #ifdef USE_FRIBIDI_EX_API
   FriBidiBracketType *btypes;
-#endif
-  FriBidiLevel *levels;
-  _raqm_bidi_run *runs = NULL;
-  raqm_run_t *last;
-  int max_level;
-  size_t run_count;
-  bool ok = true;
-
-#ifdef RAQM_TESTING
-  switch (rq->base_dir)
-  {
-    case RAQM_DIRECTION_RTL:
-      RAQM_TEST ("Direction is: RTL\n\n");
-      break;
-    case RAQM_DIRECTION_LTR:
-      RAQM_TEST ("Direction is: LTR\n\n");
-      break;
-    case RAQM_DIRECTION_TTB:
-      RAQM_TEST ("Direction is: TTB\n\n");
-      break;
-    case RAQM_DIRECTION_DEFAULT:
-    default:
-      RAQM_TEST ("Direction is: DEFAULT\n\n");
-      break;
-  }
 #endif
 
   types = calloc (rq->text_len, sizeof (FriBidiCharType));
 #ifdef USE_FRIBIDI_EX_API
   btypes = calloc (rq->text_len, sizeof (FriBidiBracketType));
 #endif
-  levels = calloc (rq->text_len, sizeof (FriBidiLevel));
+  levels = calloc (rq->text_len, sizeof (_raqm_bidi_level_t));
+
   if (!types || !levels
 #ifdef USE_FRIBIDI_EX_API
       || !btypes
 #endif
       )
   {
-    ok = false;
     goto done;
   }
 
@@ -1201,9 +1276,49 @@ _raqm_itemize (raqm_t *rq)
 
   if (max_level == 0)
   {
-    ok = false;
     goto done;
   }
+
+  /* Get the number of bidi runs */
+  runs = _raqm_reorder_runs (types, rq->text_len, par_type, levels, run_count);
+
+done:
+  free (types);
+  free (levels);
+#ifdef USE_FRIBIDI_EX_API
+  free (btypes);
+#endif
+
+  return runs;
+}
+#endif
+
+static bool
+_raqm_itemize (raqm_t *rq)
+{
+  _raqm_bidi_run *runs = NULL;
+  raqm_run_t *last;
+  size_t run_count = 0;
+  bool ok = true;
+
+#ifdef RAQM_TESTING
+  switch (rq->base_dir)
+  {
+    case RAQM_DIRECTION_RTL:
+      RAQM_TEST ("Direction is: RTL\n\n");
+      break;
+    case RAQM_DIRECTION_LTR:
+      RAQM_TEST ("Direction is: LTR\n\n");
+      break;
+    case RAQM_DIRECTION_TTB:
+      RAQM_TEST ("Direction is: TTB\n\n");
+      break;
+    case RAQM_DIRECTION_DEFAULT:
+    default:
+      RAQM_TEST ("Direction is: DEFAULT\n\n");
+      break;
+  }
+#endif
 
   if (!_raqm_resolve_scripts (rq))
   {
@@ -1211,8 +1326,8 @@ _raqm_itemize (raqm_t *rq)
     goto done;
   }
 
-  /* Get the number of bidi runs */
-  runs = _raqm_reorder_runs (types, rq->text_len, par_type, levels, &run_count);
+  runs = _raqm_bidi_itemize (rq, &run_count);
+
   if (!runs)
   {
     ok = false;
@@ -1334,11 +1449,6 @@ _raqm_itemize (raqm_t *rq)
 
 done:
   free (runs);
-  free (types);
-#ifdef USE_FRIBIDI_EX_API
-  free (btypes);
-#endif
-  free (levels);
 
   return ok;
 }

@@ -6,9 +6,9 @@ Raqm
 Raqm is a small library that encapsulates the logic for complex text layout and
 provides a convenient API.
 
-It currently provides bidirectional text support (using [FriBiDi][1]), shaping
-(using [HarfBuzz][2]), and proper script itemization. As a result,
-Raqm can support most writing systems covered by Unicode.
+It currently provides bidirectional text support (using [FriBiDi][1] or
+[SheenBidi][2]), shaping (using [HarfBuzz][3]), and proper script itemization.
+As a result, Raqm can support most writing systems covered by Unicode.
 
 The documentation can be accessed on the web at:
 > http://host-oman.github.io/libraqm/
@@ -20,12 +20,12 @@ Building
 --------
 
 Raqm depends on the following libraries:
-* [FreeType][3]
-* [HarfBuzz][2]
-* [FriBiDi][1]
+* [FreeType][4]
+* [HarfBuzz][3]
+* [FriBiDi][1] or [SheenBidi][2]
 
 To build the documentation you will also need:
-* [GTK-Doc][4]
+* [GTK-Doc][5]
 
 To install dependencies on Fedora:
 
@@ -78,6 +78,7 @@ The following projects have patches to support complex text layout using Raqm:
 
 
 [1]: http://fribidi.org
-[2]: http://harfbuzz.org
-[3]: https://www.freetype.org
-[4]: https://www.gtk.org/gtk-doc
+[2]: https://github.com/Tehreer/SheenBidi
+[3]: http://harfbuzz.org
+[4]: https://www.freetype.org
+[5]: https://www.gtk.org/gtk-doc
