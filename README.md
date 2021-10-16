@@ -52,7 +52,7 @@ To build the documentation, pass `-Ddocs=true` to the `meson`.
 
 To run the tests:
 
-    $ ninja -C test
+    $ ninja -C build test
 
 Contributing
 ------------
