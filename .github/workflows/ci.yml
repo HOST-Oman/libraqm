@@ -38,3 +38,23 @@ jobs:
       run: ninja -C build
     - name: Test
       run: ninja -C build test
+
+  build-sheenbidi:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+    - name: Install Python Dependencies
+      run: pip install --upgrade meson ninja
+    - name: Meson Setup
+      run: meson -Dsheenbidi=true build
+    - name: Build
+      run: ninja -C build
+    - name: Test
+      run: ninja -C build test

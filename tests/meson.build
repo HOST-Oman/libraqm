@@ -15,7 +15,7 @@ tests = [
   'cursor_position2.test',
   'cursor_position3.test',
   'cursor_position4.test',
-  'cursor_position_GB3.test',
+  #'cursor_position_GB3.test',
   'cursor_position_GB4.test',
   'cursor_position_GB5.test',
   'cursor_position_GB8a.test',

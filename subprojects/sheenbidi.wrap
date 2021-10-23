@@ -1,0 +1,4 @@
+[wrap-git]
+directory=sheenbidi
+url=https://github.com/Tehreer/SheenBidi.git
+revision=master
