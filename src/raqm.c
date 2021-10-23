@@ -418,6 +418,53 @@ raqm_set_text (raqm_t         *rq,
   return true;
 }
 
+static void *
+_raqm_get_utf8_codepoint (const void *str,
+                          uint32_t *out_codepoint)
+{
+  const char *s = (const char *)str;
+
+  if (0xf0 == (0xf8 & s[0]))
+  {
+    *out_codepoint = ((0x07 & s[0]) << 18) | ((0x3f & s[1]) << 12) | ((0x3f & s[2]) << 6) | (0x3f & s[3]);
+    s += 4;
+  }
+  else if (0xe0 == (0xf0 & s[0]))
+  {
+    *out_codepoint = ((0x0f & s[0]) << 12) | ((0x3f & s[1]) << 6) | (0x3f & s[2]);
+    s += 3;
+  }
+  else if (0xc0 == (0xe0 & s[0]))
+  {
+    *out_codepoint = ((0x1f & s[0]) << 6) | (0x3f & s[1]);
+    s += 2;
+  }
+  else
+  {
+    *out_codepoint = s[0];
+    s += 1;
+  }
+
+  return (void *)s;
+}
+
+static size_t
+_raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
+{
+  size_t in_len = 0;
+  uint32_t *out_utf32 = unicode;
+  const char *in_utf8 = text;
+
+  while ((*in_utf8 != '\0') && (in_len < len))
+  {
+    in_utf8 = _raqm_get_utf8_codepoint (in_utf8, out_utf32);
+    ++out_utf32;
+    ++in_len;
+  }
+
+  return (out_utf32 - unicode);
+}
+
 /**
  * raqm_set_text_utf8:
  * @rq: a #raqm_t.
@@ -462,9 +509,7 @@ raqm_set_text_utf8 (raqm_t         *rq,
 
   memcpy (rq->text_utf8, text, sizeof (char) * len);
 
-  ulen = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
-                                     text, len, unicode);
-
+  ulen = _raqm_u8_to_u32 (text, len, unicode);
   ok = raqm_set_text (rq, unicode, ulen);
 
   free (unicode);
@@ -1308,7 +1353,7 @@ typedef struct {
 
 /* Special paired characters for script detection */
 static size_t paired_len = 34;
-static const FriBidiChar paired_chars[] =
+static const uint32_t paired_chars[] =
 {
   0x0028, 0x0029, /* ascii paired punctuation */
   0x003c, 0x003e,
@@ -1411,7 +1456,7 @@ _raqm_stack_push (_raqm_stack_t *stack,
 }
 
 static int
-_get_pair_index (const FriBidiChar ch)
+_get_pair_index (const uint32_t ch)
 {
   int lower = 0;
   int upper = paired_len - 1;
@@ -1614,20 +1659,30 @@ _raqm_shape (raqm_t *rq)
   return true;
 }
 
+/* Count equivalent UTF-8 bytes in codepoint */
+static size_t
+_raqm_count_codepoint_utf8_bytes (uint32_t chr)
+{
+  if (0 == ((uint32_t) 0xffffff80 & chr))
+    return 1;
+  else if (0 == ((uint32_t) 0xfffff800 & chr))
+    return 2;
+  else if (0 == ((uint32_t) 0xffff0000 & chr))
+    return 3;
+  else
+    return 4;
+}
+
 /* Convert index from UTF-32 to UTF-8 */
 static uint32_t
 _raqm_u32_to_u8_index (raqm_t   *rq,
                        uint32_t  index)
 {
-  FriBidiStrIndex length;
-  char *output = malloc ((sizeof (char) * 4 * index) + 1);
+  size_t length = 0;
 
-  length = fribidi_unicode_to_charset (FRIBIDI_CHAR_SET_UTF8,
-                                       rq->text,
-                                       index,
-                                       output);
+  for (uint32_t i = 0; i < index; ++i)
+    length += _raqm_count_codepoint_utf8_bytes (rq->text[i]);
 
-  free (output);
   return length;
 }
 
@@ -1636,15 +1691,27 @@ static uint32_t
 _raqm_u8_to_u32_index (raqm_t   *rq,
                        uint32_t  index)
 {
-  FriBidiStrIndex length;
-  uint32_t *output = malloc (sizeof (uint32_t) * (index + 1));
+  const unsigned char *s = (const unsigned char *) rq->text_utf8;
+  const unsigned char *t = s;
+  size_t length = 0;
 
-  length = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
-                                       rq->text_utf8,
-                                       index,
-                                       output);
+  while (((size_t) (s - t) < index) && ('\0' != *s))
+  {
+    if (0xf0 == (0xf8 & *s))
+      s += 4;
+    else if (0xe0 == (0xf0 & *s))
+      s += 3;
+    else if (0xc0 == (0xe0 & *s))
+      s += 2;
+    else
+      s += 1;
 
-  free (output);
+    length++;
+  }
+
+  if ((size_t) (s-t) > index)
+    length--;
+
   return length;
 }
 
