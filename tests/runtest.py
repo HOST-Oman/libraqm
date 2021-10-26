@@ -10,7 +10,7 @@ SKIP_EXIT_STATUS = 77
 def cmd(command):
     print(command)
     p = subprocess.Popen(command, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE, text=True)
+                         stderr=subprocess.PIPE, universal_newlines=True)
     out, err = p.communicate()
     print(f"Error:\n{err}")
     return out.strip(), p.returncode
