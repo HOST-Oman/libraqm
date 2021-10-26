@@ -1,0 +1,67 @@
+fonts/sha1sum/788742748bf8bfbd3b6b56859f92938275da74bd.otf
+汉语English عربي
+--direction ttb --require FT_020800
+Direction is: TTB
+
+Before script detection:
+script for ch[0]	Hani
+script for ch[1]	Hani
+script for ch[2]	Latn
+script for ch[3]	Latn
+script for ch[4]	Latn
+script for ch[5]	Latn
+script for ch[6]	Latn
+script for ch[7]	Latn
+script for ch[8]	Latn
+script for ch[9]	Zyyy
+script for ch[10]	Arab
+script for ch[11]	Arab
+script for ch[12]	Arab
+script for ch[13]	Arab
+
+After script detection:
+script for ch[0]	Hani
+script for ch[1]	Hani
+script for ch[2]	Latn
+script for ch[3]	Latn
+script for ch[4]	Latn
+script for ch[5]	Latn
+script for ch[6]	Latn
+script for ch[7]	Latn
+script for ch[8]	Latn
+script for ch[9]	Latn
+script for ch[10]	Arab
+script for ch[11]	Arab
+script for ch[12]	Arab
+script for ch[13]	Arab
+
+Number of runs before script itemization: 1
+
+Fribidi Runs:
+run[0]:	 start: 0	length: 14	level: 0
+
+Number of runs after script itemization: 3
+
+Final Runs:
+run[0]:	 start: 0	length: 2	direction: ttb	script: Hani	font: Noto Serif CJK SC
+run[1]:	 start: 2	length: 8	direction: ttb	script: Latn	font: Noto Serif CJK SC
+run[2]:	 start: 10	length: 4	direction: ttb	script: Arab	font: Noto Serif CJK SC
+
+Glyph information:
+glyph [8]	x_offset: -500	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [9]	x_offset: -500	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [1]	x_offset: -327	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [6]	x_offset: -329	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [2]	x_offset: -280	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [5]	x_offset: -162	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [4]	x_offset: -162	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [7]	x_offset: -235	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [3]	x_offset: -327	y_offset: -880	x_advance: 0	font: Noto Serif CJK SC
+glyph [0]	x_offset: -500	y_offset: 0	x_advance: 0	font: Noto Serif CJK SC
+glyph [0]	x_offset: -500	y_offset: 0	x_advance: 0	font: Noto Serif CJK SC
+glyph [0]	x_offset: -500	y_offset: 0	x_advance: 0	font: Noto Serif CJK SC
+glyph [0]	x_offset: -500	y_offset: 0	x_advance: 0	font: Noto Serif CJK SC
+glyph [0]	x_offset: -500	y_offset: 0	x_advance: 0	font: Noto Serif CJK SC
+
+UTF-32 clusters: 00 01 02 03 04 05 06 07 08 09 10 11 12 13
+UTF-8 clusters:  00 03 06 07 08 09 10 11 12 13 14 16 18 20
