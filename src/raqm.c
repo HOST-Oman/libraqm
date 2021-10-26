@@ -1311,7 +1311,7 @@ _raqm_itemize (raqm_t *rq)
 #ifdef RAQM_TESTING
   RAQM_TEST ("Number of runs before script itemization: %zu\n\n", run_count);
 
-  RAQM_TEST ("Fribidi Runs:\n");
+  RAQM_TEST ("BiDi Runs:\n");
   for (size_t i = 0; i < run_count; i++)
   {
     RAQM_TEST ("run[%zu]:\t start: %zu\tlength: %zu\tlevel: %d\n",

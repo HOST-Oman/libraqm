@@ -65,7 +65,7 @@ script for ch[27]	Latn
 
 Number of runs before script itemization: 5
 
-Fribidi Runs:
+BiDi Runs:
 run[0]:	 start: 0	length: 7	level: 0
 run[1]:	 start: 15	length: 5	level: 1
 run[2]:	 start: 12	length: 3	level: 2

@@ -47,7 +47,7 @@ script for ch[18]	Arab
 
 Number of runs before script itemization: 3
 
-Fribidi Runs:
+BiDi Runs:
 run[0]:	 start: 0	length: 4	level: 1
 run[1]:	 start: 4	length: 11	level: 0
 run[2]:	 start: 15	length: 4	level: 1
