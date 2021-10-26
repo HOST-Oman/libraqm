@@ -1036,66 +1036,63 @@ static _raqm_bidi_run *
 _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
 {
   SBLevel base_level = SBLevelDefaultLTR;
-  _raqm_bidi_run *runs = NULL;
+  _raqm_bidi_run *runs;
+  const SBRun *sheenbidi_runs;
+  SBAlgorithmRef bidiAlgorithm;
+  SBParagraphRef firstParagraph;
+  SBLineRef paragraphLine;
 
+  if (rq->base_dir == RAQM_DIRECTION_RTL)
+    base_level = 1;
+  else if (rq->base_dir == RAQM_DIRECTION_LTR)
+    base_level = 0;
+
+  SBCodepointSequence codepointSequence =
   {
-    const SBRun *sheenbidi_runs;
-    SBAlgorithmRef bidiAlgorithm;
-    SBParagraphRef firstParagraph;
-    SBLineRef paragraphLine;
+    SBStringEncodingUTF32,
+    (void *) rq->text,
+    rq->text_len,
+  };
 
-    if (rq->base_dir == RAQM_DIRECTION_RTL)
-      base_level = 1;
-    else if (rq->base_dir == RAQM_DIRECTION_LTR)
-      base_level = 0;
+  /* paragraph */
+  bidiAlgorithm = SBAlgorithmCreate (&codepointSequence);
 
-    SBCodepointSequence codepointSequence =
+  firstParagraph = SBAlgorithmCreateParagraph (bidiAlgorithm,
+                                               0,
+                                               INT32_MAX,
+                                               base_level);
+
+  SBUInteger paragraphLength = SBParagraphGetLength (firstParagraph);
+
+  /* lines */
+  paragraphLine = SBParagraphCreateLine (firstParagraph,
+                                         0,
+                                         paragraphLength);
+
+  *run_count = SBLineGetRunCount (paragraphLine);
+
+  if (SBParagraphGetBaseLevel (firstParagraph) == 0)
+    rq->resolved_dir = RAQM_DIRECTION_LTR;
+  else
+    rq->resolved_dir = RAQM_DIRECTION_RTL;
+
+  runs = malloc (sizeof (_raqm_bidi_run) * (*run_count));
+
+  if (runs)
+  {
+    sheenbidi_runs = SBLineGetRunsPtr(paragraphLine);
+
+    for (size_t i = 0; i < (*run_count); ++i)
     {
-      SBStringEncodingUTF32,
-      (void *) rq->text,
-      rq->text_len,
-    };
-
-    /* paragraph */
-    bidiAlgorithm = SBAlgorithmCreate (&codepointSequence);
-
-    firstParagraph = SBAlgorithmCreateParagraph (bidiAlgorithm,
-                                                 0,
-                                                 INT32_MAX,
-                                                 base_level);
-
-    SBUInteger paragraphLength = SBParagraphGetLength (firstParagraph);
-
-    /* lines */
-    paragraphLine = SBParagraphCreateLine (firstParagraph,
-                                           0,
-                                           paragraphLength);
-
-    *run_count = SBLineGetRunCount (paragraphLine);
-
-    if (SBParagraphGetBaseLevel (firstParagraph) == 0)
-      rq->resolved_dir = RAQM_DIRECTION_LTR;
-    else
-      rq->resolved_dir = RAQM_DIRECTION_RTL;
-
-    runs = malloc (sizeof (_raqm_bidi_run) * (*run_count));
-
-    if (runs)
-    {
-      sheenbidi_runs = SBLineGetRunsPtr(paragraphLine);
-
-      for (size_t i = 0; i < (*run_count); ++i)
-      {
-        runs[i].pos = sheenbidi_runs[i].offset;
-        runs[i].len = sheenbidi_runs[i].length;
-        runs[i].level = sheenbidi_runs[i].level;
-      }
+      runs[i].pos = sheenbidi_runs[i].offset;
+      runs[i].len = sheenbidi_runs[i].length;
+      runs[i].level = sheenbidi_runs[i].level;
     }
-
-    SBLineRelease (paragraphLine);
-    SBParagraphRelease (firstParagraph);
-    SBAlgorithmRelease (bidiAlgorithm);
   }
+
+  SBLineRelease (paragraphLine);
+  SBParagraphRelease (firstParagraph);
+  SBAlgorithmRelease (bidiAlgorithm);
 
   return runs;
 }
@@ -1233,28 +1230,24 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
   else if (rq->base_dir == RAQM_DIRECTION_LTR)
     par_type = FRIBIDI_PAR_LTR;
 
-  {
-    fribidi_get_bidi_types (rq->text, rq->text_len, types);
+  fribidi_get_bidi_types (rq->text, rq->text_len, types);
 #ifdef USE_FRIBIDI_EX_API
-    fribidi_get_bracket_types (rq->text, rq->text_len, types, btypes);
-    max_level = fribidi_get_par_embedding_levels_ex (types, btypes,
-                                                     rq->text_len, &par_type,
-                                                     levels);
+  fribidi_get_bracket_types (rq->text, rq->text_len, types, btypes);
+  max_level = fribidi_get_par_embedding_levels_ex (types, btypes,
+                                                   rq->text_len, &par_type,
+                                                   levels);
 #else
-    max_level = fribidi_get_par_embedding_levels (types, rq->text_len,
-                                                  &par_type, levels);
+  max_level = fribidi_get_par_embedding_levels (types, rq->text_len,
+                                                &par_type, levels);
 #endif
 
-   if (par_type == FRIBIDI_PAR_LTR)
-     rq->resolved_dir = RAQM_DIRECTION_LTR;
-   else
-     rq->resolved_dir = RAQM_DIRECTION_RTL;
-  }
+  if (par_type == FRIBIDI_PAR_LTR)
+    rq->resolved_dir = RAQM_DIRECTION_LTR;
+  else
+    rq->resolved_dir = RAQM_DIRECTION_RTL;
 
   if (max_level == 0)
-  {
     goto done;
-  }
 
   /* Get the number of bidi runs */
   runs = _raqm_reorder_runs (types, rq->text_len, par_type, levels, run_count);
