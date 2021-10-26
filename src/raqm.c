@@ -1038,20 +1038,6 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
   SBLevel base_level = SBLevelDefaultLTR;
   _raqm_bidi_run *runs = NULL;
 
-  if (rq->base_dir == RAQM_DIRECTION_TTB)
-  {
-    *run_count = 1;
-    rq->resolved_dir = RAQM_DIRECTION_LTR;
-    runs = malloc (sizeof (_raqm_bidi_run));
-
-    if (runs)
-    {
-      runs->pos = 0;
-      runs->len = rq->text_len;
-      runs->level = 0;
-    }
-  }
-  else
   {
     const SBRun *sheenbidi_runs;
     SBAlgorithmRef bidiAlgorithm;
@@ -1247,15 +1233,6 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
   else if (rq->base_dir == RAQM_DIRECTION_LTR)
     par_type = FRIBIDI_PAR_LTR;
 
-  if (rq->base_dir == RAQM_DIRECTION_TTB)
-  {
-    /* Treat every thing as LTR in vertical text */
-    max_level = 1;
-    memset (types, FRIBIDI_TYPE_LTR, rq->text_len);
-    memset (levels, 0, rq->text_len);
-    rq->resolved_dir = RAQM_DIRECTION_LTR;
-  }
-  else
   {
     fribidi_get_bidi_types (rq->text, rq->text_len, types);
 #ifdef USE_FRIBIDI_EX_API
@@ -1326,7 +1303,21 @@ _raqm_itemize (raqm_t *rq)
     goto done;
   }
 
-  runs = _raqm_bidi_itemize (rq, &run_count);
+  if (rq->base_dir == RAQM_DIRECTION_TTB)
+  {
+    /* Treat every thing as LTR in vertical text */
+    run_count = 1;
+    rq->resolved_dir = RAQM_DIRECTION_LTR;
+    runs = malloc (sizeof (_raqm_bidi_run));
+    if (runs)
+    {
+      runs->pos = 0;
+      runs->len = rq->text_len;
+      runs->level = 0;
+    }
+  } else {
+    runs = _raqm_bidi_itemize (rq, &run_count);
+  }
 
   if (!runs)
   {
