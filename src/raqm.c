@@ -1035,52 +1035,42 @@ typedef struct {
 static _raqm_bidi_run *
 _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
 {
-  SBLevel base_level = SBLevelDefaultLTR;
   _raqm_bidi_run *runs;
-  const SBRun *sheenbidi_runs;
-  SBAlgorithmRef bidiAlgorithm;
-  SBParagraphRef firstParagraph;
-  SBLineRef paragraphLine;
+  SBAlgorithmRef bidi;
+  SBParagraphRef par;
+  SBUInteger par_len;
+  SBLineRef line;
+
+  SBLevel base_level = SBLevelDefaultLTR;
+  SBCodepointSequence input = {
+     SBStringEncodingUTF32,
+     (void *) rq->text,
+     rq->text_len
+  };
 
   if (rq->base_dir == RAQM_DIRECTION_RTL)
     base_level = 1;
   else if (rq->base_dir == RAQM_DIRECTION_LTR)
     base_level = 0;
 
-  SBCodepointSequence codepointSequence =
-  {
-    SBStringEncodingUTF32,
-    (void *) rq->text,
-    rq->text_len,
-  };
-
   /* paragraph */
-  bidiAlgorithm = SBAlgorithmCreate (&codepointSequence);
-
-  firstParagraph = SBAlgorithmCreateParagraph (bidiAlgorithm,
-                                               0,
-                                               INT32_MAX,
-                                               base_level);
-
-  SBUInteger paragraphLength = SBParagraphGetLength (firstParagraph);
+  bidi = SBAlgorithmCreate (&input);
+  par = SBAlgorithmCreateParagraph (bidi, 0, INT32_MAX, base_level);
+  par_len = SBParagraphGetLength (par);
 
   /* lines */
-  paragraphLine = SBParagraphCreateLine (firstParagraph,
-                                         0,
-                                         paragraphLength);
+  line = SBParagraphCreateLine (par, 0, par_len);
+  *run_count = SBLineGetRunCount (line);
 
-  *run_count = SBLineGetRunCount (paragraphLine);
-
-  if (SBParagraphGetBaseLevel (firstParagraph) == 0)
+  if (SBParagraphGetBaseLevel (par) == 0)
     rq->resolved_dir = RAQM_DIRECTION_LTR;
   else
     rq->resolved_dir = RAQM_DIRECTION_RTL;
 
   runs = malloc (sizeof (_raqm_bidi_run) * (*run_count));
-
   if (runs)
   {
-    sheenbidi_runs = SBLineGetRunsPtr(paragraphLine);
+    const SBRun *sheenbidi_runs = SBLineGetRunsPtr(line);
 
     for (size_t i = 0; i < (*run_count); ++i)
     {
@@ -1090,9 +1080,9 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
     }
   }
 
-  SBLineRelease (paragraphLine);
-  SBParagraphRelease (firstParagraph);
-  SBAlgorithmRelease (bidiAlgorithm);
+  SBLineRelease (line);
+  SBParagraphRelease (par);
+  SBAlgorithmRelease (bidi);
 
   return runs;
 }
