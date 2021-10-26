@@ -19,6 +19,9 @@ if cc.get_argument_syntax() == 'msvc'
     config_h.set('RAQM_API', '__declspec (dllexport)')
   endif
 endif
+if sheenbidi.found()
+  config_h.set('RAQM_SHEENBIDI', 1)
+endif
 configure_file(output : 'config.h', configuration : config_h)
 
 version_h = configuration_data()

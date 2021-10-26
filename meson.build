@@ -48,17 +48,19 @@ harfbuzz = dependency('harfbuzz', version : '>= 1.7.2',
                                          'glib=disabled', 'gobject=disabled',
                                          'cairo=disabled', 'icu=disabled',
                                          'tests=disabled'])
+
+fribidi = dependency('', required : false)
+sheenbidi = dependency('', required : false)
 if get_option('sheenbidi')
-  add_project_arguments('-DRAQM_SHEENBIDI=1', language : 'c')
-  bidi   = dependency('sheenbidi',
-                      fallback : ['sheenbidi', 'sheenbidi_dep'])
+  sheenbidi = dependency('sheenbidi',
+                         fallback : ['sheenbidi', 'sheenbidi_dep'])
 else
-  bidi   = dependency('fribidi',
-                      fallback : ['fribidi', 'libfribidi_dep'],
-                      default_options : ['docs=false', 'tests=false'])
+  fribidi = dependency('fribidi',
+                       fallback : ['fribidi', 'libfribidi_dep'],
+                       default_options : ['docs=false', 'tests=false'])
 endif
 
-deps = [freetype, harfbuzz, bidi]
+deps = [freetype, harfbuzz, fribidi, sheenbidi]
 
 subdir('src')
 subdir('tests')
