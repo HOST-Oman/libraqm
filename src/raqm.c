@@ -1678,6 +1678,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   return true;
 }
 
+#ifdef HAVE_FT_GET_TRANSFORM
 static void
 _raqm_ft_transform (int      *x,
                     int      *y,
@@ -1692,6 +1693,7 @@ _raqm_ft_transform (int      *x,
   *x = vector.x;
   *y = vector.y;
 }
+#endif
 
 static bool
 _raqm_shape (raqm_t *rq)
