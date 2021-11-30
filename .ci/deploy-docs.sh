@@ -1,32 +1,22 @@
 #!/bin/bash
 
+set -x
 set -o errexit -o nounset
 
-if test "x$TRAVIS_SECURE_ENV_VARS" != "xtrue"; then exit; fi
+if test "x$GITHUB_REF_TYPE" != xtag; then exit; fi
 
-TAG="$(git describe --exact-match --match "v[0-9]*" HEAD 2>/dev/null || true)"
 
-if test "x$TAG" = x; then exit; fi
+git config user.name "CI"
+git config user.email "ci@raqm.org"
+git fetch origin
+git checkout -b gh-pages -t origin/gh-pages
 
-DOCSDIR=build-docs
-
-rm -rf $DOCSDIR || exit
-mkdir $DOCSDIR
-cd $DOCSDIR
-
-cp ../build/docs/html/* .
-
-git init
-git config user.name "Travis CI"
-git config user.email "travis@raqm.org"
-set +x
-echo "git remote add upstream \"https://\$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git\""
-git remote add upstream "https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git"
-set -x
-git fetch upstream
-git reset upstream/gh-pages
-
-touch .
+cp build/docs/html/* .
+rm -rf build
+ls *
 git add -A .
-git commit -m "Rebuild docs for $TAG"
-git push -q upstream HEAD:gh-pages
+
+if [[ $(git status -s) ]]; then
+  git commit -m "Rebuild docs for $GITHUB_REF"
+  git push -q origin HEAD:gh-pages
+fi
