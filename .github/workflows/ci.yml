@@ -44,6 +44,9 @@ jobs:
       run: ninja -C build
     - name: Test
       run: ninja -C build test
+    - name: Deploy documentation
+      if: matrix.os == 'ubuntu-latest'
+      run: .ci/deploy-docs.sh
 
   build-sheenbidi:
 
