@@ -1017,7 +1017,7 @@ raqm_get_glyphs (raqm_t *rq,
  *
  * Return value:
  * The #raqm_direction_t specifying the resolved direction of text,
- * or #RAQM_DIRECTION_DEFAULT if #raqm_layout has not been called on @rq.
+ * or #RAQM_DIRECTION_DEFAULT if raqm_layout() has not been called on @rq.
  *
  * Since: 0.8
  */
