@@ -31,9 +31,15 @@ jobs:
         # This dir contains a pkg-config which meson will happily use and later fail, so remove it
         $env:path = ($env:path.Split(';') | Where-Object { $_ -ne 'C:\Strawberry\perl\bin' }) -join ';'
         meson build
-    - if: matrix.os != 'windows-latest'
-      name: Meson Setup
+    - if: matrix.os == 'macos-latest'
+      name: Meson Setup on macOS
       run: meson build
+    - if: matrix.os == 'ubuntu-latest'
+      name: Install dependencies on Ubuntu
+      run: sudo apt-get install gtk-doc-tools
+    - if: matrix.os == 'ubuntu-latest'
+      name: Meson Setup on Ubuntu
+      run: meson -Ddocs=true build
     - name: Build
       run: ninja -C build
     - name: Test
