@@ -1039,7 +1039,7 @@ raqm_get_par_resolved_direction (raqm_t *rq)
  *
  * Return value:
  * The #raqm_direction_t specifying the resolved direction of text at the
- * specified index, or #RAQM_DIRECTION_DEFAULT if #raqm_layout has not been
+ * specified index, or #RAQM_DIRECTION_DEFAULT if raqm_layout() has not been
  * called on @rq.
  *
  * Since: 0.8
