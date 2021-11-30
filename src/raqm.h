@@ -156,6 +156,13 @@ RAQM_API raqm_glyph_t *
 raqm_get_glyphs (raqm_t *rq,
                  size_t *length);
 
+RAQM_API raqm_direction_t
+raqm_get_par_resolved_direction (raqm_t *rq);
+
+RAQM_API raqm_direction_t
+raqm_get_direction_at_index (raqm_t *rq,
+                             size_t index);
+
 RAQM_API bool
 raqm_index_to_position (raqm_t *rq,
                         size_t *index,
