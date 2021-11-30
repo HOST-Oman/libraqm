@@ -14,6 +14,8 @@ raqm_set_invisible_glyph
 raqm_add_font_feature
 raqm_layout
 raqm_get_glyphs
+raqm_get_par_resolved_direction
+raqm_get_direction_at_index
 raqm_index_to_position
 raqm_position_to_index
 raqm_version

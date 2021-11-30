@@ -1009,6 +1009,67 @@ raqm_get_glyphs (raqm_t *rq,
   return rq->glyphs;
 }
 
+/**
+ * raqm_get_par_resolved_direction:
+ * @rq: a #raqm_t.
+ *
+ * Gets the resolved direction of the paragraph;
+ *
+ * Return value:
+ * The #raqm_direction_t specifying the resolved direction of text,
+ * or #RAQM_DIRECTION_DEFAULT if raqm_layout() has not been called on @rq.
+ *
+ * Since: 0.8
+ */
+RAQM_API raqm_direction_t
+raqm_get_par_resolved_direction (raqm_t *rq)
+{
+  if (!rq)
+    return RAQM_DIRECTION_DEFAULT;
+
+  return rq->resolved_dir;
+}
+
+/**
+ * raqm_get_direction_at_index:
+ * @rq: a #raqm_t.
+ * @index: (in): character index.
+ *
+ * Gets the resolved direction of the character at specified index;
+ *
+ * Return value:
+ * The #raqm_direction_t specifying the resolved direction of text at the
+ * specified index, or #RAQM_DIRECTION_DEFAULT if raqm_layout() has not been
+ * called on @rq.
+ *
+ * Since: 0.8
+ */
+RAQM_API raqm_direction_t
+raqm_get_direction_at_index (raqm_t *rq,
+                             size_t index)
+{
+  if (!rq)
+    return RAQM_DIRECTION_DEFAULT;
+
+  for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
+  {
+    if (run->pos <= index && index < run->pos + run->len) {
+      switch (run->direction) {
+        case HB_DIRECTION_LTR:
+          return RAQM_DIRECTION_LTR;
+        case HB_DIRECTION_RTL:
+          return RAQM_DIRECTION_RTL;
+        case HB_DIRECTION_TTB:
+          return RAQM_DIRECTION_TTB;
+        default:
+          return RAQM_DIRECTION_DEFAULT;
+      }
+    }
+  }
+
+  return RAQM_DIRECTION_DEFAULT;
+}
+
 static bool
 _raqm_resolve_scripts (raqm_t *rq);
 
@@ -1290,7 +1351,7 @@ _raqm_itemize (raqm_t *rq)
   {
     /* Treat every thing as LTR in vertical text */
     run_count = 1;
-    rq->resolved_dir = RAQM_DIRECTION_LTR;
+    rq->resolved_dir = RAQM_DIRECTION_TTB;
     runs = malloc (sizeof (_raqm_bidi_run));
     if (runs)
     {

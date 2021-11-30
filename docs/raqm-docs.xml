@@ -42,6 +42,10 @@
     <title>Index of new symbols in 0.7.x</title>
     <xi:include href="xml/api-index-0.7.xml"/>
   </index>
+  <index id="api-index-0-8" role="0.8">
+    <title>Index of new symbols in 0.8.x</title>
+    <xi:include href="xml/api-index-0.8.xml"/>
+  </index>
   <!--index id="deprecated-api-index" role="deprecated">
     <title>Index of deprecated API</title>
     <xi:include href="xml/api-index-deprecated.xml"/>
