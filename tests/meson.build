@@ -1,4 +1,4 @@
-python3 = import('python').find_installation('python3')
+python3 = import('python').find_installation()
 
 raqm_test = executable(
   'raqm-test',
