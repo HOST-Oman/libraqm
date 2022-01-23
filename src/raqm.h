@@ -146,6 +146,12 @@ raqm_set_freetype_load_flags (raqm_t *rq,
                               int flags);
 
 RAQM_API bool
+raqm_set_freetype_load_flags_range (raqm_t *rq,
+                                    int     flags,
+                                    size_t  start,
+                                    size_t  len);
+
+RAQM_API bool
 raqm_set_invisible_glyph (raqm_t *rq,
                           int gid);
 

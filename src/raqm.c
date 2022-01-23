@@ -178,6 +178,7 @@ typedef enum {
 
 typedef struct {
   FT_Face       ftface;
+  int           ftloadflags;
   hb_language_t lang;
   hb_script_t   script;
 } _raqm_text_info;
@@ -204,7 +205,6 @@ struct _raqm {
 
   _raqm_flags_t    flags;
 
-  int              ft_loadflags;
   int              invisible_glyph;
 };
 
@@ -240,6 +240,7 @@ _raqm_init_text_info (raqm_t *rq)
   for (size_t i = 0; i < rq->text_len; i++)
   {
     rq->text_info[i].ftface = NULL;
+    rq->text_info[i].ftloadflags = -1;
     rq->text_info[i].lang = default_lang;
     rq->text_info[i].script = HB_SCRIPT_INVALID;
   }
@@ -268,6 +269,9 @@ _raqm_compare_text_info (_raqm_text_info a,
                          _raqm_text_info b)
 {
   if (a.ftface != b.ftface)
+    return false;
+
+  if (a.ftloadflags != b.ftloadflags)
     return false;
 
   if (a.lang != b.lang)
@@ -325,7 +329,6 @@ raqm_create (void)
   rq->features = NULL;
   rq->features_len = 0;
 
-  rq->ft_loadflags = -1;
   rq->invisible_glyph = 0;
 
   _raqm_init_intermediate_data (rq);
@@ -720,12 +723,13 @@ raqm_add_font_feature (raqm_t     *rq,
 
 static hb_font_t *
 _raqm_create_hb_font (raqm_t *rq,
-                      FT_Face face)
+                      FT_Face face,
+                      int     loadflags)
 {
   hb_font_t *font = hb_ft_font_create_referenced (face);
 
-  if (rq->ft_loadflags >= 0)
-    hb_ft_font_set_load_flags (font, rq->ft_loadflags);
+  if (loadflags >= 0)
+    hb_ft_font_set_load_flags (font, loadflags);
 
   return font;
 }
@@ -825,6 +829,30 @@ raqm_set_freetype_face_range (raqm_t *rq,
   return _raqm_set_freetype_face (rq, face, start, end);
 }
 
+static bool
+_raqm_set_freetype_load_flags (raqm_t *rq,
+                               int     flags,
+                               size_t  start,
+                               size_t  end)
+{
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (start >= rq->text_len || end > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+
+  for (size_t i = start; i < end; i++)
+    rq->text_info[i].ftloadflags = flags;
+
+  return true;
+}
+
 /**
  * raqm_set_freetype_load_flags:
  * @rq: a #raqm_t.
@@ -843,14 +871,59 @@ raqm_set_freetype_face_range (raqm_t *rq,
  */
 bool
 raqm_set_freetype_load_flags (raqm_t *rq,
-                              int flags)
+                              int     flags)
 {
+  return _raqm_set_freetype_load_flags(rq, flags, 0, rq->text_len);
+}
+
+/**
+ * raqm_set_freetype_load_flags_range:
+ * @rq: a #raqm_t.
+ * @flags: FreeType load flags.
+ * @start: index of first character that should use @flags.
+ * @len: number of characters using @flags.
+ *
+ * Sets the load flags passed to FreeType when loading glyphs for @len-number
+ * of characters staring at @start. Flags should be the same as used by the
+ * client when rendering corresponding FreeType glyphs. The @start and @len
+ * are input string array indices (i.e. counting bytes in UTF-8 and scaler
+ * values in UTF-32).
+ *
+ * This method can be used repeatedly to set different flags for different
+ * parts of the text. It is the responsibility of the client to make sure that
+ * flag ranges cover the whole text.
+ *
+ * This requires version of HarfBuzz that has hb_ft_font_set_load_flags(), for
+ * older version the flags will be ignored.
+ *
+ * See also raqm_set_freetype_load_flags().
+ *
+ * Return value:
+ * %true if no errors happened, %false otherwise.
+ *
+ * Since: 0.9
+ */
+bool
+raqm_set_freetype_load_flags_range (raqm_t *rq,
+                                    int     flags,
+                                    size_t  start,
+                                    size_t  len)
+{
+  size_t end = start + len;
+
   if (!rq)
     return false;
 
-  rq->ft_loadflags = flags;
+  if (!rq->text_len)
+    return true;
 
-  return true;
+  if (rq->flags & RAQM_FLAG_UTF8)
+  {
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
+  }
+
+  return _raqm_set_freetype_load_flags (rq, flags, start, end);
 }
 
 /**
@@ -1442,7 +1515,8 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos + runs[i].len - 1;
       run->script = rq->text_info[run->pos].script;
-      run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface);
+      run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface,
+          rq->text_info[run->pos].ftloadflags);
       for (int j = runs[i].len - 1; j >= 0; j--)
       {
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
@@ -1458,7 +1532,8 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = info.script;
-          newrun->font = _raqm_create_hb_font (rq, info.ftface);
+          newrun->font = _raqm_create_hb_font (rq, info.ftface,
+              info.ftloadflags);
           run->next = newrun;
           run = newrun;
         }
@@ -1473,7 +1548,8 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos;
       run->script = rq->text_info[run->pos].script;
-      run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface);
+      run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface,
+          rq->text_info[run->pos].ftloadflags);
       for (size_t j = 0; j < runs[i].len; j++)
       {
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
@@ -1489,7 +1565,8 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = info.script;
-          newrun->font = _raqm_create_hb_font (rq, info.ftface);
+          newrun->font = _raqm_create_hb_font (rq, info.ftface,
+              info.ftloadflags);
           run->next = newrun;
           run = newrun;
         }
