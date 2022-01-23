@@ -279,6 +279,23 @@ _raqm_compare_text_info (_raqm_text_info a,
   return true;
 }
 
+static void
+_raqm_init_intermediate_data (raqm_t* rq)
+{
+  rq->text = NULL;
+  rq->text_utf8 = NULL;
+  rq->text_len = 0;
+
+  rq->text_info = NULL;
+
+  rq->resolved_dir = RAQM_DIRECTION_DEFAULT;
+
+  rq->runs = NULL;
+  rq->glyphs = NULL;
+
+  rq->flags = RAQM_FLAG_NONE;
+}
+
 /**
  * raqm_create:
  *
@@ -303,24 +320,14 @@ raqm_create (void)
 
   rq->ref_count = 1;
 
-  rq->text = NULL;
-  rq->text_utf8 = NULL;
-  rq->text_len = 0;
-
-  rq->text_info = NULL;
-
   rq->base_dir = RAQM_DIRECTION_DEFAULT;
-  rq->resolved_dir = RAQM_DIRECTION_DEFAULT;
 
   rq->features = NULL;
   rq->features_len = 0;
 
-  rq->runs = NULL;
-  rq->glyphs = NULL;
-
-  rq->flags = RAQM_FLAG_NONE;
-
   rq->invisible_glyph = 0;
+
+  _raqm_init_intermediate_data (rq);
 
   return rq;
 }
@@ -361,6 +368,16 @@ _raqm_free_runs (raqm_t *rq)
   }
 }
 
+static void
+_raqm_free_intermediate_data (raqm_t *rq)
+{
+  free (rq->text);
+  free (rq->text_utf8);
+  _raqm_free_text_info (rq);
+  _raqm_free_runs (rq);
+  free (rq->glyphs);
+}
+
 /**
  * raqm_destroy:
  * @rq: a #raqm_t.
@@ -377,11 +394,7 @@ raqm_destroy (raqm_t *rq)
   if (!rq || --rq->ref_count != 0)
     return;
 
-  free (rq->text);
-  free (rq->text_utf8);
-  _raqm_free_text_info (rq);
-  _raqm_free_runs (rq);
-  free (rq->glyphs);
+  _raqm_free_intermediate_data (rq);
   free (rq);
 }
 
@@ -409,21 +422,26 @@ raqm_set_text (raqm_t         *rq,
   if (!rq || !text)
     return false;
 
-  rq->text_len = len;
+  /* Reset internal state of the previous text processing */
+  _raqm_free_intermediate_data (rq);
+  _raqm_init_intermediate_data (rq);
 
   /* Empty string, don’t fail but do nothing */
   if (!len)
     return true;
 
-  free (rq->text);
+  rq->text_len = len;
 
   rq->text = malloc (sizeof (uint32_t) * rq->text_len);
   if (!rq->text)
     return false;
 
-  _raqm_free_text_info (rq);
   if (!_raqm_init_text_info (rq))
+  {
+    free (rq->text);
+    rq->text = NULL;
     return false;
+  }
 
   memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
 
@@ -502,14 +520,13 @@ raqm_set_text_utf8 (raqm_t         *rq,
   if (!rq || !text)
     return false;
 
+  /* Reset internal state of the previous text processing */
+  _raqm_free_intermediate_data (rq);
+  _raqm_init_intermediate_data (rq);
+
   /* Empty string, don’t fail but do nothing */
   if (!len)
-  {
-    rq->text_len = len;
     return true;
-  }
-
-  rq->flags |= RAQM_FLAG_UTF8;
 
   rq->text_utf8 = malloc (sizeof (char) * len);
   if (!rq->text_utf8)
@@ -517,12 +534,26 @@ raqm_set_text_utf8 (raqm_t         *rq,
 
   unicode = malloc (sizeof (uint32_t) * len);
   if (!unicode)
+  {
+    free (rq->text_utf8);
+    rq->text_utf8 = NULL;
     return false;
+  }
 
   memcpy (rq->text_utf8, text, sizeof (char) * len);
 
   ulen = _raqm_u8_to_u32 (text, len, unicode);
   ok = raqm_set_text (rq, unicode, ulen);
+
+  if (ok)
+  {
+    rq->flags |= RAQM_FLAG_UTF8;
+  }
+  else
+  {
+    free (rq->text_utf8);
+    rq->text_utf8 = NULL;
+  }
 
   free (unicode);
   return ok;
@@ -1104,7 +1135,7 @@ raqm_get_direction_at_index (raqm_t *rq,
 
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
-    if (run->pos <= index && index < run->pos + run->len) {
+    if (run->pos <= ((int)index) && ((int)index) < run->pos + run->len) {
       switch (run->direction) {
         case HB_DIRECTION_LTR:
           return RAQM_DIRECTION_LTR;
