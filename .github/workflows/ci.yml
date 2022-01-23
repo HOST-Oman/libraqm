@@ -37,7 +37,9 @@ jobs:
       run: meson build
     - if: matrix.os == 'ubuntu-latest'
       name: Install dependencies on Ubuntu
-      run: sudo apt-get install gtk-doc-tools
+      run: |
+        sudo apt-get update || true
+        sudo apt-get install -y gtk-doc-tools
     - if: matrix.os == 'ubuntu-latest'
       name: Meson Setup on Ubuntu
       run: meson -Ddocs=true build
