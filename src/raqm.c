@@ -399,6 +399,33 @@ raqm_destroy (raqm_t *rq)
   free (rq);
 }
 
+static bool
+_raqm_set_text_utf32(raqm_t         *rq,
+                     const uint32_t *text,
+                     size_t          len)
+{
+  /* Empty string, don’t fail but do nothing */
+  if (!len)
+    return true;
+
+  rq->text_len = len;
+
+  rq->text = malloc (sizeof (uint32_t) * rq->text_len);
+  if (!rq->text)
+    return false;
+
+  if (!_raqm_init_text_info (rq))
+  {
+    free (rq->text);
+    rq->text = NULL;
+    return false;
+  }
+
+  memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
+
+  return true;
+}
+
 /**
  * raqm_set_text:
  * @rq: a #raqm_t.
@@ -427,26 +454,7 @@ raqm_set_text (raqm_t         *rq,
   _raqm_free_intermediate_data (rq);
   _raqm_init_intermediate_data (rq);
 
-  /* Empty string, don’t fail but do nothing */
-  if (!len)
-    return true;
-
-  rq->text_len = len;
-
-  rq->text = malloc (sizeof (uint32_t) * rq->text_len);
-  if (!rq->text)
-    return false;
-
-  if (!_raqm_init_text_info (rq))
-  {
-    free (rq->text);
-    rq->text = NULL;
-    return false;
-  }
-
-  memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
-
-  return true;
+  return _raqm_set_text_utf32 (rq, text, len);
 }
 
 static void *
@@ -544,7 +552,7 @@ raqm_set_text_utf8 (raqm_t         *rq,
   memcpy (rq->text_utf8, text, sizeof (char) * len);
 
   ulen = _raqm_u8_to_u32 (text, len, unicode);
-  ok = raqm_set_text (rq, unicode, ulen);
+  ok = _raqm_set_text_utf32 (rq, unicode, ulen);
 
   if (ok)
   {
