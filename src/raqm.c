@@ -24,7 +24,6 @@
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#undef HAVE_CONFIG_H  // Workaround for Fribidi 1.0.5 and earlier
 #endif
 
 #include <assert.h>
@@ -34,9 +33,6 @@
 #include <SheenBidi.h>
 #else
 #include <fribidi.h>
-#if FRIBIDI_MAJOR_VERSION >= 1
-#define USE_FRIBIDI_EX_API
-#endif
 #endif
 
 #include <hb.h>
@@ -895,17 +891,10 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
  * Sets the glyph id to be used for invisible glyhphs.
  *
  * If @gid is negative, invisible glyphs will be suppressed from the output.
- * This requires HarfBuzz 1.8.0 or later. If raqm is used with an earlier
- * HarfBuzz version, the return value will be %false and the shaping behavior
- * does not change.
  *
  * If @gid is zero, invisible glyphs will be rendered as space.
- * This works on all versions of HarfBuzz.
  *
  * If @gid is a positive number, it will be used for invisible glyphs.
- * This requires a version of HarfBuzz that has
- * hb_buffer_set_invisible_glyph(). For older versions, the return value
- * will be %false and the shaping behavior does not change.
  *
  * Return value:
  * %true if no errors happened, %false otherwise.
@@ -918,17 +907,6 @@ raqm_set_invisible_glyph (raqm_t *rq,
 {
   if (!rq)
     return false;
-
-#ifndef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
-  if (gid > 0)
-    return false;
-#endif
-
-#if !defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) || \
-    !HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
-  if (gid < 0)
-    return false;
-#endif
 
   rq->invisible_glyph = gid;
   return true;
@@ -1330,24 +1308,14 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
   FriBidiCharType *types;
   _raqm_bidi_level_t *levels;
   int max_level = 0;
-#ifdef USE_FRIBIDI_EX_API
   FriBidiBracketType *btypes;
-#endif
 
   types = calloc (rq->text_len, sizeof (FriBidiCharType));
-#ifdef USE_FRIBIDI_EX_API
   btypes = calloc (rq->text_len, sizeof (FriBidiBracketType));
-#endif
   levels = calloc (rq->text_len, sizeof (_raqm_bidi_level_t));
 
-  if (!types || !levels
-#ifdef USE_FRIBIDI_EX_API
-      || !btypes
-#endif
-      )
-  {
+  if (!types || !levels || !btypes)
     goto done;
-  }
 
   if (rq->base_dir == RAQM_DIRECTION_RTL)
     par_type = FRIBIDI_PAR_RTL;
@@ -1355,15 +1323,10 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
     par_type = FRIBIDI_PAR_LTR;
 
   fribidi_get_bidi_types (rq->text, rq->text_len, types);
-#ifdef USE_FRIBIDI_EX_API
   fribidi_get_bracket_types (rq->text, rq->text_len, types, btypes);
   max_level = fribidi_get_par_embedding_levels_ex (types, btypes,
                                                    rq->text_len, &par_type,
                                                    levels);
-#else
-  max_level = fribidi_get_par_embedding_levels (types, rq->text_len,
-                                                &par_type, levels);
-#endif
 
   if (par_type == FRIBIDI_PAR_LTR)
     rq->resolved_dir = RAQM_DIRECTION_LTR;
@@ -1379,9 +1342,7 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
 done:
   free (types);
   free (levels);
-#ifdef USE_FRIBIDI_EX_API
   free (btypes);
-#endif
 
   return runs;
 }
@@ -1816,7 +1777,6 @@ _raqm_resolve_scripts (raqm_t *rq)
   return true;
 }
 
-#ifdef HAVE_FT_GET_TRANSFORM
 static void
 _raqm_ft_transform (int      *x,
                     int      *y,
@@ -1831,18 +1791,14 @@ _raqm_ft_transform (int      *x,
   *x = vector.x;
   *y = vector.y;
 }
-#endif
 
 static bool
 _raqm_shape (raqm_t *rq)
 {
   hb_buffer_flags_t hb_buffer_flags = HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT;
 
-#if defined(HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES) && \
-    HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES
   if (rq->invisible_glyph < 0)
     hb_buffer_flags |= HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES;
-#endif
 
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
@@ -1855,15 +1811,12 @@ _raqm_shape (raqm_t *rq)
     hb_buffer_set_direction (run->buffer, run->direction);
     hb_buffer_set_flags (run->buffer, hb_buffer_flags);
 
-#ifdef HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH
     if (rq->invisible_glyph > 0)
       hb_buffer_set_invisible_glyph (run->buffer, rq->invisible_glyph);
-#endif
 
     hb_shape_full (run->font, run->buffer, rq->features, rq->features_len,
                    NULL);
 
-#ifdef HAVE_FT_GET_TRANSFORM
     {
       FT_Matrix matrix;
       hb_glyph_position_t *pos;
@@ -1877,7 +1830,6 @@ _raqm_shape (raqm_t *rq)
         _raqm_ft_transform (&pos[i].x_offset, &pos[i].y_offset, matrix);
       }
     }
-#endif
   }
 
   return true;

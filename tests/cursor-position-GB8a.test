@@ -1,6 +1,6 @@
 fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
 🇦🇧🇨🇩
---cluster 1 --position 1000 --require HB_020900
+--cluster 1 --position 1000
 Direction is: DEFAULT
 
 Before script detection:
