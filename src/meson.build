@@ -1,18 +1,6 @@
 cc = meson.get_compiler('c')
 
 config_h = configuration_data()
-if freetype.type_name() == 'internal' or \
-  cc.has_function('FT_Get_Transform', dependencies : freetype)
-  config_h.set('HAVE_FT_GET_TRANSFORM', 1)
-endif
-if harfbuzz.type_name() == 'internal' or \
-  cc.has_function('hb_buffer_set_invisible_glyph', dependencies : harfbuzz)
-  config_h.set('HAVE_HB_BUFFER_SET_INVISIBLE_GLYPH', 1)
-endif
-if harfbuzz.type_name() == 'internal' or \
-  cc.has_header_symbol('hb.h', 'HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES', dependencies : harfbuzz)
-  config_h.set('HAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES', 1)
-endif
 if cc.get_argument_syntax() == 'msvc'
   library_type = get_option('default_library')
   if library_type == 'shared' or library_type == 'both'

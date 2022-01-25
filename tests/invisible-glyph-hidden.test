@@ -1,6 +1,6 @@
 fonts/sha1sum/e4c7989e4c78dc2af43fd87ede6a6ba6cbf14cb5.ttf
 芦󠄂
---direction ltr --invisible-glyph -1 --require HB_010800
+--direction ltr --invisible-glyph -1
 Direction is: LTR
 
 Before script detection:

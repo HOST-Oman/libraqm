@@ -12,7 +12,7 @@ cc = meson.get_compiler('c')
 
 # FreeType version ([libtool,    actual] from its docs/VERSIONS.TXT)
 #                  ([pkg-config, cmake])
-freetype_version = ['12.0.6', '2.4.2']
+freetype_version = ['24.0.18', '2.11.0']
 
 # Set freetype as a dummy, for now
 freetype = dependency('', required: false)
@@ -42,7 +42,7 @@ if not freetype.found()
                                            'zlib=disabled', 'harfbuzz=disabled'])
 endif
 
-harfbuzz = dependency('harfbuzz', version : '>= 1.7.2',
+harfbuzz = dependency('harfbuzz', version : '>= 3.0.0',
                       fallback : ['harfbuzz', 'libharfbuzz_dep'],
                       default_options : ['freetype=enabled',
                                          'glib=disabled', 'gobject=disabled',
@@ -55,7 +55,7 @@ if get_option('sheenbidi')
   sheenbidi = dependency('sheenbidi',
                          fallback : ['sheenbidi', 'sheenbidi_dep'])
 else
-  fribidi = dependency('fribidi',
+  fribidi = dependency('fribidi',  version : '>= 1.0.6',
                        fallback : ['fribidi', 'libfribidi_dep'],
                        default_options : ['docs=false', 'tests=false'])
 endif

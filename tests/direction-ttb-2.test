@@ -1,6 +1,6 @@
 fonts/sha1sum/788742748bf8bfbd3b6b56859f92938275da74bd.otf
 汉语English عربي
---direction ttb --require FT_020800
+--direction ttb
 Direction is: TTB
 
 Before script detection:
