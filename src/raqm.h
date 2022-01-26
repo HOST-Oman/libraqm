@@ -107,7 +107,8 @@ RAQM_API void
 raqm_destroy (raqm_t *rq);
 
 RAQM_API void
-raqm_clear_contents (raqm_t *rq);
+raqm_clear_contents (raqm_t *rq,
+                     bool    free_memory);
 
 RAQM_API bool
 raqm_set_text (raqm_t         *rq,
