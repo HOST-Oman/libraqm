@@ -167,11 +167,6 @@
   typedef FriBidiLevel _raqm_bidi_level_t;
 #endif
 
-typedef enum {
-  RAQM_FLAG_NONE = 0,
-  RAQM_FLAG_UTF8 = 1 << 0
-} _raqm_flags_t;
-
 typedef struct {
   FT_Face       ftface;
   int           ftloadflags;
@@ -198,8 +193,6 @@ struct _raqm {
 
   raqm_run_t      *runs;
   raqm_glyph_t    *glyphs;
-
-  _raqm_flags_t    flags;
 
   int              invisible_glyph;
 };
@@ -292,8 +285,6 @@ _raqm_init_intermediate_data (raqm_t* rq)
 
   rq->runs = NULL;
   rq->glyphs = NULL;
-
-  rq->flags = RAQM_FLAG_NONE;
 }
 
 /**
@@ -548,34 +539,29 @@ raqm_set_text_utf8 (raqm_t         *rq,
   if (!len)
     return true;
 
-  rq->text_utf8 = malloc (sizeof (char) * len);
-  if (!rq->text_utf8)
-    return false;
-
   unicode = malloc (sizeof (uint32_t) * len);
   if (!unicode)
+    return false;
+
+  ulen = _raqm_u8_to_u32 (text, len, unicode);
+  ok = raqm_set_text (rq, unicode, ulen);
+
+  free (unicode);
+
+  if (!ok)
+    return false;
+
+  rq->text_utf8 = malloc (sizeof (char) * len);
+  if (!rq->text_utf8)
   {
-    free (rq->text_utf8);
-    rq->text_utf8 = NULL;
+    free (rq->text);
+    rq->text = NULL;
+    rq->text_len = 0;
     return false;
   }
 
   memcpy (rq->text_utf8, text, sizeof (char) * len);
 
-  ulen = _raqm_u8_to_u32 (text, len, unicode);
-  ok = _raqm_set_text_utf32 (rq, unicode, ulen);
-
-  if (ok)
-  {
-    rq->flags |= RAQM_FLAG_UTF8;
-  }
-  else
-  {
-    free (rq->text_utf8);
-    rq->text_utf8 = NULL;
-  }
-
-  free (unicode);
   return ok;
 }
 
@@ -660,7 +646,7 @@ raqm_set_language (raqm_t       *rq,
   if (!rq->text_len)
     return true;
 
-  if (rq->flags & RAQM_FLAG_UTF8)
+  if (rq->text_utf8)
   {
     start = _raqm_u8_to_u32_index (rq, start);
     end = _raqm_u8_to_u32_index (rq, end);
@@ -828,7 +814,7 @@ raqm_set_freetype_face_range (raqm_t *rq,
   if (!rq->text_len)
     return true;
 
-  if (rq->flags & RAQM_FLAG_UTF8)
+  if (rq->text_utf8)
   {
     start = _raqm_u8_to_u32_index (rq, start);
     end = _raqm_u8_to_u32_index (rq, end);
@@ -925,7 +911,7 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
   if (!rq->text_len)
     return true;
 
-  if (rq->flags & RAQM_FLAG_UTF8)
+  if (rq->text_utf8)
   {
     start = _raqm_u8_to_u32_index (rq, start);
     end = _raqm_u8_to_u32_index (rq, end);
@@ -1088,7 +1074,7 @@ raqm_get_glyphs (raqm_t *rq,
     count += len;
   }
 
-  if (rq->flags & RAQM_FLAG_UTF8)
+  if (rq->text_utf8)
   {
 #ifdef RAQM_TESTING
     RAQM_TEST ("\nUTF-32 clusters:");
@@ -1978,7 +1964,7 @@ raqm_index_to_position (raqm_t *rq,
   if (rq == NULL)
     return false;
 
-  if (rq->flags & RAQM_FLAG_UTF8)
+  if (rq->text_utf8)
     *index = _raqm_u8_to_u32_index (rq, *index);
 
   if (*index >= rq->text_len)
@@ -2035,7 +2021,7 @@ raqm_index_to_position (raqm_t *rq,
   }
 
 found:
-  if (rq->flags & RAQM_FLAG_UTF8)
+  if (rq->text_utf8)
     *index = _raqm_u32_to_u8_index (rq, *index);
   RAQM_TEST ("The position is %d at index %zu\n",*x ,*index);
   return true;
