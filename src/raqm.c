@@ -389,7 +389,7 @@ raqm_reference (raqm_t *rq)
  *
  * Decreases the reference count on @rq by one. If the result is zero, then @rq
  * and all associated resources are freed.
- * See cairo_reference().
+ * See raqm_reference().
  *
  * Since: 0.1
  */
