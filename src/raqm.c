@@ -200,8 +200,8 @@ struct _raqm {
 };
 
 struct _raqm_run {
-  int            pos;
-  int            len;
+  uint32_t       pos;
+  uint32_t       len;
 
   hb_direction_t direction;
   hb_script_t    script;
@@ -1139,7 +1139,7 @@ raqm_get_direction_at_index (raqm_t *rq,
 
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
-    if (run->pos <= ((int)index) && ((int)index) < run->pos + run->len) {
+    if (run->pos <= index && index < run->pos + run->len) {
       switch (run->direction) {
         case HB_DIRECTION_LTR:
           return RAQM_DIRECTION_LTR;
