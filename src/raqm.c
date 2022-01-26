@@ -410,7 +410,6 @@ raqm_destroy (raqm_t *rq)
 /**
  * raqm_clear_contents:
  * @rq: a #raqm_t.
- * @free_memory: whether to free internal buffers or to keep them for reuse.
  *
  * Clears internal state of previously used raqm_t object, making it
  * ready for reuse.
@@ -418,22 +417,12 @@ raqm_destroy (raqm_t *rq)
  * Since: 0.9
  */
 void
-raqm_clear_contents (raqm_t *rq,
-                     bool    free_memory)
+raqm_clear_contents (raqm_t *rq)
 {
   if (!rq)
     return;
 
   _raqm_release_text_info (rq);
-
-  if (free_memory)
-  {
-    _raqm_free_text (rq);
-
-    free (rq->glyphs);
-    rq->glyphs = NULL;
-    rq->glyphs_capacity = 0;
-  }
 
   _raqm_free_runs (rq);
   rq->runs = NULL;
