@@ -398,31 +398,23 @@ raqm_destroy (raqm_t *rq)
   free (rq);
 }
 
-static bool
-_raqm_set_text_utf32(raqm_t         *rq,
-                     const uint32_t *text,
-                     size_t          len)
+/**
+ * raqm_clear_contents:
+ * @rq: a #raqm_t.
+ *
+ * Clears internal state of previously used raqm_t object, making it
+ * ready for reuse.
+ *
+ * Since: 0.9
+ */
+void
+raqm_clear_contents (raqm_t *rq)
 {
-  /* Empty string, don’t fail but do nothing */
-  if (!len)
-    return true;
+  if (!rq)
+    return;
 
-  rq->text_len = len;
-
-  rq->text = malloc (sizeof (uint32_t) * rq->text_len);
-  if (!rq->text)
-    return false;
-
-  if (!_raqm_init_text_info (rq))
-  {
-    free (rq->text);
-    rq->text = NULL;
-    return false;
-  }
-
-  memcpy (rq->text, text, sizeof (uint32_t) * rq->text_len);
-
-  return true;
+  _raqm_free_intermediate_data (rq);
+  _raqm_init_intermediate_data (rq);
 }
 
 /**
@@ -449,11 +441,31 @@ raqm_set_text (raqm_t         *rq,
   if (!rq || !text)
     return false;
 
-  /* Reset internal state of the previous text processing */
-  _raqm_free_intermediate_data (rq);
-  _raqm_init_intermediate_data (rq);
+  /* Call raqm_clear_contents to reuse this raqm_t */
+  if (rq->text)
+    return false;
 
-  return _raqm_set_text_utf32 (rq, text, len);
+  /* Empty string, don’t fail but do nothing */
+  if (!len)
+    return true;
+
+  rq->text_len = len;
+
+  rq->text = malloc (sizeof (uint32_t) * len);
+  if (!rq->text)
+    return false;
+
+  if (!_raqm_init_text_info (rq))
+  {
+    free (rq->text);
+    rq->text = NULL;
+    rq->text_len = 0;
+    return false;
+  }
+
+  memcpy (rq->text, text, sizeof (uint32_t) * len);
+
+  return true;
 }
 
 static void *
@@ -528,9 +540,9 @@ raqm_set_text_utf8 (raqm_t         *rq,
   if (!rq || !text)
     return false;
 
-  /* Reset internal state of the previous text processing */
-  _raqm_free_intermediate_data (rq);
-  _raqm_init_intermediate_data (rq);
+  /* Call raqm_clear_contents to reuse this raqm_t */
+  if (rq->text)
+    return false;
 
   /* Empty string, don’t fail but do nothing */
   if (!len)
