@@ -3,6 +3,7 @@
 raqm_create
 raqm_reference
 raqm_destroy
+raqm_clear_contents
 raqm_set_text
 raqm_set_text_utf8
 raqm_set_par_direction
