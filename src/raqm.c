@@ -411,8 +411,8 @@ raqm_destroy (raqm_t *rq)
  * raqm_clear_contents:
  * @rq: a #raqm_t.
  *
- * Clears internal state of previously used raqm_t object, making it
- * ready for reuse.
+ * Clears internal state of previously used raqm_t object, making it ready
+ * for reuse and keeping some of allocated memory to increase performance.
  *
  * Since: 0.9
  */
