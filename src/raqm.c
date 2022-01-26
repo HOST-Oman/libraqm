@@ -265,12 +265,12 @@ _raqm_compare_text_info (_raqm_text_info a,
 static void
 _raqm_free_text(raqm_t* rq)
 {
-    free(rq->text);
-    rq->text = NULL;
-    rq->text_info = NULL;
-    rq->text_utf8 = NULL;
-    rq->text_len = 0;
-    rq->text_capacity_bytes = 0;
+  free (rq->text);
+  rq->text = NULL;
+  rq->text_info = NULL;
+  rq->text_utf8 = NULL;
+  rq->text_len = 0;
+  rq->text_capacity_bytes = 0;
 }
 
 static bool
