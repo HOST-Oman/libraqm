@@ -353,7 +353,7 @@ _raqm_free_runs (raqm_run_t *runs)
  * Return value:
  * A newly allocated #raqm_t with a reference count of 1. The initial reference
  * count should be released with raqm_destroy() when you are done using the
- * #raqm_t. Returns %NULL in case of error.
+ * #raqm_t. Returns `NULL` in case of error.
  *
  * Since: 0.1
  */
@@ -494,7 +494,7 @@ raqm_clear_contents (raqm_t *rq)
  * separately can give improper output.
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Since: 0.1
  */
@@ -580,7 +580,7 @@ _raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
  * Same as raqm_set_text(), but for text encoded in UTF-8 encoding.
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Since: 0.1
  */
@@ -636,7 +636,7 @@ raqm_set_text_utf8 (raqm_t     *rq,
  * text.
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Since: 0.1
  */
@@ -669,7 +669,7 @@ raqm_set_par_direction (raqm_t          *rq,
  * parts of the text.
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Stability:
  * Unstable
@@ -716,7 +716,7 @@ raqm_set_language (raqm_t       *rq,
  * raqm_add_font_feature:
  * @rq: a #raqm_t.
  * @feature: (transfer none): a font feature string.
- * @len: length of @feature, -1 for %NULL-terminated.
+ * @len: length of @feature, -1 for `NULL`-terminated.
  *
  * Adds a font feature to be used by the #raqm_t during text layout. This is
  * usually used to turn on optional font features that are not enabled by
@@ -730,7 +730,7 @@ raqm_set_language (raqm_t       *rq,
  * end of the features list and can potentially override previous features.
  *
  * Return value:
- * %true if parsing @feature succeeded, %false otherwise.
+ * `true` if parsing @feature succeeded, `false` otherwise.
  *
  * Since: 0.1
  */
@@ -813,7 +813,7 @@ _raqm_set_freetype_face (raqm_t *rq,
  * See also raqm_set_freetype_face_range().
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Since: 0.1
  */
@@ -842,7 +842,7 @@ raqm_set_freetype_face (raqm_t *rq,
  * See also raqm_set_freetype_face().
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Since: 0.1
  */
@@ -905,7 +905,7 @@ _raqm_set_freetype_load_flags (raqm_t *rq,
  * older version the flags will be ignored.
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Since: 0.3
  */
@@ -939,7 +939,7 @@ raqm_set_freetype_load_flags (raqm_t *rq,
  * See also raqm_set_freetype_load_flags().
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Since: 0.9
  */
@@ -980,7 +980,7 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
  * If @gid is a positive number, it will be used for invisible glyphs.
  *
  * Return value:
- * %true if no errors happened, %false otherwise.
+ * `true` if no errors happened, `false` otherwise.
  *
  * Since: 0.6
  */
@@ -1010,7 +1010,7 @@ _raqm_shape (raqm_t *rq);
  * text shaping, and any other part of the layout process.
  *
  * Return value:
- * %true if the layout process was successful, %false otherwise.
+ * `true` if the layout process was successful, `false` otherwise.
  *
  * Since: 0.1
  */
@@ -1055,7 +1055,7 @@ _raqm_u32_to_u8_index (raqm_t   *rq,
  * information.
  *
  * Return value: (transfer none):
- * An array of #raqm_glyph_t, or %NULL in case of error. This is owned by @rq
+ * An array of #raqm_glyph_t, or `NULL` in case of error. This is owned by @rq
  * and must not be freed.
  *
  * Since: 0.1
@@ -1997,7 +1997,7 @@ _raqm_in_hangul_syllable (hb_codepoint_t ch);
  * character is left-to-right, then the cursor will be at the right of it.
  *
  * Return value:
- * %true if the process was successful, %false otherwise.
+ * `true` if the process was successful, `false` otherwise.
  *
  * Since: 0.2
  */
@@ -2089,7 +2089,7 @@ found:
  * @index.
  *
  * Return value:
- * %true if the process was successful, %false in case of error.
+ * `true` if the process was successful, `false` in case of error.
  *
  * Since: 0.2
  */
@@ -2367,8 +2367,8 @@ raqm_version_string (void)
  * Checks if library version is less than or equal the specified version.
  *
  * Return value:
- * %true if library version is less than or equal the specfied version, %false
- * otherwise.
+ * `true` if library version is less than or equal the specified version,
+ * `false` otherwise.
  *
  * Since: 0.7
  **/
@@ -2389,8 +2389,8 @@ raqm_version_atleast (unsigned int major,
  * Checks if library version is less than or equal the specified version.
  *
  * Return value:
- * %true if library version is less than or equal the specfied version, %false
- * otherwise.
+ * `true` if library version is less than or equal the specified version,
+ * `false` otherwise.
  *
  * Since: 0.7
  **/
