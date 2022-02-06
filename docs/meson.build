@@ -13,8 +13,8 @@ gnome.gtkdoc(
   'raqm',
   main_xml : 'raqm-docs.xml',
   src_dir : [
-    join_paths(meson.source_root(), 'src'),
-    join_paths(meson.build_root(), 'src'),
+    meson.project_source_root() / 'src',
+    meson.project_build_root() / 'src',
   ],
   ignore_headers : ['config.h'],
   content_files : [version_xml],
