@@ -19,6 +19,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v1
+    # https://github.com/mesonbuild/meson/issues/9955#issuecomment-1030843844
+    - name: Downgrade pip
+      run: python -m pip install -U pip==21.3.1
     - name: Install Python Dependencies
       run: pip install --upgrade meson ninja
     - name: MSVC Setup
@@ -62,6 +65,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v1
+    # https://github.com/mesonbuild/meson/issues/9955#issuecomment-1030843844
+    - name: Downgrade pip
+      run: python -m pip install -U pip==21.3.1
     - name: Install Python Dependencies
       run: pip install --upgrade meson ninja
     - name: Meson Setup
