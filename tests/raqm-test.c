@@ -21,7 +21,9 @@
  * SOFTWARE.
  *
  */
-
+#ifdef __GNUC__ 
+#define  _DEFAULT_SOURCE
+#endif
 #include <assert.h>
 #include <errno.h>
 #include <locale.h>
