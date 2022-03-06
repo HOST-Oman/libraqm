@@ -1153,8 +1153,11 @@ raqm_get_glyphs (raqm_t *rq,
  * Gets the resolved direction of the paragraph;
  *
  * Return value:
- * The #raqm_direction_t specifying the resolved direction of text,
- * or #RAQM_DIRECTION_DEFAULT if raqm_layout() has not been called on @rq.
+ * The #raqm_direction_t specifying the resolved direction of text.
+ * - #RAQM_DIRECTION_RTL, #RAQM_DIRECTION_LTR or #RAQM_DIRECTION_TTB
+ *   when the direction was determined
+ * - #RAQM_DIRECTION_DEFAULT if the text is direction neutral
+ * - #RAQM_DIRECTION_DEFAULT if raqm_layout() has not been called on @rq
  *
  * Since: 0.8
  */
@@ -1416,8 +1419,10 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
 
   if (par_type == FRIBIDI_PAR_LTR)
     rq->resolved_dir = RAQM_DIRECTION_LTR;
-  else
+  else if (par_type == FRIBIDI_PAR_RTL)
     rq->resolved_dir = RAQM_DIRECTION_RTL;
+  else
+    rq->resolved_dir = RAQM_DIRECTION_DEFAULT;
 
   if (max_level == 0)
     goto done;
