@@ -40,6 +40,7 @@ static char *languages = NULL;
 static char *direction = NULL;
 static char *features = NULL;
 static char *require = NULL;
+static char *baselines = NULL;
 static int cluster = -1;
 static int position = -1;
 static int invisible_glyph = 0;
@@ -100,6 +101,8 @@ parse_args (int argc, char **argv)
       direction = argv[++i];
     else if (strcmp (argv[i], "--font-features") == 0)
       features = argv[++i];
+    else if (strcmp (argv[i], "--baselines") == 0)
+      baselines = argv[++i];
     else if (strcmp (argv[i], "--require") == 0)
       require = argv[++i];
     else if (strcmp (argv[i], "--cluster") == 0)
@@ -226,6 +229,17 @@ main (int argc, char **argv)
   {
     for (char *tok = strtok (features, ","); tok; tok = strtok (NULL, ","))
       assert (raqm_add_font_feature (rq, tok, -1));
+  }
+  
+  if (baselines)
+  {
+    for (char *tok = strtok (baselines, ","); tok; tok = strtok (NULL, ","))
+    {
+      int start, length;
+      start = atoi (strtok (NULL, ","));
+      length = atoi (strtok (NULL, ","));
+      assert (raqm_set_baseline_tag_range (rq, tok, start, length));
+    }
   }
 
   if (invisible_glyph)

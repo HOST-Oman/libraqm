@@ -37,6 +37,7 @@
 
 #include <hb.h>
 #include <hb-ft.h>
+#include <hb-ot.h>
 
 #include "raqm.h"
 
@@ -172,6 +173,8 @@ typedef struct {
   int           ftloadflags;
   hb_language_t lang;
   hb_script_t   script;
+  hb_ot_layout_baseline_tag_t baseline_tag;
+  int baseline_shift;
 } _raqm_text_info;
 
 typedef struct _raqm_run raqm_run_t;
@@ -232,6 +235,8 @@ _raqm_init_text_info (raqm_t *rq)
     rq->text_info[i].ftloadflags = -1;
     rq->text_info[i].lang = default_lang;
     rq->text_info[i].script = HB_SCRIPT_INVALID;
+    rq->text_info[i].baseline_tag = HB_TAG_NONE;
+    rq->text_info[i].baseline_shift = 0;
   }
 }
 
@@ -264,6 +269,12 @@ _raqm_compare_text_info (_raqm_text_info a,
   if (a.script != b.script)
     return false;
 
+  if (a.baseline_tag != b.baseline_tag)
+    return false;
+
+  if (a.baseline_shift != b.baseline_shift)
+    return false;
+  
   return true;
 }
 
@@ -1077,6 +1088,146 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
   return _raqm_set_freetype_load_flags (rq, flags, start, end);
 }
 
+static bool
+_raqm_set_baseline_tag (raqm_t *rq,
+                        const char   *baseline_tag,
+                        size_t  start,
+                        size_t  end)
+{
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (start >= rq->text_len || end > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+  
+  hb_ot_layout_baseline_tag_t tag = (hb_ot_layout_baseline_tag_t)hb_tag_from_string(baseline_tag, -1);
+
+  for (size_t i = start; i < end; i++)
+    rq->text_info[i].baseline_tag = tag;
+
+  return true;
+}
+/**
+ * raqm_set_baseline_tag_range:
+ * @rq: a #raqm_t.
+ * @baseline_tag: an opentype baseline tag.
+ * @start: index of first character that should use @baseline_tag.
+ * @len: number of characters using @baseline_tag.
+ * 
+ * Set the alignment baseline for a given range, using a specific
+ * opentype baseline tag, such as 'romn' for the alphabetic baseline,
+ * or 'hang' for the hanging baseline. This will use a fallback if
+ * the font has no such metrics and Raqm is build with a version
+ * of Harfbuzz that has hb_ot_layout_get_baseline_with_fallback().
+ * 
+ * The baseline values will then be added to the x or y offset.
+ *
+ * Return value:
+ * `true` if no errors happened, `false` otherwise.
+ *
+ * Since: 0.10
+ */
+bool
+raqm_set_baseline_tag_range(raqm_t *rq,
+                            const char* baseline_tag,
+                            size_t start,
+                            size_t len)
+{
+  size_t end = start + len;
+
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (rq->text_utf8)
+  {
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
+  }
+  else if (rq->text_utf16)
+  {
+    start = _raqm_u16_to_u32_index (rq, start);
+    end = _raqm_u16_to_u32_index (rq, end);
+  }
+
+  return _raqm_set_baseline_tag (rq, baseline_tag, start, end);
+}
+
+static bool
+_raqm_set_baseline_shift (raqm_t *rq,
+                          int    shift,
+                          size_t start,
+                          size_t end)
+{
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (start >= rq->text_len || end > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+
+  for (size_t i = start; i < end; i++)
+    rq->text_info[i].baseline_shift = shift;
+
+  return true;
+}
+
+/**
+ * raqm_set_baseline_shift_range:
+ * @rq: a #raqm_t.
+ * @shift: amount to shift in Freetype Font Units (26.6 format).
+ * @start: index of first character that should use @shift.
+ * @len: number of characters using @shift.
+ * 
+ * Shift the alignment baseline for a given range. This will be
+ * added to the glyph offset.
+ *
+ * Return value:
+ * `true` if no errors happened, `false` otherwise.
+ *
+ * Since: 0.10 
+ */
+bool
+raqm_set_baseline_shift_range(raqm_t *rq,
+                              int shift,
+                              size_t start,
+                              size_t len)
+{
+  size_t end = start + len;
+
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (rq->text_utf8)
+  {
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
+  }
+  else if (rq->text_utf16)
+  {
+    start = _raqm_u16_to_u32_index (rq, start);
+    end = _raqm_u16_to_u32_index (rq, end);
+  }
+
+  return _raqm_set_baseline_shift (rq, shift, start, end);
+}
+
 /**
  * raqm_set_invisible_glyph:
  * @rq: a #raqm_t.
@@ -1214,6 +1365,20 @@ raqm_get_glyphs (raqm_t *rq,
     len = hb_buffer_get_length (run->buffer);
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
+    
+    hb_position_t baseline = 0;
+
+    if (rq->text_info[info[0].cluster].baseline_tag != HB_TAG_NONE) {
+      hb_ot_layout_get_baseline_with_fallback(run->font,
+                                              rq->text_info[info[0].cluster].baseline_tag,
+                                              run->direction,
+                                              (hb_tag_t)run->script,
+                                              HB_TAG_NONE,
+                                              &baseline);
+    }
+    baseline += rq->text_info[info[0].cluster].baseline_shift;
+    float baseline_offset = (float)baseline;
+    
 
     for (size_t i = 0; i < len; i++)
     {
@@ -1223,6 +1388,11 @@ raqm_get_glyphs (raqm_t *rq,
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
+      if (run->direction == HB_DIRECTION_TTB) {
+        rq->glyphs[count + i].x_offset += baseline_offset;
+      } else {
+        rq->glyphs[count + i].y_offset += baseline_offset;
+      }
       rq->glyphs[count + i].ftface = rq->text_info[info[i].cluster].ftface;
 
       RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\tfont: %s\n",

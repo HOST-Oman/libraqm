@@ -11,6 +11,7 @@ raqm_test = executable(
 
 tests = [
   'buffer-flags-1.test',
+  'baselines.test',
   'cursor-position-1.test',
   'cursor-position-2.test',
   'cursor-position-3.test',

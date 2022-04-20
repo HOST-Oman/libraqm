@@ -159,6 +159,18 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
                                     size_t  len);
 
 RAQM_API bool
+raqm_set_baseline_tag_range(raqm_t *rq,
+                            const char* baseline_tag,
+                            size_t start,
+                            size_t len);
+
+RAQM_API bool
+raqm_set_baseline_shift_range(raqm_t *rq,
+                              int shift,
+                              size_t start,
+                              size_t len);
+
+RAQM_API bool
 raqm_set_invisible_glyph (raqm_t *rq,
                           int gid);
 

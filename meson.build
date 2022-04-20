@@ -43,7 +43,7 @@ if not freetype.found()
                                            'zlib=disabled', 'harfbuzz=disabled'])
 endif
 
-harfbuzz = dependency('harfbuzz', version : '>= 3.0.0',
+harfbuzz = dependency('harfbuzz', version : '>= 4.0.0',
                       fallback : ['harfbuzz', 'libharfbuzz_dep'],
                       default_options : ['freetype=enabled',
                                          'glib=disabled', 'gobject=disabled',
