@@ -180,6 +180,7 @@ struct _raqm {
   int              ref_count;
 
   uint32_t        *text;
+  uint16_t        *text_utf16;
   char            *text_utf8;
   size_t           text_len;
   size_t           text_capacity_bytes;
@@ -216,6 +217,10 @@ struct _raqm_run {
 static uint32_t
 _raqm_u8_to_u32_index (raqm_t   *rq,
                        uint32_t  index);
+
+static uint32_t
+_raqm_u16_to_u32_index (raqm_t   *rq,
+                        uint32_t  index);
 
 static void
 _raqm_init_text_info (raqm_t *rq)
@@ -269,6 +274,7 @@ _raqm_free_text(raqm_t* rq)
   rq->text = NULL;
   rq->text_info = NULL;
   rq->text_utf8 = NULL;
+  rq->text_utf16 = NULL;
   rq->text_len = 0;
   rq->text_capacity_bytes = 0;
 }
@@ -276,12 +282,15 @@ _raqm_free_text(raqm_t* rq)
 static bool
 _raqm_alloc_text(raqm_t *rq,
                  size_t  len,
-                 bool    need_utf8)
+                 bool    need_utf8,
+                 bool    need_utf16)
 {
   /* Allocate contiguous memory block for texts and text_info */
   size_t mem_size = (sizeof (uint32_t) + sizeof (_raqm_text_info)) * len;
   if (need_utf8)
     mem_size += sizeof (char) * len;
+  else if (need_utf16)
+    mem_size += sizeof (uint16_t) * len;
 
   if (mem_size > rq->text_capacity_bytes)
   {
@@ -298,6 +307,7 @@ _raqm_alloc_text(raqm_t *rq,
 
   rq->text_info = (_raqm_text_info*)(rq->text + len);
   rq->text_utf8 = need_utf8 ? (char*)(rq->text_info + len) : NULL;
+  rq->text_utf16 = need_utf16 ? (uint16_t*)(rq->text_info + len) : NULL;
 
   return true;
 }
@@ -377,6 +387,7 @@ raqm_create (void)
   rq->invisible_glyph = 0;
 
   rq->text = NULL;
+  rq->text_utf16 = NULL;
   rq->text_utf8 = NULL;
   rq->text_info = NULL;
   rq->text_capacity_bytes = 0;
@@ -514,7 +525,7 @@ raqm_set_text (raqm_t         *rq,
   if (!len)
     return true;
 
-  if (!_raqm_alloc_text(rq, len, false))
+  if (!_raqm_alloc_text(rq, len, false, false))
       return false;
 
   rq->text_len = len;
@@ -571,6 +582,53 @@ _raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
   return (out_utf32 - unicode);
 }
 
+static void *
+_raqm_get_utf16_codepoint (const void *str,
+                          uint32_t *out_codepoint)
+{
+  const uint16_t *s = (const uint16_t *)str;
+  
+  if (s[0] > 0xD800 && s[0] < 0xDBFF)
+  {
+    if (s[1] > 0xDC00 && s[1] < 0xDFFF)
+    {
+      uint32_t X = ((s[0] & ((1 << 6) -1)) << 10) | (s[1] & ((1 << 10) -1));
+      uint32_t W = (s[0] >> 6) & ((1 << 5) - 1);
+      *out_codepoint = (W+1) << 16 | X;
+      s += 2;
+    }
+    else
+    {
+      //A single high surrogate, this is an error.
+      *out_codepoint = s[0];
+      s += 1;
+    }
+  } 
+  else
+  {
+      *out_codepoint = s[0];
+      s += 1;
+  }
+  return (void *)s;
+}
+
+static size_t
+_raqm_u16_to_u32 (const uint16_t *text, size_t len, uint32_t *unicode)
+{
+  size_t in_len = 0;
+  uint32_t *out_utf32 = unicode;
+  const uint16_t *in_utf16 = text;
+  
+  while ((*in_utf16 != '\0') && (in_len < len))
+  {
+    in_utf16 = _raqm_get_utf16_codepoint (in_utf16, out_utf32);
+    ++out_utf32;
+    ++in_len;
+  }
+  
+  return (out_utf32 - unicode);
+}
+
 /**
  * raqm_set_text_utf8:
  * @rq: a #raqm_t.
@@ -600,7 +658,7 @@ raqm_set_text_utf8 (raqm_t     *rq,
   if (!len)
     return true;
 
-  if (!_raqm_alloc_text(rq, len, true))
+  if (!_raqm_alloc_text(rq, len, true, false))
       return false;
 
   rq->text_len = _raqm_u8_to_u32 (text, len, rq->text);
@@ -610,6 +668,44 @@ raqm_set_text_utf8 (raqm_t     *rq,
   return true;
 }
 
+/**
+ * raqm_set_text_utf16:
+ * @rq: a #raqm_t.
+ * @text: a UTF-16 encoded text string.
+ * @len: the length of @text in UTF-16 shorts.
+ *
+ * Same as raqm_set_text(), but for text encoded in UTF-16 encoding.
+ *
+ * Return value:
+ * `true` if no errors happened, `false` otherwise.
+ *
+ * Since: 0.10
+ */
+bool
+raqm_set_text_utf16 (raqm_t     *rq,
+                    const uint16_t *text,
+                    size_t      len)
+{
+  if (!rq || !text)
+    return false;
+
+  /* Call raqm_clear_contents to reuse this raqm_t */
+  if (rq->text_len)
+    return false;
+
+  /* Empty string, don’t fail but do nothing */
+  if (!len)
+    return true;
+
+  if (!_raqm_alloc_text(rq, len, false, true))
+      return false;
+
+  rq->text_len = _raqm_u16_to_u32 (text, len, rq->text);
+  memcpy (rq->text_utf16, text, sizeof (uint16_t) * len);
+  _raqm_init_text_info (rq);
+
+  return true;
+}
 /**
  * raqm_set_par_direction:
  * @rq: a #raqm_t.
@@ -695,6 +791,11 @@ raqm_set_language (raqm_t       *rq,
   {
     start = _raqm_u8_to_u32_index (rq, start);
     end = _raqm_u8_to_u32_index (rq, end);
+  }
+  else if (rq->text_utf16)
+  {
+    start = _raqm_u16_to_u32_index (rq, start);
+    end = _raqm_u16_to_u32_index (rq, end);
   }
 
   if (start >= rq->text_len || end > rq->text_len)
@@ -865,6 +966,11 @@ raqm_set_freetype_face_range (raqm_t *rq,
     start = _raqm_u8_to_u32_index (rq, start);
     end = _raqm_u8_to_u32_index (rq, end);
   }
+  else if (rq->text_utf16)
+  {
+    start = _raqm_u16_to_u32_index (rq, start);
+    end = _raqm_u16_to_u32_index (rq, end);
+  }
 
   return _raqm_set_freetype_face (rq, face, start, end);
 }
@@ -961,6 +1067,11 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
   {
     start = _raqm_u8_to_u32_index (rq, start);
     end = _raqm_u8_to_u32_index (rq, end);
+  }
+  else if (rq->text_utf16)
+  {
+    start = _raqm_u16_to_u32_index (rq, start);
+    end = _raqm_u16_to_u32_index (rq, end);
   }
 
   return _raqm_set_freetype_load_flags (rq, flags, start, end);
@@ -1977,6 +2088,52 @@ _raqm_u8_to_u32_index (raqm_t   *rq,
 
   return length;
 }
+/* Count equivalent UTF-16 short in codepoint */
+static size_t
+_raqm_count_codepoint_utf16_short (uint32_t chr)
+{
+  if (chr > 0x010000)
+    return 2;
+  else
+    return 1;
+}
+/* Convert index from UTF-32 to UTF-16 */
+static uint32_t
+_raqm_u32_to_u16_index (raqm_t   *rq,
+                       uint32_t  index)
+{
+  size_t length = 0;
+
+  for (uint32_t i = 0; i < index; ++i)
+    length += _raqm_count_codepoint_utf16_short (rq->text[i]);
+
+  return length;
+}
+
+/* Convert index from UTF-16 to UTF-32 */
+static uint32_t
+_raqm_u16_to_u32_index (raqm_t   *rq,
+                       uint32_t  index)
+{
+  const uint16_t *s = (const uint16_t *) rq->text_utf16;
+  const uint16_t *t = s;
+  size_t length = 0;
+
+  while (((size_t) (s - t) < index) && ('\0' != *s))
+  {
+    if (*s < 0xD800 || *s > 0xDBFF)
+      s += 1;
+    else
+      s += 2;
+
+    length++;
+  }
+
+  if ((size_t) (s-t) > index)
+    length--;
+
+  return length;
+}
 
 static bool
 _raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
@@ -2016,6 +2173,8 @@ raqm_index_to_position (raqm_t *rq,
 
   if (rq->text_utf8)
     *index = _raqm_u8_to_u32_index (rq, *index);
+  else if (rq->text_utf16)
+    *index = _raqm_u16_to_u32_index (rq, *index);
 
   if (*index >= rq->text_len)
     return false;
@@ -2073,6 +2232,8 @@ raqm_index_to_position (raqm_t *rq,
 found:
   if (rq->text_utf8)
     *index = _raqm_u32_to_u8_index (rq, *index);
+  else if (rq->text_utf16)
+    *index = _raqm_u32_to_u16_index (rq, *index);
   RAQM_TEST ("The position is %d at index %zu\n",*x ,*index);
   return true;
 }

@@ -118,6 +118,10 @@ RAQM_API bool
 raqm_set_text_utf8 (raqm_t     *rq,
                     const char *text,
                     size_t      len);
+RAQM_API bool
+raqm_set_text_utf16 (raqm_t     *rq,
+                    const uint16_t *text,
+                    size_t      len);
 
 RAQM_API bool
 raqm_set_par_direction (raqm_t          *rq,

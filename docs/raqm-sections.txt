@@ -6,6 +6,7 @@ raqm_destroy
 raqm_clear_contents
 raqm_set_text
 raqm_set_text_utf8
+raqm_set_text_utf16
 raqm_set_par_direction
 raqm_set_language
 raqm_set_freetype_face
