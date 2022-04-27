@@ -1,4 +1,4 @@
 [wrap-git]
 directory=harfbuzz
 url=https://github.com/harfbuzz/harfbuzz.git
-revision=3.0.0
+revision=4.0.0
