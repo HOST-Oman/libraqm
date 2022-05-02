@@ -854,6 +854,29 @@ raqm_add_font_feature (raqm_t     *rq,
     if (!new_features)
       return false;
 
+    if (fea.start != HB_FEATURE_GLOBAL_START)
+    {
+      if (rq->text_utf8)
+      {
+        fea.start = _raqm_u8_to_u32_index (rq, fea.start);
+      }
+      else if (rq->text_utf16)
+      {
+        fea.start = _raqm_u16_to_u32_index (rq, fea.start);
+      }
+    }
+    if (fea.end != HB_FEATURE_GLOBAL_END)
+    {
+      if (rq->text_utf8)
+      {
+        fea.end = _raqm_u8_to_u32_index (rq, fea.end);
+      }
+      else if (rq->text_utf16)
+      {
+        fea.end = _raqm_u16_to_u32_index (rq, fea.end);
+      }
+    }
+
     rq->features = new_features;
     rq->features[rq->features_len] = fea;
     rq->features_len++;
