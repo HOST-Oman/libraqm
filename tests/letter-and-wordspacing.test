@@ -1,0 +1,144 @@
+fonts/sha1sum/d46a2549d27c32605024201abf801bb9a9273da3.ttf
+عربيעבריתأهلב ריתمم(ُeng lish ) مرحبا
+--direction rtl --letterspacing 10,0,37 --wordspacing 50,0,37
+ 
+Direction is: RTL
+
+Before script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+script for ch[4]	Hebr
+script for ch[5]	Hebr
+script for ch[6]	Hebr
+script for ch[7]	Hebr
+script for ch[8]	Hebr
+script for ch[9]	Arab
+script for ch[10]	Arab
+script for ch[11]	Arab
+script for ch[12]	Hebr
+script for ch[13]	Zyyy
+script for ch[14]	Hebr
+script for ch[15]	Hebr
+script for ch[16]	Hebr
+script for ch[17]	Arab
+script for ch[18]	Arab
+script for ch[19]	Zyyy
+script for ch[20]	Zinh
+script for ch[21]	Latn
+script for ch[22]	Latn
+script for ch[23]	Latn
+script for ch[24]	Zyyy
+script for ch[25]	Latn
+script for ch[26]	Latn
+script for ch[27]	Latn
+script for ch[28]	Latn
+script for ch[29]	Zyyy
+script for ch[30]	Zyyy
+script for ch[31]	Zyyy
+script for ch[32]	Arab
+script for ch[33]	Arab
+script for ch[34]	Arab
+script for ch[35]	Arab
+script for ch[36]	Arab
+
+After script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+script for ch[4]	Hebr
+script for ch[5]	Hebr
+script for ch[6]	Hebr
+script for ch[7]	Hebr
+script for ch[8]	Hebr
+script for ch[9]	Arab
+script for ch[10]	Arab
+script for ch[11]	Arab
+script for ch[12]	Hebr
+script for ch[13]	Hebr
+script for ch[14]	Hebr
+script for ch[15]	Hebr
+script for ch[16]	Hebr
+script for ch[17]	Arab
+script for ch[18]	Arab
+script for ch[19]	Arab
+script for ch[20]	Arab
+script for ch[21]	Latn
+script for ch[22]	Latn
+script for ch[23]	Latn
+script for ch[24]	Latn
+script for ch[25]	Latn
+script for ch[26]	Latn
+script for ch[27]	Latn
+script for ch[28]	Latn
+script for ch[29]	Latn
+script for ch[30]	Arab
+script for ch[31]	Arab
+script for ch[32]	Arab
+script for ch[33]	Arab
+script for ch[34]	Arab
+script for ch[35]	Arab
+script for ch[36]	Arab
+
+Number of runs before script itemization: 3
+
+BiDi Runs:
+run[0]:	 start: 29	length: 8	level: 1
+run[1]:	 start: 21	length: 8	level: 2
+run[2]:	 start: 0	length: 21	level: 1
+
+Number of runs after script itemization: 8
+
+Final Runs:
+run[0]:	 start: 30	length: 7	direction: rtl	script: Arab	font: DejaVu Sans
+run[1]:	 start: 29	length: 1	direction: rtl	script: Latn	font: DejaVu Sans
+run[2]:	 start: 21	length: 8	direction: ltr	script: Latn	font: DejaVu Sans
+run[3]:	 start: 17	length: 4	direction: rtl	script: Arab	font: DejaVu Sans
+run[4]:	 start: 12	length: 5	direction: rtl	script: Hebr	font: DejaVu Sans
+run[5]:	 start: 9	length: 3	direction: rtl	script: Arab	font: DejaVu Sans
+run[6]:	 start: 4	length: 5	direction: rtl	script: Hebr	font: DejaVu Sans
+run[7]:	 start: 0	length: 4	direction: rtl	script: Arab	font: DejaVu Sans
+
+Glyph information:
+glyph [35]	x_offset: 0	y_offset: 0	x_advance: 624	font: DejaVu Sans
+glyph [38]	x_offset: 0	y_offset: 0	x_advance: 618	font: DejaVu Sans
+glyph [40]	x_offset: 0	y_offset: 0	x_advance: 1266	font: DejaVu Sans
+glyph [42]	x_offset: 0	y_offset: 0	x_advance: 1130	font: DejaVu Sans
+glyph [50]	x_offset: 0	y_offset: 0	x_advance: 1097	font: DejaVu Sans
+glyph [1]	x_offset: 0	y_offset: 0	x_advance: 651	font: DejaVu Sans
+glyph [2]	x_offset: 0	y_offset: 0	x_advance: 799	font: DejaVu Sans
+glyph [1]	x_offset: 0	y_offset: 0	x_advance: 651	font: DejaVu Sans
+glyph [4]	x_offset: 0	y_offset: 0	x_advance: 1260	font: DejaVu Sans
+glyph [9]	x_offset: 0	y_offset: 0	x_advance: 1298	font: DejaVu Sans
+glyph [5]	x_offset: 0	y_offset: 0	x_advance: 1300	font: DejaVu Sans
+glyph [1]	x_offset: 0	y_offset: 0	x_advance: 651	font: DejaVu Sans
+glyph [8]	x_offset: 0	y_offset: 0	x_advance: 569	font: DejaVu Sans
+glyph [7]	x_offset: 0	y_offset: 0	x_advance: 569	font: DejaVu Sans
+glyph [10]	x_offset: 0	y_offset: 0	x_advance: 1067	font: DejaVu Sans
+glyph [6]	x_offset: 0	y_offset: 0	x_advance: 1298	font: DejaVu Sans
+glyph [27]	x_offset: 0	y_offset: 0	x_advance: 0	font: DejaVu Sans
+glyph [3]	x_offset: 0	y_offset: 0	x_advance: 799	font: DejaVu Sans
+glyph [49]	x_offset: 0	y_offset: 0	x_advance: 1363	font: DejaVu Sans
+glyph [50]	x_offset: 10	y_offset: 0	x_advance: 1107	font: DejaVu Sans
+glyph [15]	x_offset: 10	y_offset: 0	x_advance: 1356	font: DejaVu Sans
+glyph [12]	x_offset: 10	y_offset: 0	x_advance: 468	font: DejaVu Sans
+glyph [14]	x_offset: 10	y_offset: 0	x_advance: 1166	font: DejaVu Sans
+glyph [1]	x_offset: 50	y_offset: 0	x_advance: 701	font: DejaVu Sans
+glyph [11]	x_offset: 10	y_offset: 0	x_advance: 1194	font: DejaVu Sans
+glyph [46]	x_offset: 10	y_offset: 0	x_advance: 1561	font: DejaVu Sans
+glyph [53]	x_offset: 10	y_offset: 0	x_advance: 1090	font: DejaVu Sans
+glyph [16]	x_offset: 10	y_offset: 0	x_advance: 579	font: DejaVu Sans
+glyph [15]	x_offset: 10	y_offset: 0	x_advance: 1356	font: DejaVu Sans
+glyph [12]	x_offset: 10	y_offset: 0	x_advance: 468	font: DejaVu Sans
+glyph [14]	x_offset: 10	y_offset: 0	x_advance: 1166	font: DejaVu Sans
+glyph [11]	x_offset: 10	y_offset: 0	x_advance: 1194	font: DejaVu Sans
+glyph [13]	x_offset: 10	y_offset: 0	x_advance: 1292	font: DejaVu Sans
+glyph [56]	x_offset: 10	y_offset: 0	x_advance: 1717	font: DejaVu Sans
+glyph [37]	x_offset: 10	y_offset: 0	x_advance: 580	font: DejaVu Sans
+glyph [42]	x_offset: 10	y_offset: 0	x_advance: 1140	font: DejaVu Sans
+glyph [44]	x_offset: 10	y_offset: 0	x_advance: 1232	font: DejaVu Sans
+
+UTF-32 clusters: 36 35 34 33 32 31 30 29 21 22 23 24 25 26 27 28 19 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
+UTF-8 clusters:  59 57 55 53 51 50 49 48 40 41 42 43 44 45 46 47 37 37 35 33 31 29 27 26 24 22 20 18 16 14 12 10 08 06 04 02 00

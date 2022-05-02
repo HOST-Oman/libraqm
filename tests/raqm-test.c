@@ -40,6 +40,8 @@ static char *languages = NULL;
 static char *direction = NULL;
 static char *features = NULL;
 static char *require = NULL;
+static char *letterspacing = NULL;
+static char *wordspacing = NULL;
 static int cluster = -1;
 static int position = -1;
 static int invisible_glyph = 0;
@@ -100,6 +102,10 @@ parse_args (int argc, char **argv)
       direction = argv[++i];
     else if (strcmp (argv[i], "--font-features") == 0)
       features = argv[++i];
+    else if (strcmp (argv[i], "--letterspacing") == 0)
+      letterspacing = argv[++i];
+    else if (strcmp (argv[i], "--wordspacing") == 0)
+      wordspacing = argv[++i];
     else if (strcmp (argv[i], "--require") == 0)
       require = argv[++i];
     else if (strcmp (argv[i], "--cluster") == 0)
@@ -226,6 +232,32 @@ main (int argc, char **argv)
   {
     for (char *tok = strtok (features, ","); tok; tok = strtok (NULL, ","))
       assert (raqm_add_font_feature (rq, tok, -1));
+  }
+  
+  if (letterspacing)
+  {
+    for (char *tok = strtok (letterspacing, ","); tok; tok = strtok (NULL, ","))
+    {
+      int spacing = atoi (tok);
+      bool percentage = false;
+      int start, length;
+      start = atoi (strtok (NULL, ","));
+      length = atoi (strtok (NULL, ","));
+      assert (raqm_set_letter_spacing_range (rq, spacing, percentage, start, length));
+    }
+  }
+  
+  if (wordspacing)
+  {
+    for (char *tok = strtok (wordspacing, ","); tok; tok = strtok (NULL, ","))
+    {
+      int spacing = atoi (tok);
+      bool percentage = false;
+      int start, length;
+      start = atoi (strtok (NULL, ","));
+      length = atoi (strtok (NULL, ","));
+      assert (raqm_set_word_spacing_range (rq, spacing, percentage, start, length));
+    }
   }
 
   if (invisible_glyph)

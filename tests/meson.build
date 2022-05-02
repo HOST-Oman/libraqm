@@ -43,6 +43,7 @@ tests = [
   'invisible-glyph-space.test',
   'languages-sr-ru.test',
   'languages-sr.test',
+  'letter-and-wordspacing.test',
   'multi-fonts-1.test',
   'multi-fonts-2.test',
   'scripts-backward-ltr.test',

@@ -172,6 +172,8 @@ typedef struct {
   int           ftloadflags;
   hb_language_t lang;
   hb_script_t   script;
+  int           spacing_after;
+  bool          spacing_is_percentage;
 } _raqm_text_info;
 
 typedef struct _raqm_run raqm_run_t;
@@ -228,6 +230,8 @@ _raqm_init_text_info (raqm_t *rq)
     rq->text_info[i].ftloadflags = -1;
     rq->text_info[i].lang = default_lang;
     rq->text_info[i].script = HB_SCRIPT_INVALID;
+    rq->text_info[i].spacing_after = 0;
+    rq->text_info[i].spacing_is_percentage = false;
   }
 }
 
@@ -259,6 +263,8 @@ _raqm_compare_text_info (_raqm_text_info a,
 
   if (a.script != b.script)
     return false;
+
+  /* Spacing shouldn't break runs, so we don't compare them here. */
 
   return true;
 }
@@ -1054,6 +1060,159 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
   start = _raqm_encoding_to_u32_index (rq, start);
 
   return _raqm_set_freetype_load_flags (rq, flags, start, end);
+}
+
+/* CSS  Word seperators, word spacing is only applied on these.*/
+static size_t word_separators_len = 7;
+static const uint32_t word_separators[] =
+{
+  0x0020,  /// Space
+  0x00A0,  /// No break space
+  0x1361,  /// Ethiopic word space
+  0x10100, /// Aegean wordspace
+  0x10101, /// Aegean wordspace
+  0x1039F, /// Ugaric word divider
+  0x1091F  /// Phoenician word separator
+};
+
+static bool
+_raqm_set_spacing (raqm_t *rq,
+                   int    spacing,
+                   bool   percentage,
+                   bool   word_spacing,
+                   size_t start,
+                   size_t end)
+{
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (start >= rq->text_len || end > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+
+  for (size_t i = start; i < end; i++)
+    if (word_spacing)
+    {
+      for (size_t j = 0; j < word_separators_len; j++)
+      {
+        if (rq->text[i] == word_separators[j])
+        {
+          rq->text_info[i].spacing_after = spacing;
+          rq->text_info[i].spacing_is_percentage = percentage;
+        }
+      }
+    }
+    else
+    {
+      rq->text_info[i].spacing_after = spacing;
+      rq->text_info[i].spacing_is_percentage = percentage;
+    }
+
+  return true;
+}
+
+/**
+ * raqm_set_letter_spacing_range:
+ * @rq: a #raqm_t.
+ * @spacing: amount of spacing in Freetype Font Units (26.6 format), or percentages of the advance (0 - 100)
+ * @percentage: whether to interpret the @spacing amount as a percentage of
+ * the character advance.
+ * @start: index of first character that should use @spacing.
+ * @len: number of characters using @spacing.
+ * 
+ * Set the letter spacing or tracking for a given range, the value
+ * will be added onto the advance and offset for RTL, and the advance for
+ * other directions. Letter spacing will be applied between characters, so
+ * the last character will not have spacing applied after it.
+ * Note that not all scripts have a letter-spacing tradition,
+ * for example, Arabic does not, while Devanagari does.
+ *
+ * Return value:
+ * `true` if no errors happened, `false` otherwise.
+ *
+ * Since: 0.10 
+ */
+bool
+raqm_set_letter_spacing_range(raqm_t *rq,
+                              int    spacing,
+                              bool   percentage,
+                              size_t start,
+                              size_t len)
+{
+  size_t end = start + (len-1);
+
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (rq->text_utf8)
+  {
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
+  }
+  else if (rq->text_utf16)
+  {
+    start = _raqm_u16_to_u32_index (rq, start);
+    end = _raqm_u16_to_u32_index (rq, end);
+  }
+
+  return _raqm_set_spacing (rq, spacing, percentage, false, start, end);
+}
+
+/**
+ * raqm_set_word_spacing_range:
+ * @rq: a #raqm_t.
+ * @spacing: amount of spacing in Freetype Font Units (26.6 format), or percentages of the advance (0 - 100)
+ * @percentage: whether to interpret the @spacing amount as a percentage of
+ * the character advance.
+ * @start: index of first character that should use @spacing.
+ * @len: number of characters using @spacing.
+ * 
+ * Set the word spacing for a given range. Word spacing will only be applied to
+ * 'word separator' characters, such as 'space', 'no break space' and
+ * Ethiopic word separator'.
+ * The value will be added onto the advance and offset for RTL, and the advance
+ * for other directions.
+ *
+ * Return value:
+ * `true` if no errors happened, `false` otherwise.
+ *
+ * Since: 0.10 
+ */
+bool
+raqm_set_word_spacing_range(raqm_t *rq,
+                            int    spacing,
+                            bool   percentage,
+                            size_t start,
+                            size_t len)
+{
+  size_t end = start + len;
+
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (rq->text_utf8)
+  {
+    start = _raqm_u8_to_u32_index (rq, start);
+    end = _raqm_u8_to_u32_index (rq, end);
+  }
+  else if (rq->text_utf16)
+  {
+    start = _raqm_u16_to_u32_index (rq, start);
+    end = _raqm_u16_to_u32_index (rq, end);
+  }
+
+  return _raqm_set_spacing (rq, spacing, percentage, true, start, end);
 }
 
 /**
@@ -1998,15 +2157,56 @@ _raqm_shape (raqm_t *rq)
 
     {
       FT_Matrix matrix;
+      hb_glyph_info_t *info;
       hb_glyph_position_t *pos;
       unsigned int len;
 
       FT_Get_Transform (hb_ft_font_get_face (run->font), &matrix, NULL);
       pos = hb_buffer_get_glyph_positions (run->buffer, &len);
+      info = hb_buffer_get_glyph_infos (run->buffer, &len);
       for (unsigned int i = 0; i < len; i++)
       {
         _raqm_ft_transform (&pos[i].x_advance, &pos[i].y_advance, matrix);
         _raqm_ft_transform (&pos[i].x_offset, &pos[i].y_offset, matrix);
+
+        if (rq->text_info[info[i].cluster].spacing_after != 0)
+        {
+          if (run->direction == HB_DIRECTION_TTB)
+          {
+            if (rq->text_info[info[i].cluster].spacing_is_percentage)
+            {
+              int spacing = pos[i].y_advance * (rq->text_info[info[i].cluster].spacing_after * 0.01);
+              pos[i].y_advance += spacing;
+            }
+            else {
+              pos[i].y_advance -= rq->text_info[info[i].cluster].spacing_after;
+            }
+          }
+          else if (run->direction == HB_DIRECTION_RTL)
+          {
+            if (rq->text_info[info[i].cluster].spacing_is_percentage)
+            {
+              int spacing = pos[i].x_advance * (rq->text_info[info[i].cluster].spacing_after * 0.01);
+              pos[i].x_offset += spacing;
+              pos[i].x_advance += spacing;
+            }
+            else {
+              pos[i].x_advance += rq->text_info[info[i].cluster].spacing_after;
+              pos[i].x_offset += rq->text_info[info[i].cluster].spacing_after;
+            }
+          }
+          else
+          {
+            if (rq->text_info[info[i].cluster].spacing_is_percentage)
+            {
+              pos[i].x_advance *= 1.0 + (rq->text_info[info[i].cluster].spacing_after * 0.01);
+            }
+            else {
+              pos[i].x_advance += rq->text_info[info[i].cluster].spacing_after;
+            }
+          }
+        }
+
       }
     }
   }

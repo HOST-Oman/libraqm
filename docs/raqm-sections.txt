@@ -13,6 +13,8 @@ raqm_set_freetype_face
 raqm_set_freetype_face_range
 raqm_set_freetype_load_flags
 raqm_set_freetype_load_flags_range
+raqm_set_letter_spacing_range
+raqm_set_word_spacing_range
 raqm_set_invisible_glyph
 raqm_add_font_feature
 raqm_layout
