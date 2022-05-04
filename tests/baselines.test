@@ -27,8 +27,8 @@ run[0]:	 start: 0	length: 2	direction: ltr	script: Cyrl	font: DejaVu Serif
 run[1]:	 start: 2	length: 2	direction: ltr	script: Cyrl	font: DejaVu Serif
 
 Glyph information:
-glyph [3]	x_offset: 0	y_offset: 1228	x_advance: 1942	font: DejaVu Serif
-glyph [2]	x_offset: 0	y_offset: 1228	x_advance: 1250	font: DejaVu Serif
+glyph [3]	x_offset: 0	y_offset: -1228	x_advance: 1942	font: DejaVu Serif
+glyph [2]	x_offset: 0	y_offset: -1228	x_advance: 1250	font: DejaVu Serif
 glyph [3]	x_offset: 0	y_offset: 0	x_advance: 1942	font: DejaVu Serif
 glyph [2]	x_offset: 0	y_offset: 0	x_advance: 1250	font: DejaVu Serif
 

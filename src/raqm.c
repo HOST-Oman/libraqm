@@ -169,12 +169,12 @@
 #endif
 
 typedef struct {
-  FT_Face       ftface;
-  int           ftloadflags;
-  hb_language_t lang;
-  hb_script_t   script;
+  FT_Face                     ftface;
+  int                         ftloadflags;
+  hb_language_t               lang;
+  hb_script_t                 script;
   hb_ot_layout_baseline_tag_t baseline_tag;
-  int baseline_shift;
+  int                         baseline_shift;
 } _raqm_text_info;
 
 typedef struct _raqm_run raqm_run_t;
@@ -1089,10 +1089,10 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
 }
 
 static bool
-_raqm_set_baseline_tag (raqm_t *rq,
-                        const char   *baseline_tag,
-                        size_t  start,
-                        size_t  end)
+_raqm_set_baseline_tag (raqm_t     *rq,
+                        const char *baseline_tag,
+                        size_t      start,
+                        size_t      end)
 {
   if (!rq)
     return false;
@@ -1106,7 +1106,7 @@ _raqm_set_baseline_tag (raqm_t *rq,
   if (!rq->text_info)
     return false;
   
-  hb_ot_layout_baseline_tag_t tag = (hb_ot_layout_baseline_tag_t)hb_tag_from_string(baseline_tag, -1);
+  hb_ot_layout_baseline_tag_t tag = (hb_ot_layout_baseline_tag_t) hb_tag_from_string(baseline_tag, -1);
 
   for (size_t i = start; i < end; i++)
     rq->text_info[i].baseline_tag = tag;
@@ -1120,13 +1120,12 @@ _raqm_set_baseline_tag (raqm_t *rq,
  * @start: index of first character that should use @baseline_tag.
  * @len: number of characters using @baseline_tag.
  * 
- * Set the alignment baseline for a given range, using a specific
+ * Set the dominant baseline for a given range, using a specific
  * opentype baseline tag, such as 'romn' for the alphabetic baseline,
  * or 'hang' for the hanging baseline. This will use a fallback if
- * the font has no such metrics and Raqm is build with a version
- * of Harfbuzz that has hb_ot_layout_get_baseline_with_fallback().
+ * the font has no such metrics.
  * 
- * The baseline values will then be added to the x or y offset.
+ * The baseline values will then be applied to the glyph offset.
  *
  * Return value:
  * `true` if no errors happened, `false` otherwise.
@@ -1365,20 +1364,22 @@ raqm_get_glyphs (raqm_t *rq,
     len = hb_buffer_get_length (run->buffer);
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
-    
+
+    int baseline_offset = 0;
     hb_position_t baseline = 0;
 
-    if (rq->text_info[info[0].cluster].baseline_tag != HB_TAG_NONE) {
+    hb_ot_layout_baseline_tag_t baseline_tag = rq->text_info[info[0].cluster].baseline_tag;
+    if (baseline_tag != HB_TAG_NONE)
+    {
       hb_ot_layout_get_baseline_with_fallback(run->font,
-                                              rq->text_info[info[0].cluster].baseline_tag,
+                                              baseline_tag,
                                               run->direction,
                                               (hb_tag_t)run->script,
                                               HB_TAG_NONE,
                                               &baseline);
     }
-    baseline += rq->text_info[info[0].cluster].baseline_shift;
-    float baseline_offset = (float)baseline;
-    
+    baseline_offset -= baseline;
+    baseline_offset += rq->text_info[info[0].cluster].baseline_shift;
 
     for (size_t i = 0; i < len; i++)
     {
@@ -1388,9 +1389,12 @@ raqm_get_glyphs (raqm_t *rq,
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
-      if (run->direction == HB_DIRECTION_TTB) {
+      if (run->direction == HB_DIRECTION_TTB)
+      {
         rq->glyphs[count + i].x_offset += baseline_offset;
-      } else {
+      }
+      else
+      {
         rq->glyphs[count + i].y_offset += baseline_offset;
       }
       rq->glyphs[count + i].ftface = rq->text_info[info[i].cluster].ftface;
