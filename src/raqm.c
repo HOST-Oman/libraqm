@@ -214,13 +214,9 @@ struct _raqm_run {
   raqm_run_t    *next;
 };
 
-static uint32_t
-_raqm_u8_to_u32_index (raqm_t   *rq,
-                       uint32_t  index);
-
-static uint32_t
-_raqm_u16_to_u32_index (raqm_t   *rq,
-                        uint32_t  index);
+static size_t
+_raqm_encoding_to_u32_index (raqm_t *rq,
+                             size_t  index);
 
 static void
 _raqm_init_text_info (raqm_t *rq)
@@ -779,7 +775,7 @@ raqm_set_language (raqm_t       *rq,
                    size_t        len)
 {
   hb_language_t language;
-  size_t end = start + len;
+  size_t end;
 
   if (!rq)
     return false;
@@ -787,16 +783,8 @@ raqm_set_language (raqm_t       *rq,
   if (!rq->text_len)
     return true;
 
-  if (rq->text_utf8)
-  {
-    start = _raqm_u8_to_u32_index (rq, start);
-    end = _raqm_u8_to_u32_index (rq, end);
-  }
-  else if (rq->text_utf16)
-  {
-    start = _raqm_u16_to_u32_index (rq, start);
-    end = _raqm_u16_to_u32_index (rq, end);
-  }
+  end = _raqm_encoding_to_u32_index (rq, start + len);
+  start = _raqm_encoding_to_u32_index (rq, start);
 
   if (start >= rq->text_len || end > rq->text_len)
     return false;
@@ -855,27 +843,9 @@ raqm_add_font_feature (raqm_t     *rq,
       return false;
 
     if (fea.start != HB_FEATURE_GLOBAL_START)
-    {
-      if (rq->text_utf8)
-      {
-        fea.start = _raqm_u8_to_u32_index (rq, fea.start);
-      }
-      else if (rq->text_utf16)
-      {
-        fea.start = _raqm_u16_to_u32_index (rq, fea.start);
-      }
-    }
+      fea.start = _raqm_encoding_to_u32_index (rq, fea.start);
     if (fea.end != HB_FEATURE_GLOBAL_END)
-    {
-      if (rq->text_utf8)
-      {
-        fea.end = _raqm_u8_to_u32_index (rq, fea.end);
-      }
-      else if (rq->text_utf16)
-      {
-        fea.end = _raqm_u16_to_u32_index (rq, fea.end);
-      }
-    }
+      fea.end = _raqm_encoding_to_u32_index (rq, fea.end);
 
     rq->features = new_features;
     rq->features[rq->features_len] = fea;
@@ -976,7 +946,7 @@ raqm_set_freetype_face_range (raqm_t *rq,
                               size_t  start,
                               size_t  len)
 {
-  size_t end = start + len;
+  size_t end;
 
   if (!rq)
     return false;
@@ -984,16 +954,8 @@ raqm_set_freetype_face_range (raqm_t *rq,
   if (!rq->text_len)
     return true;
 
-  if (rq->text_utf8)
-  {
-    start = _raqm_u8_to_u32_index (rq, start);
-    end = _raqm_u8_to_u32_index (rq, end);
-  }
-  else if (rq->text_utf16)
-  {
-    start = _raqm_u16_to_u32_index (rq, start);
-    end = _raqm_u16_to_u32_index (rq, end);
-  }
+  end = _raqm_encoding_to_u32_index (rq, start + len);
+  start = _raqm_encoding_to_u32_index (rq, start);
 
   return _raqm_set_freetype_face (rq, face, start, end);
 }
@@ -1078,7 +1040,7 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
                                     size_t  start,
                                     size_t  len)
 {
-  size_t end = start + len;
+  size_t end;
 
   if (!rq)
     return false;
@@ -1086,16 +1048,8 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
   if (!rq->text_len)
     return true;
 
-  if (rq->text_utf8)
-  {
-    start = _raqm_u8_to_u32_index (rq, start);
-    end = _raqm_u8_to_u32_index (rq, end);
-  }
-  else if (rq->text_utf16)
-  {
-    start = _raqm_u16_to_u32_index (rq, start);
-    end = _raqm_u16_to_u32_index (rq, end);
-  }
+  end = _raqm_encoding_to_u32_index (rq, start + len);
+  start = _raqm_encoding_to_u32_index (rq, start);
 
   return _raqm_set_freetype_load_flags (rq, flags, start, end);
 }
@@ -2084,9 +2038,9 @@ _raqm_u32_to_u8_index (raqm_t   *rq,
 }
 
 /* Convert index from UTF-8 to UTF-32 */
-static uint32_t
+static size_t
 _raqm_u8_to_u32_index (raqm_t   *rq,
-                       uint32_t  index)
+                       size_t  index)
 {
   const unsigned char *s = (const unsigned char *) rq->text_utf8;
   const unsigned char *t = s;
@@ -2111,6 +2065,7 @@ _raqm_u8_to_u32_index (raqm_t   *rq,
 
   return length;
 }
+
 /* Count equivalent UTF-16 short in codepoint */
 static size_t
 _raqm_count_codepoint_utf16_short (uint32_t chr)
@@ -2120,6 +2075,7 @@ _raqm_count_codepoint_utf16_short (uint32_t chr)
   else
     return 1;
 }
+
 /* Convert index from UTF-32 to UTF-16 */
 static uint32_t
 _raqm_u32_to_u16_index (raqm_t   *rq,
@@ -2134,9 +2090,9 @@ _raqm_u32_to_u16_index (raqm_t   *rq,
 }
 
 /* Convert index from UTF-16 to UTF-32 */
-static uint32_t
+static size_t
 _raqm_u16_to_u32_index (raqm_t   *rq,
-                       uint32_t  index)
+                       size_t  index)
 {
   const uint16_t *s = (const uint16_t *) rq->text_utf16;
   const uint16_t *t = s;
@@ -2156,6 +2112,17 @@ _raqm_u16_to_u32_index (raqm_t   *rq,
     length--;
 
   return length;
+}
+
+static inline size_t
+_raqm_encoding_to_u32_index (raqm_t *rq,
+                             size_t  index)
+{
+  if (rq->text_utf8)
+    return _raqm_u8_to_u32_index (rq, index);
+  else if (rq->text_utf16)
+    return _raqm_u16_to_u32_index (rq, index);
+  return index;
 }
 
 static bool
@@ -2194,10 +2161,7 @@ raqm_index_to_position (raqm_t *rq,
   if (rq == NULL)
     return false;
 
-  if (rq->text_utf8)
-    *index = _raqm_u8_to_u32_index (rq, *index);
-  else if (rq->text_utf16)
-    *index = _raqm_u16_to_u32_index (rq, *index);
+  *index = _raqm_encoding_to_u32_index (rq, *index);
 
   if (*index >= rq->text_len)
     return false;
