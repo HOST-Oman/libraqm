@@ -233,12 +233,12 @@ glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
 glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
 glyph [1]	x_offset: 0	y_offset: 0	x_advance: 651	font: DejaVu Sans
 glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
-glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1229	font: DejaVu Sans
 glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1239	font: DejaVu Sans
-glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1229	font: DejaVu Sans
-glyph [20]	x_offset: 10	y_offset: 0	x_advance: 999	font: DejaVu Sans
-glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
 glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1239	font: DejaVu Sans
+glyph [20]	x_offset: 0	y_offset: 0	x_advance: 989	font: DejaVu Sans
+glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1239	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
 
 UTF-32 clusters: 06 06 06 06 06 06 06 06 14 14 14 14 14 14 14 14 14 14 14 14 26 26 26 26 26 26 26 26 26 26 36 36 36 36 36 36 36 36 36 36 36 36 36 36 50 50 50 50 50 50 50 50 50 50 50 61 61 61 61 61 61 61 68 68 68 71 72 04 04 02 02 00 00
 UTF-8 clusters:  12 12 12 12 12 12 12 12 27 27 27 27 27 27 27 27 27 27 27 27 50 50 50 50 50 50 50 50 50 50 69 69 69 69 69 69 69 69 69 69 69 69 69 69 96 96 96 96 96 96 96 96 96 96 96 117 117 117 117 117 117 117 130 130 130 135 136 08 08 04 04 00 00
