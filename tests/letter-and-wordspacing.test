@@ -1,70 +1,105 @@
 fonts/sha1sum/d46a2549d27c32605024201abf801bb9a9273da3.ttf
-عربيעבריתأهلב ריתمم(ُeng lish ) مرحبا
---direction rtl --letterspacing 10,0,37 --wordspacing 50,0,37
- 
+وَرِقْE̽̿̎ͩͥ͊̚n̡̩͉̜̩͕ͨ̉ͩ̂̾ğ̞̭͙̰͍̽̆͝l̯̟̹̩̟͓̒̐ͫͥ̒̑͝i̷̲̪̳̝̓͌͊̍̚ş̍̒ͬ̅̅h̫ͥ z
+--direction rtl --letterspacing 10,0,72 --wordspacing 50,0,72
 Direction is: RTL
 
 Before script detection:
 script for ch[0]	Arab
-script for ch[1]	Arab
+script for ch[1]	Zinh
 script for ch[2]	Arab
-script for ch[3]	Arab
-script for ch[4]	Hebr
-script for ch[5]	Hebr
-script for ch[6]	Hebr
-script for ch[7]	Hebr
-script for ch[8]	Hebr
-script for ch[9]	Arab
-script for ch[10]	Arab
-script for ch[11]	Arab
-script for ch[12]	Hebr
-script for ch[13]	Zyyy
-script for ch[14]	Hebr
-script for ch[15]	Hebr
-script for ch[16]	Hebr
-script for ch[17]	Arab
-script for ch[18]	Arab
-script for ch[19]	Zyyy
+script for ch[3]	Zinh
+script for ch[4]	Arab
+script for ch[5]	Zinh
+script for ch[6]	Latn
+script for ch[7]	Zinh
+script for ch[8]	Zinh
+script for ch[9]	Zinh
+script for ch[10]	Zinh
+script for ch[11]	Zinh
+script for ch[12]	Zinh
+script for ch[13]	Zinh
+script for ch[14]	Latn
+script for ch[15]	Zinh
+script for ch[16]	Zinh
+script for ch[17]	Zinh
+script for ch[18]	Zinh
+script for ch[19]	Zinh
 script for ch[20]	Zinh
-script for ch[21]	Latn
-script for ch[22]	Latn
-script for ch[23]	Latn
-script for ch[24]	Zyyy
-script for ch[25]	Latn
+script for ch[21]	Zinh
+script for ch[22]	Zinh
+script for ch[23]	Zinh
+script for ch[24]	Zinh
+script for ch[25]	Zinh
 script for ch[26]	Latn
-script for ch[27]	Latn
-script for ch[28]	Latn
-script for ch[29]	Zyyy
-script for ch[30]	Zyyy
-script for ch[31]	Zyyy
-script for ch[32]	Arab
-script for ch[33]	Arab
-script for ch[34]	Arab
-script for ch[35]	Arab
-script for ch[36]	Arab
+script for ch[27]	Zinh
+script for ch[28]	Zinh
+script for ch[29]	Zinh
+script for ch[30]	Zinh
+script for ch[31]	Zinh
+script for ch[32]	Zinh
+script for ch[33]	Zinh
+script for ch[34]	Zinh
+script for ch[35]	Zinh
+script for ch[36]	Latn
+script for ch[37]	Zinh
+script for ch[38]	Zinh
+script for ch[39]	Zinh
+script for ch[40]	Zinh
+script for ch[41]	Zinh
+script for ch[42]	Zinh
+script for ch[43]	Zinh
+script for ch[44]	Zinh
+script for ch[45]	Zinh
+script for ch[46]	Zinh
+script for ch[47]	Zinh
+script for ch[48]	Zinh
+script for ch[49]	Zinh
+script for ch[50]	Latn
+script for ch[51]	Zinh
+script for ch[52]	Zinh
+script for ch[53]	Zinh
+script for ch[54]	Zinh
+script for ch[55]	Zinh
+script for ch[56]	Zinh
+script for ch[57]	Zinh
+script for ch[58]	Zinh
+script for ch[59]	Zinh
+script for ch[60]	Zinh
+script for ch[61]	Latn
+script for ch[62]	Zinh
+script for ch[63]	Zinh
+script for ch[64]	Zinh
+script for ch[65]	Zinh
+script for ch[66]	Zinh
+script for ch[67]	Zinh
+script for ch[68]	Latn
+script for ch[69]	Zinh
+script for ch[70]	Zinh
+script for ch[71]	Zyyy
+script for ch[72]	Latn
 
 After script detection:
 script for ch[0]	Arab
 script for ch[1]	Arab
 script for ch[2]	Arab
 script for ch[3]	Arab
-script for ch[4]	Hebr
-script for ch[5]	Hebr
-script for ch[6]	Hebr
-script for ch[7]	Hebr
-script for ch[8]	Hebr
-script for ch[9]	Arab
-script for ch[10]	Arab
-script for ch[11]	Arab
-script for ch[12]	Hebr
-script for ch[13]	Hebr
-script for ch[14]	Hebr
-script for ch[15]	Hebr
-script for ch[16]	Hebr
-script for ch[17]	Arab
-script for ch[18]	Arab
-script for ch[19]	Arab
-script for ch[20]	Arab
+script for ch[4]	Arab
+script for ch[5]	Arab
+script for ch[6]	Latn
+script for ch[7]	Latn
+script for ch[8]	Latn
+script for ch[9]	Latn
+script for ch[10]	Latn
+script for ch[11]	Latn
+script for ch[12]	Latn
+script for ch[13]	Latn
+script for ch[14]	Latn
+script for ch[15]	Latn
+script for ch[16]	Latn
+script for ch[17]	Latn
+script for ch[18]	Latn
+script for ch[19]	Latn
+script for ch[20]	Latn
 script for ch[21]	Latn
 script for ch[22]	Latn
 script for ch[23]	Latn
@@ -74,71 +109,136 @@ script for ch[26]	Latn
 script for ch[27]	Latn
 script for ch[28]	Latn
 script for ch[29]	Latn
-script for ch[30]	Arab
-script for ch[31]	Arab
-script for ch[32]	Arab
-script for ch[33]	Arab
-script for ch[34]	Arab
-script for ch[35]	Arab
-script for ch[36]	Arab
+script for ch[30]	Latn
+script for ch[31]	Latn
+script for ch[32]	Latn
+script for ch[33]	Latn
+script for ch[34]	Latn
+script for ch[35]	Latn
+script for ch[36]	Latn
+script for ch[37]	Latn
+script for ch[38]	Latn
+script for ch[39]	Latn
+script for ch[40]	Latn
+script for ch[41]	Latn
+script for ch[42]	Latn
+script for ch[43]	Latn
+script for ch[44]	Latn
+script for ch[45]	Latn
+script for ch[46]	Latn
+script for ch[47]	Latn
+script for ch[48]	Latn
+script for ch[49]	Latn
+script for ch[50]	Latn
+script for ch[51]	Latn
+script for ch[52]	Latn
+script for ch[53]	Latn
+script for ch[54]	Latn
+script for ch[55]	Latn
+script for ch[56]	Latn
+script for ch[57]	Latn
+script for ch[58]	Latn
+script for ch[59]	Latn
+script for ch[60]	Latn
+script for ch[61]	Latn
+script for ch[62]	Latn
+script for ch[63]	Latn
+script for ch[64]	Latn
+script for ch[65]	Latn
+script for ch[66]	Latn
+script for ch[67]	Latn
+script for ch[68]	Latn
+script for ch[69]	Latn
+script for ch[70]	Latn
+script for ch[71]	Latn
+script for ch[72]	Latn
 
-Number of runs before script itemization: 3
+Number of runs before script itemization: 2
 
 BiDi Runs:
-run[0]:	 start: 29	length: 8	level: 1
-run[1]:	 start: 21	length: 8	level: 2
-run[2]:	 start: 0	length: 21	level: 1
+run[0]:	 start: 6	length: 67	level: 2
+run[1]:	 start: 0	length: 6	level: 1
 
-Number of runs after script itemization: 8
+Number of runs after script itemization: 2
 
 Final Runs:
-run[0]:	 start: 30	length: 7	direction: rtl	script: Arab	font: DejaVu Sans
-run[1]:	 start: 29	length: 1	direction: rtl	script: Latn	font: DejaVu Sans
-run[2]:	 start: 21	length: 8	direction: ltr	script: Latn	font: DejaVu Sans
-run[3]:	 start: 17	length: 4	direction: rtl	script: Arab	font: DejaVu Sans
-run[4]:	 start: 12	length: 5	direction: rtl	script: Hebr	font: DejaVu Sans
-run[5]:	 start: 9	length: 3	direction: rtl	script: Arab	font: DejaVu Sans
-run[6]:	 start: 4	length: 5	direction: rtl	script: Hebr	font: DejaVu Sans
-run[7]:	 start: 0	length: 4	direction: rtl	script: Arab	font: DejaVu Sans
+run[0]:	 start: 6	length: 67	direction: ltr	script: Latn	font: DejaVu Sans
+run[1]:	 start: 0	length: 6	direction: rtl	script: Arab	font: DejaVu Sans
 
 Glyph information:
-glyph [35]	x_offset: 0	y_offset: 0	x_advance: 624	font: DejaVu Sans
-glyph [38]	x_offset: 0	y_offset: 0	x_advance: 618	font: DejaVu Sans
-glyph [40]	x_offset: 0	y_offset: 0	x_advance: 1266	font: DejaVu Sans
-glyph [42]	x_offset: 0	y_offset: 0	x_advance: 1130	font: DejaVu Sans
-glyph [50]	x_offset: 0	y_offset: 0	x_advance: 1097	font: DejaVu Sans
-glyph [1]	x_offset: 0	y_offset: 0	x_advance: 651	font: DejaVu Sans
-glyph [2]	x_offset: 0	y_offset: 0	x_advance: 799	font: DejaVu Sans
-glyph [1]	x_offset: 0	y_offset: 0	x_advance: 651	font: DejaVu Sans
-glyph [4]	x_offset: 0	y_offset: 0	x_advance: 1260	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1239	font: DejaVu Sans
 glyph [9]	x_offset: 0	y_offset: 0	x_advance: 1298	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1239	font: DejaVu Sans
 glyph [5]	x_offset: 0	y_offset: 0	x_advance: 1300	font: DejaVu Sans
-glyph [1]	x_offset: 0	y_offset: 0	x_advance: 651	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1239	font: DejaVu Sans
 glyph [8]	x_offset: 0	y_offset: 0	x_advance: 569	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1239	font: DejaVu Sans
 glyph [7]	x_offset: 0	y_offset: 0	x_advance: 569	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
 glyph [10]	x_offset: 0	y_offset: 0	x_advance: 1067	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
 glyph [6]	x_offset: 0	y_offset: 0	x_advance: 1298	font: DejaVu Sans
-glyph [27]	x_offset: 0	y_offset: 0	x_advance: 0	font: DejaVu Sans
-glyph [3]	x_offset: 0	y_offset: 0	x_advance: 799	font: DejaVu Sans
-glyph [49]	x_offset: 0	y_offset: 0	x_advance: 1363	font: DejaVu Sans
-glyph [50]	x_offset: 10	y_offset: 0	x_advance: 1107	font: DejaVu Sans
-glyph [15]	x_offset: 10	y_offset: 0	x_advance: 1356	font: DejaVu Sans
-glyph [12]	x_offset: 10	y_offset: 0	x_advance: 468	font: DejaVu Sans
-glyph [14]	x_offset: 10	y_offset: 0	x_advance: 1166	font: DejaVu Sans
-glyph [1]	x_offset: 50	y_offset: 0	x_advance: 701	font: DejaVu Sans
-glyph [11]	x_offset: 10	y_offset: 0	x_advance: 1194	font: DejaVu Sans
-glyph [46]	x_offset: 10	y_offset: 0	x_advance: 1561	font: DejaVu Sans
-glyph [53]	x_offset: 10	y_offset: 0	x_advance: 1090	font: DejaVu Sans
-glyph [16]	x_offset: 10	y_offset: 0	x_advance: 579	font: DejaVu Sans
-glyph [15]	x_offset: 10	y_offset: 0	x_advance: 1356	font: DejaVu Sans
-glyph [12]	x_offset: 10	y_offset: 0	x_advance: 468	font: DejaVu Sans
-glyph [14]	x_offset: 10	y_offset: 0	x_advance: 1166	font: DejaVu Sans
-glyph [11]	x_offset: 10	y_offset: 0	x_advance: 1194	font: DejaVu Sans
-glyph [13]	x_offset: 10	y_offset: 0	x_advance: 1292	font: DejaVu Sans
-glyph [56]	x_offset: 10	y_offset: 0	x_advance: 1717	font: DejaVu Sans
-glyph [37]	x_offset: 10	y_offset: 0	x_advance: 580	font: DejaVu Sans
-glyph [42]	x_offset: 10	y_offset: 0	x_advance: 1140	font: DejaVu Sans
-glyph [44]	x_offset: 10	y_offset: 0	x_advance: 1232	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [1]	x_offset: 0	y_offset: 0	x_advance: 651	font: DejaVu Sans
+glyph [0]	x_offset: 0	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1239	font: DejaVu Sans
+glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [20]	x_offset: 10	y_offset: 0	x_advance: 999	font: DejaVu Sans
+glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1229	font: DejaVu Sans
+glyph [0]	x_offset: 10	y_offset: 0	x_advance: 1239	font: DejaVu Sans
 
-UTF-32 clusters: 36 35 34 33 32 31 30 29 21 22 23 24 25 26 27 28 19 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
-UTF-8 clusters:  59 57 55 53 51 50 49 48 40 41 42 43 44 45 46 47 37 37 35 33 31 29 27 26 24 22 20 18 16 14 12 10 08 06 04 02 00
+UTF-32 clusters: 06 06 06 06 06 06 06 06 14 14 14 14 14 14 14 14 14 14 14 14 26 26 26 26 26 26 26 26 26 26 36 36 36 36 36 36 36 36 36 36 36 36 36 36 50 50 50 50 50 50 50 50 50 50 50 61 61 61 61 61 61 61 68 68 68 71 72 04 04 02 02 00 00
+UTF-8 clusters:  12 12 12 12 12 12 12 12 27 27 27 27 27 27 27 27 27 27 27 27 50 50 50 50 50 50 50 50 50 50 69 69 69 69 69 69 69 69 69 69 69 69 69 69 96 96 96 96 96 96 96 96 96 96 96 117 117 117 117 117 117 117 130 130 130 135 136 08 08 04 04 00 00

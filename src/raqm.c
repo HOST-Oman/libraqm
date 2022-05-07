@@ -220,6 +220,10 @@ static size_t
 _raqm_encoding_to_u32_index (raqm_t *rq,
                              size_t  index);
 
+static bool
+_raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
+                                hb_codepoint_t r_char);
+
 static void
 _raqm_init_text_info (raqm_t *rq)
 {
@@ -1062,19 +1066,6 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
   return _raqm_set_freetype_load_flags (rq, flags, start, end);
 }
 
-/* CSS  Word seperators, word spacing is only applied on these.*/
-static size_t word_separators_len = 7;
-static const uint32_t word_separators[] =
-{
-  0x0020,  /// Space
-  0x00A0,  /// No break space
-  0x1361,  /// Ethiopic word space
-  0x10100, /// Aegean wordspace
-  0x10101, /// Aegean wordspace
-  0x1039F, /// Ugaric word divider
-  0x1091F  /// Phoenician word separator
-};
-
 static bool
 _raqm_set_spacing (raqm_t *rq,
                    int    spacing,
@@ -1096,11 +1087,23 @@ _raqm_set_spacing (raqm_t *rq,
     return false;
 
   for (size_t i = start; i < end; i++)
+  {
+    bool set_spacing = i == rq->text_len - 1;
+    if (!set_spacing)
+      set_spacing = _raqm_allowed_grapheme_boundary (rq->text[i], rq->text[i + 1]);
+
     if (word_spacing)
     {
-      for (size_t j = 0; j < word_separators_len; j++)
+      if (set_spacing)
       {
-        if (rq->text[i] == word_separators[j])
+        /* CSS word seperators, word spacing is only applied on these.*/
+        if (rq->text[i] == 0x0020  || /* Space */
+            rq->text[i] == 0x00A0  || /* No Break Space */
+            rq->text[i] == 0x1361  || /* Ethiopic Word Space */
+            rq->text[i] == 0x10100 || /* Aegean Word Seperator Line */
+            rq->text[i] == 0x10101 || /* Aegean Word Seperator Dot */
+            rq->text[i] == 0x1039F || /* Ugaric Word Divider */
+            rq->text[i] == 0x1091F)   /* Phoenician Word Separator */
         {
           rq->text_info[i].spacing_after = spacing;
           rq->text_info[i].spacing_is_percentage = percentage;
@@ -1112,6 +1115,7 @@ _raqm_set_spacing (raqm_t *rq,
       rq->text_info[i].spacing_after = spacing;
       rq->text_info[i].spacing_is_percentage = percentage;
     }
+  }
 
   return true;
 }
@@ -1132,6 +1136,10 @@ _raqm_set_spacing (raqm_t *rq,
  * Note that not all scripts have a letter-spacing tradition,
  * for example, Arabic does not, while Devanagari does.
  *
+ * This will also add 'disable liga and clig' font features to the internal 
+ * features list, so call this function after setting the font features for
+ * best spacing results.
+ * 
  * Return value:
  * `true` if no errors happened, `false` otherwise.
  *
@@ -1144,7 +1152,7 @@ raqm_set_letter_spacing_range(raqm_t *rq,
                               size_t start,
                               size_t len)
 {
-  size_t end = start + (len-1);
+  size_t end;
 
   if (!rq)
     return false;
@@ -1152,15 +1160,17 @@ raqm_set_letter_spacing_range(raqm_t *rq,
   if (!rq->text_len)
     return true;
 
-  if (rq->text_utf8)
+  end = _raqm_encoding_to_u32_index (rq, start + len - 1);
+  start = _raqm_encoding_to_u32_index (rq, start);
+  
+  if (spacing != 0)
   {
-    start = _raqm_u8_to_u32_index (rq, start);
-    end = _raqm_u8_to_u32_index (rq, end);
-  }
-  else if (rq->text_utf16)
-  {
-    start = _raqm_u16_to_u32_index (rq, start);
-    end = _raqm_u16_to_u32_index (rq, end);
+    raqm_add_font_feature(rq, "-clig", 5);
+    rq->features[rq->features_len - 1].start = start;
+    rq->features[rq->features_len - 1].end = end;
+    raqm_add_font_feature(rq, "-liga", 5);
+    rq->features[rq->features_len - 1].start = start;
+    rq->features[rq->features_len - 1].end = end;
   }
 
   return _raqm_set_spacing (rq, spacing, percentage, false, start, end);
@@ -1193,7 +1203,7 @@ raqm_set_word_spacing_range(raqm_t *rq,
                             size_t start,
                             size_t len)
 {
-  size_t end = start + len;
+  size_t end;
 
   if (!rq)
     return false;
@@ -1201,16 +1211,8 @@ raqm_set_word_spacing_range(raqm_t *rq,
   if (!rq->text_len)
     return true;
 
-  if (rq->text_utf8)
-  {
-    start = _raqm_u8_to_u32_index (rq, start);
-    end = _raqm_u8_to_u32_index (rq, end);
-  }
-  else if (rq->text_utf16)
-  {
-    start = _raqm_u16_to_u32_index (rq, start);
-    end = _raqm_u16_to_u32_index (rq, end);
-  }
+  end = _raqm_encoding_to_u32_index (rq, start + len);
+  start = _raqm_encoding_to_u32_index (rq, start);
 
   return _raqm_set_spacing (rq, spacing, percentage, true, start, end);
 }
@@ -2164,45 +2166,55 @@ _raqm_shape (raqm_t *rq)
       FT_Get_Transform (hb_ft_font_get_face (run->font), &matrix, NULL);
       pos = hb_buffer_get_glyph_positions (run->buffer, &len);
       info = hb_buffer_get_glyph_infos (run->buffer, &len);
+
       for (unsigned int i = 0; i < len; i++)
       {
         _raqm_ft_transform (&pos[i].x_advance, &pos[i].y_advance, matrix);
         _raqm_ft_transform (&pos[i].x_offset, &pos[i].y_offset, matrix);
 
-        if (rq->text_info[info[i].cluster].spacing_after != 0)
+        bool set_spacing = i == len - 1;
+        if (!set_spacing)
+          set_spacing = info[i].cluster != info[i+1].cluster;
+
+        _raqm_text_info rq_info = rq->text_info[info[i].cluster];
+
+        if (rq_info.spacing_after != 0)
         {
-          if (run->direction == HB_DIRECTION_TTB)
+          
+          if (run->direction == HB_DIRECTION_TTB && set_spacing)
           {
-            if (rq->text_info[info[i].cluster].spacing_is_percentage)
+            if (rq_info.spacing_is_percentage)
             {
-              int spacing = pos[i].y_advance * (rq->text_info[info[i].cluster].spacing_after * 0.01);
+              int spacing = pos[i].y_advance * (rq_info.spacing_after * 0.01);
               pos[i].y_advance += spacing;
             }
             else {
-              pos[i].y_advance -= rq->text_info[info[i].cluster].spacing_after;
+              pos[i].y_advance -= rq_info.spacing_after;
             }
           }
           else if (run->direction == HB_DIRECTION_RTL)
           {
-            if (rq->text_info[info[i].cluster].spacing_is_percentage)
+            if (rq_info.spacing_is_percentage)
             {
-              int spacing = pos[i].x_advance * (rq->text_info[info[i].cluster].spacing_after * 0.01);
+              int spacing = pos[i].x_advance * (rq_info.spacing_after * 0.01);
               pos[i].x_offset += spacing;
-              pos[i].x_advance += spacing;
+              if (set_spacing)
+                pos[i].x_advance += spacing;
             }
             else {
-              pos[i].x_advance += rq->text_info[info[i].cluster].spacing_after;
-              pos[i].x_offset += rq->text_info[info[i].cluster].spacing_after;
+              if (set_spacing)
+                pos[i].x_advance += rq_info.spacing_after;
+              pos[i].x_offset += rq_info.spacing_after;
             }
           }
-          else
+          else if (set_spacing)
           {
-            if (rq->text_info[info[i].cluster].spacing_is_percentage)
+            if (rq_info.spacing_is_percentage)
             {
-              pos[i].x_advance *= 1.0 + (rq->text_info[info[i].cluster].spacing_after * 0.01);
+              pos[i].x_advance *= 1.0 + (rq_info.spacing_after * 0.01);
             }
             else {
-              pos[i].x_advance += rq->text_info[info[i].cluster].spacing_after;
+              pos[i].x_advance += rq_info.spacing_after;
             }
           }
         }
@@ -2328,10 +2340,6 @@ _raqm_encoding_to_u32_index (raqm_t *rq,
     return _raqm_u16_to_u32_index (rq, index);
   return index;
 }
-
-static bool
-_raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
-                                hb_codepoint_t r_char);
 
 static bool
 _raqm_in_hangul_syllable (hb_codepoint_t ch);
