@@ -2168,16 +2168,25 @@ _raqm_shape (raqm_t *rq)
         _raqm_ft_transform (&pos[i].x_advance, &pos[i].y_advance, matrix);
         _raqm_ft_transform (&pos[i].x_offset, &pos[i].y_offset, matrix);
 
-        bool set_spacing = i == len - 1;
-        if (!set_spacing)
-          set_spacing = info[i].cluster != info[i+1].cluster;
+        bool set_spacing = false;
+        if (run->direction == HB_DIRECTION_RTL)
+        {
+          set_spacing = i == 0;
+          if (!set_spacing)
+            set_spacing = info[i].cluster != info[i-1].cluster;
+        }
+        else {
+          set_spacing = i == len - 1;
+          if (!set_spacing)
+            set_spacing = info[i].cluster != info[i+1].cluster;
+        }
 
         _raqm_text_info rq_info = rq->text_info[info[i].cluster];
 
-        if (rq_info.spacing_after != 0)
+        if (rq_info.spacing_after != 0 && set_spacing)
         {
           
-          if (run->direction == HB_DIRECTION_TTB && set_spacing)
+          if (run->direction == HB_DIRECTION_TTB)
           {
             if (rq_info.spacing_is_percentage)
             {
@@ -2194,16 +2203,14 @@ _raqm_shape (raqm_t *rq)
             {
               int spacing = pos[i].x_advance * (rq_info.spacing_after * 0.01);
               pos[i].x_offset += spacing;
-              if (set_spacing)
-                pos[i].x_advance += spacing;
+              pos[i].x_advance += spacing;
             }
             else {
-              if (set_spacing)
-                pos[i].x_advance += rq_info.spacing_after;
+              pos[i].x_advance += rq_info.spacing_after;
               pos[i].x_offset += rq_info.spacing_after;
             }
           }
-          else if (set_spacing)
+          else
           {
             if (rq_info.spacing_is_percentage)
             {
