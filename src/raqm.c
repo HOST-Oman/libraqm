@@ -1088,32 +1088,35 @@ _raqm_set_spacing (raqm_t *rq,
 
   for (size_t i = start; i < end; i++)
   {
-    bool set_spacing = i == rq->text_len - 1;
+    bool set_spacing = i == 0;
     if (!set_spacing)
-      set_spacing = _raqm_allowed_grapheme_boundary (rq->text[i], rq->text[i + 1]);
+      set_spacing = _raqm_allowed_grapheme_boundary (rq->text[i-1], rq->text[i]);
 
-    if (word_spacing)
+    if (set_spacing)
     {
-      if (set_spacing)
+      if (word_spacing)
       {
-        /* CSS word seperators, word spacing is only applied on these.*/
-        if (rq->text[i] == 0x0020  || /* Space */
-            rq->text[i] == 0x00A0  || /* No Break Space */
-            rq->text[i] == 0x1361  || /* Ethiopic Word Space */
-            rq->text[i] == 0x10100 || /* Aegean Word Seperator Line */
-            rq->text[i] == 0x10101 || /* Aegean Word Seperator Dot */
-            rq->text[i] == 0x1039F || /* Ugaric Word Divider */
-            rq->text[i] == 0x1091F)   /* Phoenician Word Separator */
+        if (_raqm_allowed_grapheme_boundary (rq->text[i], rq->text[i+1]))
         {
-          rq->text_info[i].spacing_after = spacing;
-          rq->text_info[i].spacing_is_percentage = percentage;
+          /* CSS word seperators, word spacing is only applied on these.*/
+          if (rq->text[i] == 0x0020  || /* Space */
+              rq->text[i] == 0x00A0  || /* No Break Space */
+              rq->text[i] == 0x1361  || /* Ethiopic Word Space */
+              rq->text[i] == 0x10100 || /* Aegean Word Seperator Line */
+              rq->text[i] == 0x10101 || /* Aegean Word Seperator Dot */
+              rq->text[i] == 0x1039F || /* Ugaric Word Divider */
+              rq->text[i] == 0x1091F)   /* Phoenician Word Separator */
+          {
+            rq->text_info[i].spacing_after = spacing;
+            rq->text_info[i].spacing_is_percentage = percentage;
+          }
         }
       }
-    }
-    else
-    {
-      rq->text_info[i].spacing_after = spacing;
-      rq->text_info[i].spacing_is_percentage = percentage;
+      else
+      {
+        rq->text_info[i].spacing_after = spacing;
+        rq->text_info[i].spacing_is_percentage = percentage;
+      }
     }
   }
 
@@ -1169,6 +1172,15 @@ raqm_set_letter_spacing_range(raqm_t *rq,
     rq->features[rq->features_len - 1].start = start;
     rq->features[rq->features_len - 1].end = end;
     raqm_add_font_feature(rq, "-liga", 5);
+    rq->features[rq->features_len - 1].start = start;
+    rq->features[rq->features_len - 1].end = end;
+    raqm_add_font_feature(rq, "-hlig", 5);
+    rq->features[rq->features_len - 1].start = start;
+    rq->features[rq->features_len - 1].end = end;
+    raqm_add_font_feature(rq, "-dlig", 5);
+    rq->features[rq->features_len - 1].start = start;
+    rq->features[rq->features_len - 1].end = end;
+    raqm_add_font_feature(rq, "-calt", 5);
     rq->features[rq->features_len - 1].start = start;
     rq->features[rq->features_len - 1].end = end;
   }
