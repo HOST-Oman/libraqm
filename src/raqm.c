@@ -595,7 +595,7 @@ _raqm_get_utf16_codepoint (const void *str,
     }
     else
     {
-      //A single high surrogate, this is an error.
+      /* A single high surrogate, this is an error. */
       *out_codepoint = s[0];
       s += 1;
     }
