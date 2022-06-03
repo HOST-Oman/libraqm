@@ -26,6 +26,7 @@ tests = [
   'direction-ltr-3.test',
   'direction-ltr-4.test',
   'direction-ltr-5.test',
+  'direction-neutral-1.test',
   'direction-rtl-1.test',
   'direction-rtl-2.test',
   'direction-rtl-3.test',
