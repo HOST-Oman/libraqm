@@ -1531,22 +1531,15 @@ _raqm_itemize (raqm_t *rq)
   bool ok = true;
 
 #ifdef RAQM_TESTING
-  switch (rq->base_dir)
-  {
-    case RAQM_DIRECTION_RTL:
-      RAQM_TEST ("Direction is: RTL\n\n");
-      break;
-    case RAQM_DIRECTION_LTR:
-      RAQM_TEST ("Direction is: LTR\n\n");
-      break;
-    case RAQM_DIRECTION_TTB:
-      RAQM_TEST ("Direction is: TTB\n\n");
-      break;
-    case RAQM_DIRECTION_DEFAULT:
-    default:
-      RAQM_TEST ("Direction is: DEFAULT\n\n");
-      break;
-  }
+  static char *dir_names[] = {
+    "DEFAULT",
+    "RTL",
+    "LTR",
+    "TTB"
+  };
+
+  assert (rq->base_dir < sizeof (dir_names));
+  RAQM_TEST ("Direction is: %s\n\n", dir_names[rq->base_dir]);
 #endif
 
   if (!_raqm_resolve_scripts (rq))
@@ -1578,6 +1571,9 @@ _raqm_itemize (raqm_t *rq)
   }
 
 #ifdef RAQM_TESTING
+  assert (rq->resolved_dir < sizeof (dir_names));
+  if (rq->base_dir == RAQM_DIRECTION_DEFAULT)
+    RAQM_TEST ("Resolved direction is: %s\n\n", dir_names[rq->resolved_dir]);
   RAQM_TEST ("Number of runs before script itemization: %zu\n\n", run_count);
 
   RAQM_TEST ("BiDi Runs:\n");
