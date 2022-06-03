@@ -1,0 +1,29 @@
+fonts/sha1sum/bcb3b98eb67ece19b8b709f77143d91bcb3d95eb.ttf
+.!
+
+Direction is: DEFAULT
+
+Before script detection:
+script for ch[0]	Zyyy
+script for ch[1]	Zyyy
+
+After script detection:
+script for ch[0]	Zyyy
+script for ch[1]	Zyyy
+
+Number of runs before script itemization: 1
+
+BiDi Runs:
+run[0]:	 start: 0	length: 2	level: 0
+
+Number of runs after script itemization: 1
+
+Final Runs:
+run[0]:	 start: 0	length: 2	direction: ltr	script: Zyyy	font: Amiri
+
+Glyph information:
+glyph [17]	x_offset: 0	y_offset: 0	x_advance: 414	font: Amiri
+glyph [4]	x_offset: 0	y_offset: 0	x_advance: 482	font: Amiri
+
+UTF-32 clusters: 00 01
+UTF-8 clusters:  00 01
