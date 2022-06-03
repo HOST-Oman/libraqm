@@ -1348,10 +1348,10 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
   line = SBParagraphCreateLine (par, 0, par_len);
   *run_count = SBLineGetRunCount (line);
 
-  if (SBParagraphGetBaseLevel (par) == 0)
-    rq->resolved_dir = RAQM_DIRECTION_LTR;
-  else
+  if (SBParagraphGetBaseLevel (par) == 1)
     rq->resolved_dir = RAQM_DIRECTION_RTL;
+  else
+    rq->resolved_dir = RAQM_DIRECTION_LTR;
 
   runs = malloc (sizeof (_raqm_bidi_run) * (*run_count));
   if (runs)
@@ -1502,10 +1502,10 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
                                                    rq->text_len, &par_type,
                                                    levels);
 
-  if (par_type == FRIBIDI_PAR_LTR)
-    rq->resolved_dir = RAQM_DIRECTION_LTR;
-  else
+  if (par_type == FRIBIDI_PAR_RTL)
     rq->resolved_dir = RAQM_DIRECTION_RTL;
+  else
+    rq->resolved_dir = RAQM_DIRECTION_LTR;
 
   if (max_level == 0)
     goto done;
