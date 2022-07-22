@@ -922,16 +922,18 @@ raqm_set_freetype_face (raqm_t *rq,
  * raqm_set_freetype_face_range:
  * @rq: a #raqm_t.
  * @face: an #FT_Face.
- * @start: index of first character that should use @face.
- * @len: number of characters using @face.
+ * @start: index of first character that should use @face from the input string.
+ * @len: number of elements using @face.
  *
  * Sets an #FT_Face to be used for @len-number of characters staring at @start.
- * The @start and @len are input string array indices (i.e. counting bytes in
- * UTF-8 and scaler values in UTF-32).
+ * The @start and @len are input string array indices, counting elements
+ * according to the underlying encoding. @start must always be aligned to the
+ * start of an encoded codepoint, and @len must always end at a codepoint's
+ * final element.
  *
  * This method can be used repeatedly to set different faces for different
  * parts of the text. It is the responsibility of the client to make sure that
- * face ranges cover the whole text.
+ * face ranges cover the whole text, and is properly aligned.
  *
  * See also raqm_set_freetype_face().
  *
