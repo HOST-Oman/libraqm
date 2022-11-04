@@ -173,7 +173,6 @@ typedef struct {
   hb_language_t lang;
   hb_script_t   script;
   int           spacing_after;
-  bool          spacing_is_percentage;
 } _raqm_text_info;
 
 typedef struct _raqm_run raqm_run_t;
@@ -235,7 +234,6 @@ _raqm_init_text_info (raqm_t *rq)
     rq->text_info[i].lang = default_lang;
     rq->text_info[i].script = HB_SCRIPT_INVALID;
     rq->text_info[i].spacing_after = 0;
-    rq->text_info[i].spacing_is_percentage = false;
   }
 }
 
@@ -1067,7 +1065,6 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
 static bool
 _raqm_set_spacing (raqm_t *rq,
                    int    spacing,
-                   bool   percentage,
                    bool   word_spacing,
                    size_t start,
                    size_t end)
@@ -1106,14 +1103,12 @@ _raqm_set_spacing (raqm_t *rq,
               rq->text[i] == 0x1091F)   /* Phoenician Word Separator */
           {
             rq->text_info[i].spacing_after = spacing;
-            rq->text_info[i].spacing_is_percentage = percentage;
           }
         }
       }
       else
       {
         rq->text_info[i].spacing_after = spacing;
-        rq->text_info[i].spacing_is_percentage = percentage;
       }
     }
   }
@@ -1124,9 +1119,7 @@ _raqm_set_spacing (raqm_t *rq,
 /**
  * raqm_set_letter_spacing_range:
  * @rq: a #raqm_t.
- * @spacing: amount of spacing in Freetype Font Units (26.6 format), or percentages of the advance (0 - 100)
- * @percentage: whether to interpret the @spacing amount as a percentage of
- * the character advance.
+ * @spacing: amount of spacing in Freetype Font Units (26.6 format).
  * @start: index of first character that should use @spacing.
  * @len: number of characters using @spacing.
  * 
@@ -1149,7 +1142,6 @@ _raqm_set_spacing (raqm_t *rq,
 bool
 raqm_set_letter_spacing_range(raqm_t *rq,
                               int    spacing,
-                              bool   percentage,
                               size_t start,
                               size_t len)
 {
@@ -1183,15 +1175,13 @@ raqm_set_letter_spacing_range(raqm_t *rq,
     rq->features[rq->features_len - 1].end = end;
   }
 
-  return _raqm_set_spacing (rq, spacing, percentage, false, start, end);
+  return _raqm_set_spacing (rq, spacing, false, start, end);
 }
 
 /**
  * raqm_set_word_spacing_range:
  * @rq: a #raqm_t.
- * @spacing: amount of spacing in Freetype Font Units (26.6 format), or percentages of the advance (0 - 100)
- * @percentage: whether to interpret the @spacing amount as a percentage of
- * the character advance.
+ * @spacing: amount of spacing in Freetype Font Units (26.6 format).
  * @start: index of first character that should use @spacing.
  * @len: number of characters using @spacing.
  * 
@@ -1209,7 +1199,6 @@ raqm_set_letter_spacing_range(raqm_t *rq,
 bool
 raqm_set_word_spacing_range(raqm_t *rq,
                             int    spacing,
-                            bool   percentage,
                             size_t start,
                             size_t len)
 {
@@ -1224,7 +1213,7 @@ raqm_set_word_spacing_range(raqm_t *rq,
   end = _raqm_encoding_to_u32_index (rq, start + len);
   start = _raqm_encoding_to_u32_index (rq, start);
 
-  return _raqm_set_spacing (rq, spacing, percentage, true, start, end);
+  return _raqm_set_spacing (rq, spacing, true, start, end);
 }
 
 /**
@@ -2200,37 +2189,16 @@ _raqm_shape (raqm_t *rq)
           
           if (run->direction == HB_DIRECTION_TTB)
           {
-            if (rq_info.spacing_is_percentage)
-            {
-              int spacing = pos[i].y_advance * (rq_info.spacing_after * 0.01);
-              pos[i].y_advance += spacing;
-            }
-            else {
-              pos[i].y_advance -= rq_info.spacing_after;
-            }
+            pos[i].y_advance -= rq_info.spacing_after;
           }
           else if (run->direction == HB_DIRECTION_RTL)
           {
-            if (rq_info.spacing_is_percentage)
-            {
-              int spacing = pos[i].x_advance * (rq_info.spacing_after * 0.01);
-              pos[i].x_offset += spacing;
-              pos[i].x_advance += spacing;
-            }
-            else {
-              pos[i].x_advance += rq_info.spacing_after;
-              pos[i].x_offset += rq_info.spacing_after;
-            }
+            pos[i].x_advance += rq_info.spacing_after;
+            pos[i].x_offset += rq_info.spacing_after;
           }
           else
           {
-            if (rq_info.spacing_is_percentage)
-            {
-              pos[i].x_advance *= 1.0 + (rq_info.spacing_after * 0.01);
-            }
-            else {
-              pos[i].x_advance += rq_info.spacing_after;
-            }
+            pos[i].x_advance += rq_info.spacing_after;
           }
         }
 
