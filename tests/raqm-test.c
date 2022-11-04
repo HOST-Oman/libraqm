@@ -239,11 +239,10 @@ main (int argc, char **argv)
     for (char *tok = strtok (letterspacing, ","); tok; tok = strtok (NULL, ","))
     {
       int spacing = atoi (tok);
-      bool percentage = false;
       int start, length;
       start = atoi (strtok (NULL, ","));
       length = atoi (strtok (NULL, ","));
-      assert (raqm_set_letter_spacing_range (rq, spacing, percentage, start, length));
+      assert (raqm_set_letter_spacing_range (rq, spacing, start, length));
     }
   }
   
@@ -252,11 +251,10 @@ main (int argc, char **argv)
     for (char *tok = strtok (wordspacing, ","); tok; tok = strtok (NULL, ","))
     {
       int spacing = atoi (tok);
-      bool percentage = false;
       int start, length;
       start = atoi (strtok (NULL, ","));
       length = atoi (strtok (NULL, ","));
-      assert (raqm_set_word_spacing_range (rq, spacing, percentage, start, length));
+      assert (raqm_set_word_spacing_range (rq, spacing, start, length));
     }
   }
 
