@@ -161,13 +161,11 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
 RAQM_API bool
 raqm_set_letter_spacing_range(raqm_t *rq,
                               int    spacing,
-                              bool   percentage,
                               size_t start,
                               size_t len);
 RAQM_API bool
 raqm_set_word_spacing_range(raqm_t *rq,
                             int    spacing,
-                            bool   percentage,
                             size_t start,
                             size_t len);
 
