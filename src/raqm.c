@@ -1134,7 +1134,9 @@ raqm_layout (raqm_t *rq)
 static uint32_t
 _raqm_u32_to_u8_index (raqm_t   *rq,
                        uint32_t  index);
-
+static uint32_t
+_raqm_u32_to_u16_index (raqm_t   *rq,
+                       uint32_t  index);
 /**
  * raqm_get_glyphs:
  * @rq: a #raqm_t.
@@ -1232,6 +1234,10 @@ raqm_get_glyphs (raqm_t *rq,
       RAQM_TEST (" %02d", rq->glyphs[i].cluster);
     RAQM_TEST ("\n");
 #endif
+  } else if (rq->text_utf16) {
+    for (size_t i = 0; i < count; i++)
+      rq->glyphs[i].cluster = _raqm_u32_to_u16_index (rq,
+                                                     rq->glyphs[i].cluster);
   }
   return rq->glyphs;
 }
