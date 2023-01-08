@@ -102,9 +102,9 @@ parse_args (int argc, char **argv)
       direction = argv[++i];
     else if (strcmp (argv[i], "--font-features") == 0)
       features = argv[++i];
-    else if (strcmp (argv[i], "--letterspacing") == 0)
+    else if (strcmp (argv[i], "--letter-spacing") == 0)
       letterspacing = argv[++i];
-    else if (strcmp (argv[i], "--wordspacing") == 0)
+    else if (strcmp (argv[i], "--word-spacing") == 0)
       wordspacing = argv[++i];
     else if (strcmp (argv[i], "--require") == 0)
       require = argv[++i];
@@ -233,7 +233,7 @@ main (int argc, char **argv)
     for (char *tok = strtok (features, ","); tok; tok = strtok (NULL, ","))
       assert (raqm_add_font_feature (rq, tok, -1));
   }
-  
+
   if (letterspacing)
   {
     for (char *tok = strtok (letterspacing, ","); tok; tok = strtok (NULL, ","))
@@ -245,7 +245,7 @@ main (int argc, char **argv)
       assert (raqm_set_letter_spacing_range (rq, spacing, start, length));
     }
   }
-  
+
   if (wordspacing)
   {
     for (char *tok = strtok (wordspacing, ","); tok; tok = strtok (NULL, ","))
@@ -273,7 +273,7 @@ main (int argc, char **argv)
     index = cluster;
     assert (raqm_index_to_position (rq, &index, &x, &y));
   }
-  
+
   if (position)
     assert (raqm_position_to_index (rq, position, 0, &start_index));
 

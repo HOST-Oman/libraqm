@@ -167,7 +167,8 @@
   typedef FriBidiLevel _raqm_bidi_level_t;
 #endif
 
-typedef struct {
+typedef struct
+{
   FT_Face       ftface;
   int           ftloadflags;
   hb_language_t lang;
@@ -177,7 +178,8 @@ typedef struct {
 
 typedef struct _raqm_run raqm_run_t;
 
-struct _raqm {
+struct _raqm
+{
   int              ref_count;
 
   uint32_t        *text;
@@ -203,7 +205,8 @@ struct _raqm {
   int              invisible_glyph;
 };
 
-struct _raqm_run {
+struct _raqm_run
+{
   uint32_t       pos;
   uint32_t       len;
 
@@ -1396,7 +1399,9 @@ raqm_get_glyphs (raqm_t *rq,
       RAQM_TEST (" %02d", rq->glyphs[i].cluster);
     RAQM_TEST ("\n");
 #endif
-  } else if (rq->text_utf16) {
+  }
+  else if (rq->text_utf16)
+  {
     for (size_t i = 0; i < count; i++)
       rq->glyphs[i].cluster = _raqm_u32_to_u16_index (rq,
                                                      rq->glyphs[i].cluster);
@@ -1448,8 +1453,10 @@ raqm_get_direction_at_index (raqm_t *rq,
 
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
-    if (run->pos <= index && index < run->pos + run->len) {
-      switch (run->direction) {
+    if (run->pos <= index && index < run->pos + run->len)
+    {
+      switch (run->direction)
+      {
         case HB_DIRECTION_LTR:
           return RAQM_DIRECTION_LTR;
         case HB_DIRECTION_RTL:
@@ -1481,7 +1488,8 @@ _raqm_hb_dir (raqm_t *rq, _raqm_bidi_level_t level)
   return dir;
 }
 
-typedef struct {
+typedef struct
+{
   size_t pos;
   size_t len;
   _raqm_bidi_level_t level;
@@ -1730,9 +1738,9 @@ _raqm_itemize (raqm_t *rq)
       runs->len = rq->text_len;
       runs->level = 0;
     }
-  } else {
-    runs = _raqm_bidi_itemize (rq, &run_count);
   }
+  else
+    runs = _raqm_bidi_itemize (rq, &run_count);
 
   if (!runs)
   {
@@ -1867,7 +1875,8 @@ done:
 }
 
 /* Stack to handle script detection */
-typedef struct {
+typedef struct
+{
   size_t       capacity;
   size_t       size;
   int         *pair_index;
@@ -2180,7 +2189,8 @@ _raqm_shape (raqm_t *rq)
           if (!set_spacing)
             set_spacing = info[i].cluster != info[i-1].cluster;
         }
-        else {
+        else
+        {
           set_spacing = i == len - 1;
           if (!set_spacing)
             set_spacing = info[i].cluster != info[i+1].cluster;
@@ -2190,22 +2200,16 @@ _raqm_shape (raqm_t *rq)
 
         if (rq_info.spacing_after != 0 && set_spacing)
         {
-          
           if (run->direction == HB_DIRECTION_TTB)
-          {
             pos[i].y_advance -= rq_info.spacing_after;
-          }
           else if (run->direction == HB_DIRECTION_RTL)
           {
             pos[i].x_advance += rq_info.spacing_after;
             pos[i].x_offset += rq_info.spacing_after;
           }
           else
-          {
             pos[i].x_advance += rq_info.spacing_after;
-          }
         }
-
       }
     }
   }
