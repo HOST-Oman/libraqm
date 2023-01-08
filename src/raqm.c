@@ -594,7 +594,7 @@ _raqm_get_utf16_codepoint (const void *str,
                           uint32_t *out_codepoint)
 {
   const uint16_t *s = (const uint16_t *)str;
-  
+
   if (s[0] > 0xD800 && s[0] < 0xDBFF)
   {
     if (s[1] > 0xDC00 && s[1] < 0xDFFF)
@@ -610,7 +610,7 @@ _raqm_get_utf16_codepoint (const void *str,
       *out_codepoint = s[0];
       s += 1;
     }
-  } 
+  }
   else
   {
       *out_codepoint = s[0];
@@ -625,14 +625,14 @@ _raqm_u16_to_u32 (const uint16_t *text, size_t len, uint32_t *unicode)
   size_t in_len = 0;
   uint32_t *out_utf32 = unicode;
   const uint16_t *in_utf16 = text;
-  
+
   while ((*in_utf16 != '\0') && (in_len < len))
   {
     in_utf16 = _raqm_get_utf16_codepoint (in_utf16, out_utf32);
     ++out_utf32;
     ++in_len;
   }
-  
+
   return (out_utf32 - unicode);
 }
 
@@ -1139,7 +1139,7 @@ _raqm_set_spacing (raqm_t *rq,
  * @spacing: amount of spacing in Freetype Font Units (26.6 format).
  * @start: index of first character that should use @spacing.
  * @len: number of characters using @spacing.
- * 
+ *
  * Set the letter spacing or tracking for a given range, the value
  * will be added onto the advance and offset for RTL, and the advance for
  * other directions. Letter spacing will be applied between characters, so
@@ -1150,11 +1150,11 @@ _raqm_set_spacing (raqm_t *rq,
  * This will also add “disable `liga`, `clig`, `hlig`, `dlig`, and `calt`” font
  * features to the internal features list, so call this function after setting
  * the font features for best spacing results.
- * 
+ *
  * Return value:
  * `true` if no errors happened, `false` otherwise.
  *
- * Since: 0.10 
+ * Since: 0.10
  */
 bool
 raqm_set_letter_spacing_range(raqm_t *rq,
@@ -1196,7 +1196,7 @@ raqm_set_letter_spacing_range(raqm_t *rq,
  * @spacing: amount of spacing in Freetype Font Units (26.6 format).
  * @start: index of first character that should use @spacing.
  * @len: number of characters using @spacing.
- * 
+ *
  * Set the word spacing for a given range. Word spacing will only be applied to
  * 'word separator' characters, such as 'space', 'no break space' and
  * Ethiopic word separator'.
@@ -1206,7 +1206,7 @@ raqm_set_letter_spacing_range(raqm_t *rq,
  * Return value:
  * `true` if no errors happened, `false` otherwise.
  *
- * Since: 0.10 
+ * Since: 0.10
  */
 bool
 raqm_set_word_spacing_range(raqm_t *rq,
@@ -1348,7 +1348,7 @@ raqm_get_glyphs (raqm_t *rq,
       *length = 0;
       return NULL;
     }
-    
+
     rq->glyphs = new_mem;
     rq->glyphs_capacity = count;
   }
@@ -2482,7 +2482,7 @@ raqm_position_to_index (raqm_t *rq,
     len = hb_buffer_get_length (run->buffer);
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
- 
+
     for (size_t i = 0; i < len; i++)
     {
       delta_x = position[i].x_advance;
