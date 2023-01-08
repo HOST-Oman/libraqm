@@ -812,6 +812,32 @@ raqm_set_language (raqm_t       *rq,
   return true;
 }
 
+static bool
+_raqm_add_font_feature (raqm_t       *rq,
+                        hb_feature_t  fea)
+{
+  void* new_features;
+
+  if (!rq)
+    return false;
+
+  new_features = realloc (rq->features,
+                          sizeof (hb_feature_t) * (rq->features_len + 1));
+  if (!new_features)
+    return false;
+
+  if (fea.start != HB_FEATURE_GLOBAL_START)
+    fea.start = _raqm_encoding_to_u32_index (rq, fea.start);
+  if (fea.end != HB_FEATURE_GLOBAL_END)
+    fea.end = _raqm_encoding_to_u32_index (rq, fea.end);
+
+  rq->features = new_features;
+  rq->features[rq->features_len] = fea;
+  rq->features_len++;
+
+  return true;
+}
+
 /**
  * raqm_add_font_feature:
  * @rq: a #raqm_t.
@@ -847,21 +873,7 @@ raqm_add_font_feature (raqm_t     *rq,
 
   ok = hb_feature_from_string (feature, len, &fea);
   if (ok)
-  {
-    void* new_features = realloc (rq->features,
-                                  sizeof (hb_feature_t) * (rq->features_len + 1));
-    if (!new_features)
-      return false;
-
-    if (fea.start != HB_FEATURE_GLOBAL_START)
-      fea.start = _raqm_encoding_to_u32_index (rq, fea.start);
-    if (fea.end != HB_FEATURE_GLOBAL_END)
-      fea.end = _raqm_encoding_to_u32_index (rq, fea.end);
-
-    rq->features = new_features;
-    rq->features[rq->features_len] = fea;
-    rq->features_len++;
-  }
+    _raqm_add_font_feature (rq, fea);
 
   return ok;
 }
@@ -1135,9 +1147,9 @@ _raqm_set_spacing (raqm_t *rq,
  * Note that not all scripts have a letter-spacing tradition,
  * for example, Arabic does not, while Devanagari does.
  *
- * This will also add 'disable liga and clig' font features to the internal 
- * features list, so call this function after setting the font features for
- * best spacing results.
+ * This will also add “disable `liga`, `clig`, `hlig`, `dlig`, and `calt`” font
+ * features to the internal features list, so call this function after setting
+ * the font features for best spacing results.
  * 
  * Return value:
  * `true` if no errors happened, `false` otherwise.
@@ -1158,27 +1170,22 @@ raqm_set_letter_spacing_range(raqm_t *rq,
   if (!rq->text_len)
     return true;
 
-  end = _raqm_encoding_to_u32_index (rq, start + len - 1);
-  start = _raqm_encoding_to_u32_index (rq, start);
-  
+  end = start + len - 1;
+
   if (spacing != 0)
   {
-    raqm_add_font_feature(rq, "-clig", 5);
-    rq->features[rq->features_len - 1].start = start;
-    rq->features[rq->features_len - 1].end = end;
-    raqm_add_font_feature(rq, "-liga", 5);
-    rq->features[rq->features_len - 1].start = start;
-    rq->features[rq->features_len - 1].end = end;
-    raqm_add_font_feature(rq, "-hlig", 5);
-    rq->features[rq->features_len - 1].start = start;
-    rq->features[rq->features_len - 1].end = end;
-    raqm_add_font_feature(rq, "-dlig", 5);
-    rq->features[rq->features_len - 1].start = start;
-    rq->features[rq->features_len - 1].end = end;
-    raqm_add_font_feature(rq, "-calt", 5);
-    rq->features[rq->features_len - 1].start = start;
-    rq->features[rq->features_len - 1].end = end;
+#define NUM_TAGS 5
+    static char *tags[NUM_TAGS] = { "clig", "liga", "hlig", "dlig", "calt" };
+    for (size_t i = 0; i < NUM_TAGS; i++)
+    {
+      hb_feature_t fea = { hb_tag_from_string(tags[i], 5), 0, start, end };
+      _raqm_add_font_feature (rq, fea);
+    }
+#undef NUM_TAGS
   }
+
+  start = _raqm_encoding_to_u32_index (rq, start);
+  end = _raqm_encoding_to_u32_index (rq, end);
 
   return _raqm_set_spacing (rq, spacing, false, start, end);
 }
