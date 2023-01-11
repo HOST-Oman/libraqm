@@ -1,0 +1,1771 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Raqm: Raqm Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets Vsnapshot">
+<link rel="home" href="index.html" title="Raqm Reference Manual">
+<link rel="up" href="ch01.html" title="Raqm API">
+<link rel="prev" href="ch01.html" title="Raqm API">
+<link rel="next" href="api-index-full.html" title="API Index">
+<meta name="generator" content="GTK-Doc V1.33.1 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#raqm-Raqm.description" class="shortcut">Description</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="ch01.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="ch01.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="api-index-full.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="raqm-Raqm"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="raqm-Raqm.top_of_page"></a>Raqm</span></h2>
+<p>Raqm — A library for complex text layout</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="raqm-Raqm.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_proto_type">
+<col class="functions_proto_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="returnvalue">raqm_t</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-create" title="raqm_create ()">raqm_create</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="returnvalue">raqm_t</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-reference" title="raqm_reference ()">raqm_reference</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-destroy" title="raqm_destroy ()">raqm_destroy</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-clear-contents" title="raqm_clear_contents ()">raqm_clear_contents</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-text" title="raqm_set_text ()">raqm_set_text</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-text-utf8" title="raqm_set_text_utf8 ()">raqm_set_text_utf8</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-text-utf16" title="raqm_set_text_utf16 ()">raqm_set_text_utf16</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-par-direction" title="raqm_set_par_direction ()">raqm_set_par_direction</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-language" title="raqm_set_language ()">raqm_set_language</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-freetype-face" title="raqm_set_freetype_face ()">raqm_set_freetype_face</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-freetype-face-range" title="raqm_set_freetype_face_range ()">raqm_set_freetype_face_range</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-freetype-load-flags" title="raqm_set_freetype_load_flags ()">raqm_set_freetype_load_flags</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-freetype-load-flags-range" title="raqm_set_freetype_load_flags_range ()">raqm_set_freetype_load_flags_range</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-letter-spacing-range" title="raqm_set_letter_spacing_range ()">raqm_set_letter_spacing_range</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-word-spacing-range" title="raqm_set_word_spacing_range ()">raqm_set_word_spacing_range</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-set-invisible-glyph" title="raqm_set_invisible_glyph ()">raqm_set_invisible_glyph</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-add-font-feature" title="raqm_add_font_feature ()">raqm_add_font_feature</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-layout" title="raqm_layout ()">raqm_layout</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="raqm-Raqm.html#raqm-glyph-t" title="raqm_glyph_t"><span class="returnvalue">raqm_glyph_t</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-get-glyphs" title="raqm_get_glyphs ()">raqm_get_glyphs</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="raqm-Raqm.html#raqm-direction-t" title="enum raqm_direction_t"><span class="returnvalue">raqm_direction_t</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-get-par-resolved-direction" title="raqm_get_par_resolved_direction ()">raqm_get_par_resolved_direction</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="raqm-Raqm.html#raqm-direction-t" title="enum raqm_direction_t"><span class="returnvalue">raqm_direction_t</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-get-direction-at-index" title="raqm_get_direction_at_index ()">raqm_get_direction_at_index</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-index-to-position" title="raqm_index_to_position ()">raqm_index_to_position</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-position-to-index" title="raqm_position_to_index ()">raqm_position_to_index</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-version" title="raqm_version ()">raqm_version</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">bool</span>
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-version-atleast" title="raqm_version_atleast ()">raqm_version_atleast</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">char</span> *
+</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#raqm-version-string" title="raqm_version_string ()">raqm_version_string</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name">
+<a class="link" href="raqm-Raqm.html#RAQM-VERSION-ATLEAST:CAPS" title="RAQM_VERSION_ATLEAST()">RAQM_VERSION_ATLEAST</a><span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="raqm-Raqm.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="other_proto_type">
+<col class="other_proto_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="raqm-Raqm.html#RAQM-VERSION-MAJOR:CAPS" title="RAQM_VERSION_MAJOR">RAQM_VERSION_MAJOR</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="raqm-Raqm.html#RAQM-VERSION-MICRO:CAPS" title="RAQM_VERSION_MICRO">RAQM_VERSION_MICRO</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="raqm-Raqm.html#RAQM-VERSION-MINOR:CAPS" title="RAQM_VERSION_MINOR">RAQM_VERSION_MINOR</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="raqm-Raqm.html#RAQM-VERSION-STRING:CAPS" title="RAQM_VERSION_STRING">RAQM_VERSION_STRING</a></td>
+</tr>
+<tr>
+<td class="typedef_keyword">typedef</td>
+<td class="function_name"><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t">raqm_t</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="raqm-Raqm.html#raqm-direction-t" title="enum raqm_direction_t">raqm_direction_t</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword"> </td>
+<td class="function_name"><a class="link" href="raqm-Raqm.html#raqm-glyph-t" title="raqm_glyph_t">raqm_glyph_t</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="raqm-Raqm.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;raqm.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="raqm-Raqm.description"></a><h2>Description</h2>
+<p>Raqm is a light weight text layout library with strong emphasis on
+supporting languages and writing systems that require complex text layout.</p>
+<p>The main object in Raqm API is <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>, it stores all the states of the
+input text, its properties, and the output of the layout process.</p>
+<p>To start, you create a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> object, add text and font(s) to it, run the
+layout process, and finally query about the output. For example:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raqm.h&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"></span>
+<span class="nf">main</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">fontfile</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">text</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">direction</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">language</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">FT_Library</span><span class="w"> </span><span class="n">library</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">FT_Face</span><span class="w"> </span><span class="n">face</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">printf</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;Usage: %s FONT_FILE TEXT DIRECTION LANG</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">fontfile</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="n">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="n">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_Init_FreeType</span><span class="w"> </span><span class="p">(</span><span class="o">&amp;</span><span class="n">library</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_New_Face</span><span class="w"> </span><span class="p">(</span><span class="n">library</span><span class="p">,</span><span class="w"> </span><span class="n">fontfile</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">face</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_Set_Char_Size</span><span class="w"> </span><span class="p">(</span><span class="n">face</span><span class="p">,</span><span class="w"> </span><span class="n">face</span><span class="o">-&gt;</span><span class="n">units_per_EM</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="n">raqm_t</span><span class="w"> </span><span class="o">*</span><span class="n">rq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raqm_create</span><span class="w"> </span><span class="p">();</span><span class="w"></span>
+<span class="w">          </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
+<span class="w">          </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">raqm_direction_t</span><span class="w"> </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_DEFAULT</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="w"> </span><span class="p">(</span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;r&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_RTL</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="w"> </span><span class="p">(</span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_LTR</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">raqm_set_text_utf8</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="w"> </span><span class="p">(</span><span class="n">text</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">                </span><span class="n">raqm_set_freetype_face</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">face</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">                </span><span class="n">raqm_set_par_direction</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">dir</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">                </span><span class="n">raqm_set_language</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">language</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="w"> </span><span class="p">(</span><span class="n">text</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
+<span class="w">                </span><span class="n">raqm_layout</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">              </span><span class="kt">size_t</span><span class="w"> </span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">              </span><span class="n">raqm_glyph_t</span><span class="w"> </span><span class="o">*</span><span class="n">glyphs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raqm_get_glyphs</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">count</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">              </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">glyphs</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">              </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;glyph count: %zu</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span><span class="w"></span>
+<span class="w">              </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="p">{</span><span class="w"></span>
+<span class="w">                  </span><span class="n">printf</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;gid#%d off: (%d, %d) adv: (%d, %d) idx: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">index</span><span class="p">,</span><span class="w"></span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">x_offset</span><span class="p">,</span><span class="w"></span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">y_offset</span><span class="p">,</span><span class="w"></span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">x_advance</span><span class="p">,</span><span class="w"></span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">y_advance</span><span class="p">,</span><span class="w"></span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cluster</span><span class="p">);</span><span class="w"></span>
+<span class="w">              </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">raqm_destroy</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">);</span><span class="w"></span>
+<span class="w">          </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">FT_Done_Face</span><span class="w"> </span><span class="p">(</span><span class="n">face</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">      </span><span class="n">FT_Done_FreeType</span><span class="w"> </span><span class="p">(</span><span class="n">library</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+To compile this example:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="n">cc</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">test</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="err">`</span><span class="n">pkg</span><span class="o">-</span><span class="n">config</span><span class="w"> </span><span class="o">--</span><span class="n">libs</span><span class="w"> </span><span class="o">--</span><span class="n">cflags</span><span class="w"> </span><span class="n">raqm</span><span class="err">`</span><span class="w"></span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p></p>
+</div>
+<div class="refsect1">
+<a name="raqm-Raqm.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="raqm-create"></a><h3>raqm_create ()</h3>
+<pre class="programlisting"><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="returnvalue">raqm_t</span></a> *
+raqm_create (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<p>Creates a new <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> with all its internal states initialized to their
+defaults.</p>
+<div class="refsect3">
+<a name="raqm-create.returns"></a><h4>Returns</h4>
+<p>A newly allocated <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> with a reference count of 1. The initial reference
+count should be released with <a class="link" href="raqm-Raqm.html#raqm-destroy" title="raqm_destroy ()"><code class="function">raqm_destroy()</code></a> when you are done using the
+<a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>. Returns <code class="literal">NULL</code> in case of error.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-reference"></a><h3>raqm_reference ()</h3>
+<pre class="programlisting"><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="returnvalue">raqm_t</span></a> *
+raqm_reference (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>);</pre>
+<p>Increases the reference count on <em class="parameter"><code>rq</code></em>
+ by one. This prevents <em class="parameter"><code>rq</code></em>
+ from being
+destroyed until a matching call to <a class="link" href="raqm-Raqm.html#raqm-destroy" title="raqm_destroy ()"><code class="function">raqm_destroy()</code></a> is made.</p>
+<div class="refsect3">
+<a name="raqm-reference.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-reference.returns"></a><h4>Returns</h4>
+<p>The referenced <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-destroy"></a><h3>raqm_destroy ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+raqm_destroy (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>);</pre>
+<p>Decreases the reference count on <em class="parameter"><code>rq</code></em>
+ by one. If the result is zero, then <em class="parameter"><code>rq</code></em>
+
+and all associated resources are freed.
+See <a class="link" href="raqm-Raqm.html#raqm-reference" title="raqm_reference ()"><code class="function">raqm_reference()</code></a>.</p>
+<div class="refsect3">
+<a name="raqm-destroy.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-clear-contents"></a><h3>raqm_clear_contents ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+raqm_clear_contents (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>);</pre>
+<p>Clears internal state of previously used raqm_t object, making it ready
+for reuse and keeping some of allocated memory to increase performance.</p>
+<div class="refsect3">
+<a name="raqm-clear-contents.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-9.html#api-index-0.9">0.9</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-text"></a><h3>raqm_set_text ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_text (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+               <em class="parameter"><code>const <span class="type">uint32_t</span> *text</code></em>,
+               <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
+<p>Adds <em class="parameter"><code>text</code></em>
+ to <em class="parameter"><code>rq</code></em>
+ to be used for layout. It must be a valid UTF-32 text, any
+invalid character will be replaced with U+FFFD. The text should typically
+represent a full paragraph, since doing the layout of chunks of text
+separately can give improper output.</p>
+<div class="refsect3">
+<a name="raqm-set-text.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>text</p></td>
+<td class="parameter_description"><p>a UTF-32 encoded text string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>the length of <em class="parameter"><code>text</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-text.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-text-utf8"></a><h3>raqm_set_text_utf8 ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_text_utf8 (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                    <em class="parameter"><code>const <span class="type">char</span> *text</code></em>,
+                    <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
+<p>Same as <a class="link" href="raqm-Raqm.html#raqm-set-text" title="raqm_set_text ()"><code class="function">raqm_set_text()</code></a>, but for text encoded in UTF-8 encoding.</p>
+<div class="refsect3">
+<a name="raqm-set-text-utf8.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>text</p></td>
+<td class="parameter_description"><p>a UTF-8 encoded text string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>the length of <em class="parameter"><code>text</code></em>
+in UTF-8 bytes.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-text-utf8.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-text-utf16"></a><h3>raqm_set_text_utf16 ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_text_utf16 (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                     <em class="parameter"><code>const <span class="type">uint16_t</span> *text</code></em>,
+                     <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
+<p>Same as <a class="link" href="raqm-Raqm.html#raqm-set-text" title="raqm_set_text ()"><code class="function">raqm_set_text()</code></a>, but for text encoded in UTF-16 encoding.</p>
+<div class="refsect3">
+<a name="raqm-set-text-utf16.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>text</p></td>
+<td class="parameter_description"><p>a UTF-16 encoded text string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>the length of <em class="parameter"><code>text</code></em>
+in UTF-16 shorts.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-text-utf16.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-10.html#api-index-0.10">0.10</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-par-direction"></a><h3>raqm_set_par_direction ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_par_direction (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                        <em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-direction-t" title="enum raqm_direction_t"><span class="type">raqm_direction_t</span></a> dir</code></em>);</pre>
+<p>Sets the paragraph direction, also known as block direction in CSS. For
+horizontal text, this controls the overall direction in the Unicode
+Bidirectional Algorithm, so when the text is mainly right-to-left (with or
+without some left-to-right) text, then the base direction should be set to
+<a class="link" href="raqm-Raqm.html#RAQM-DIRECTION-RTL:CAPS"><span class="type">RAQM_DIRECTION_RTL</span></a> and vice versa.</p>
+<p>The default is <a class="link" href="raqm-Raqm.html#RAQM-DIRECTION-DEFAULT:CAPS"><span class="type">RAQM_DIRECTION_DEFAULT</span></a>, which determines the paragraph
+direction based on the first character with strong bidi type (see <a class="ulink" href="https://unicode.org/reports/tr9/#P2" target="_top">rule
+P2</a> in Unicode Bidirectional Algorithm),
+which can be good enough for many cases but has problems when a mainly
+right-to-left paragraph starts with a left-to-right character and vice versa
+as the detected paragraph direction will be the wrong one, or when text does
+not contain any characters with string bidi types (e.g. only punctuation or
+numbers) as this will default to left-to-right paragraph direction.</p>
+<p>For vertical, top-to-bottom text, <a class="link" href="raqm-Raqm.html#RAQM-DIRECTION-TTB:CAPS"><span class="type">RAQM_DIRECTION_TTB</span></a> should be used. Raqm,
+however, provides limited vertical text support and does not handle rotated
+horizontal text in vertical text, instead everything is treated as vertical
+text.</p>
+<div class="refsect3">
+<a name="raqm-set-par-direction.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>dir</p></td>
+<td class="parameter_description"><p>the direction of the paragraph.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-par-direction.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-language"></a><h3>raqm_set_language ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_language (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                   <em class="parameter"><code>const <span class="type">char</span> *lang</code></em>,
+                   <em class="parameter"><code><span class="type">size_t</span> start</code></em>,
+                   <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
+<p>Sets a <a class="ulink" href="https://www.w3.org/International/articles/language-tags/" target="_top">BCP47 language
+code</a> to be used
+for <em class="parameter"><code>len</code></em>
+-number of characters staring at <em class="parameter"><code>start</code></em>
+.  The <em class="parameter"><code>start</code></em>
+ and <em class="parameter"><code>len</code></em>
+ are
+input string array indices (i.e. counting bytes in UTF-8 and scaler values
+in UTF-32).</p>
+<p>This method can be used repeatedly to set different languages for different
+parts of the text.</p>
+<div class="refsect3">
+<a name="raqm-set-language.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>lang</p></td>
+<td class="parameter_description"><p>a BCP47 language code.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>start</p></td>
+<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>face</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>number of characters using <em class="parameter"><code>face</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-language.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-2.html#api-index-0.2">0.2</a></p>
+<p class="stability">Stability Level: <acronym title="Unstable interfaces are experimental or transitional. They are typically used to
+give outside developers early access to new or rapidly changing technology, or
+to provide an interim solution to a problem where a more general solution is
+anticipated. No claims are made about either source or binary compatibility from
+one minor release to the next.
+
+The Unstable interface level is a warning that these interfaces are  subject to
+change without warning and should not be used in unbundled products.
+
+Given such caveats, customer impact need not be a factor when considering
+incompatible changes to an Unstable interface in a major or minor release.
+Nonetheless, when such changes are introduced, the changes should still be
+mentioned in the release notes for the affected release.
+"><span class="acronym">Unstable</span></acronym></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-freetype-face"></a><h3>raqm_set_freetype_face ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_freetype_face (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                        <em class="parameter"><code><span class="type">FT_Face</span> face</code></em>);</pre>
+<p>Sets an <span class="type">FT_Face</span> to be used for all characters in <em class="parameter"><code>rq</code></em>
+.</p>
+<p>See also <a class="link" href="raqm-Raqm.html#raqm-set-freetype-face-range" title="raqm_set_freetype_face_range ()"><code class="function">raqm_set_freetype_face_range()</code></a>.</p>
+<div class="refsect3">
+<a name="raqm-set-freetype-face.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>face</p></td>
+<td class="parameter_description"><p>an <span class="type">FT_Face</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-freetype-face.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-freetype-face-range"></a><h3>raqm_set_freetype_face_range ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_freetype_face_range (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                              <em class="parameter"><code><span class="type">FT_Face</span> face</code></em>,
+                              <em class="parameter"><code><span class="type">size_t</span> start</code></em>,
+                              <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
+<p>Sets an <span class="type">FT_Face</span> to be used for <em class="parameter"><code>len</code></em>
+-number of characters staring at <em class="parameter"><code>start</code></em>
+.
+The <em class="parameter"><code>start</code></em>
+ and <em class="parameter"><code>len</code></em>
+ are input string array indices, counting elements
+according to the underlying encoding. <em class="parameter"><code>start</code></em>
+ must always be aligned to the
+start of an encoded codepoint, and <em class="parameter"><code>len</code></em>
+ must always end at a codepoint's
+final element.</p>
+<p>This method can be used repeatedly to set different faces for different
+parts of the text. It is the responsibility of the client to make sure that
+face ranges cover the whole text, and is properly aligned.</p>
+<p>See also <a class="link" href="raqm-Raqm.html#raqm-set-freetype-face" title="raqm_set_freetype_face ()"><code class="function">raqm_set_freetype_face()</code></a>.</p>
+<div class="refsect3">
+<a name="raqm-set-freetype-face-range.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>face</p></td>
+<td class="parameter_description"><p>an <span class="type">FT_Face</span>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>start</p></td>
+<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>face</code></em>
+from the input string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>number of elements using <em class="parameter"><code>face</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-freetype-face-range.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-freetype-load-flags"></a><h3>raqm_set_freetype_load_flags ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_freetype_load_flags (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                              <em class="parameter"><code><span class="type">int</span> flags</code></em>);</pre>
+<p>Sets the load flags passed to FreeType when loading glyphs, should be the
+same flags used by the client when rendering FreeType glyphs.</p>
+<p>This requires version of HarfBuzz that has <code class="function">hb_ft_font_set_load_flags()</code>, for
+older version the flags will be ignored.</p>
+<div class="refsect3">
+<a name="raqm-set-freetype-load-flags.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>FreeType load flags.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-freetype-load-flags.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-3.html#api-index-0.3">0.3</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-freetype-load-flags-range"></a><h3>raqm_set_freetype_load_flags_range ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_freetype_load_flags_range (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                                    <em class="parameter"><code><span class="type">int</span> flags</code></em>,
+                                    <em class="parameter"><code><span class="type">size_t</span> start</code></em>,
+                                    <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
+<p>Sets the load flags passed to FreeType when loading glyphs for <em class="parameter"><code>len</code></em>
+-number
+of characters staring at <em class="parameter"><code>start</code></em>
+. Flags should be the same as used by the
+client when rendering corresponding FreeType glyphs. The <em class="parameter"><code>start</code></em>
+ and <em class="parameter"><code>len</code></em>
+
+are input string array indices (i.e. counting bytes in UTF-8 and scaler
+values in UTF-32).</p>
+<p>This method can be used repeatedly to set different flags for different
+parts of the text. It is the responsibility of the client to make sure that
+flag ranges cover the whole text.</p>
+<p>This requires version of HarfBuzz that has <code class="function">hb_ft_font_set_load_flags()</code>, for
+older version the flags will be ignored.</p>
+<p>See also <a class="link" href="raqm-Raqm.html#raqm-set-freetype-load-flags" title="raqm_set_freetype_load_flags ()"><code class="function">raqm_set_freetype_load_flags()</code></a>.</p>
+<div class="refsect3">
+<a name="raqm-set-freetype-load-flags-range.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>FreeType load flags.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>start</p></td>
+<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>flags</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>number of characters using <em class="parameter"><code>flags</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-freetype-load-flags-range.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-9.html#api-index-0.9">0.9</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-letter-spacing-range"></a><h3>raqm_set_letter_spacing_range ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_letter_spacing_range (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                               <em class="parameter"><code><span class="type">int</span> spacing</code></em>,
+                               <em class="parameter"><code><span class="type">size_t</span> start</code></em>,
+                               <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
+<p>Set the letter spacing or tracking for a given range, the value
+will be added onto the advance and offset for RTL, and the advance for
+other directions. Letter spacing will be applied between characters, so
+the last character will not have spacing applied after it.
+Note that not all scripts have a letter-spacing tradition,
+for example, Arabic does not, while Devanagari does.</p>
+<p>This will also add “disable <code class="literal">liga</code>, <code class="literal">clig</code>, <code class="literal">hlig</code>, <code class="literal">dlig</code>, and <code class="literal">calt</code>” font
+features to the internal features list, so call this function after setting
+the font features for best spacing results.</p>
+<div class="refsect3">
+<a name="raqm-set-letter-spacing-range.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>spacing</p></td>
+<td class="parameter_description"><p>amount of spacing in Freetype Font Units (26.6 format).</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>start</p></td>
+<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>spacing</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>number of characters using <em class="parameter"><code>spacing</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-letter-spacing-range.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-10.html#api-index-0.10">0.10</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-word-spacing-range"></a><h3>raqm_set_word_spacing_range ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_word_spacing_range (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                             <em class="parameter"><code><span class="type">int</span> spacing</code></em>,
+                             <em class="parameter"><code><span class="type">size_t</span> start</code></em>,
+                             <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
+<p>Set the word spacing for a given range. Word spacing will only be applied to
+'word separator' characters, such as 'space', 'no break space' and
+Ethiopic word separator'.
+The value will be added onto the advance and offset for RTL, and the advance
+for other directions.</p>
+<div class="refsect3">
+<a name="raqm-set-word-spacing-range.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>spacing</p></td>
+<td class="parameter_description"><p>amount of spacing in Freetype Font Units (26.6 format).</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>start</p></td>
+<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>spacing</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>number of characters using <em class="parameter"><code>spacing</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-word-spacing-range.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-10.html#api-index-0.10">0.10</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-set-invisible-glyph"></a><h3>raqm_set_invisible_glyph ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_set_invisible_glyph (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                          <em class="parameter"><code><span class="type">int</span> gid</code></em>);</pre>
+<p>Sets the glyph id to be used for invisible glyhphs.</p>
+<p>If <em class="parameter"><code>gid</code></em>
+ is negative, invisible glyphs will be suppressed from the output.</p>
+<p>If <em class="parameter"><code>gid</code></em>
+ is zero, invisible glyphs will be rendered as space.</p>
+<p>If <em class="parameter"><code>gid</code></em>
+ is a positive number, it will be used for invisible glyphs.</p>
+<div class="refsect3">
+<a name="raqm-set-invisible-glyph.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>gid</p></td>
+<td class="parameter_description"><p>glyph id to use for invisible glyphs.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-set-invisible-glyph.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if no errors happened, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-6.html#api-index-0.6">0.6</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-add-font-feature"></a><h3>raqm_add_font_feature ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_add_font_feature (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                       <em class="parameter"><code>const <span class="type">char</span> *feature</code></em>,
+                       <em class="parameter"><code><span class="type">int</span> len</code></em>);</pre>
+<p>Adds a font feature to be used by the <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> during text layout. This is
+usually used to turn on optional font features that are not enabled by
+default, for example <code class="literal">dlig</code> or <code class="literal">ss01</code>, but can be also used to turn off
+default font features.</p>
+<p><em class="parameter"><code>feature</code></em>
+ is string representing a single font feature, in the syntax
+understood by <code class="function">hb_feature_from_string()</code>.</p>
+<p>This function can be called repeatedly, new features will be appended to the
+end of the features list and can potentially override previous features.</p>
+<div class="refsect3">
+<a name="raqm-add-font-feature.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>feature</p></td>
+<td class="parameter_description"><p>a font feature string. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="The data is owned by the callee, which is responsible of freeing it."><span class="acronym">transfer none</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>len</p></td>
+<td class="parameter_description"><p>length of <em class="parameter"><code>feature</code></em>
+, -1 for <code class="literal">NULL</code>-terminated.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-add-font-feature.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if parsing <em class="parameter"><code>feature</code></em>
+succeeded, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-layout"></a><h3>raqm_layout ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_layout (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>);</pre>
+<p>Run the text layout process on <em class="parameter"><code>rq</code></em>
+. This is the main Raqm function where the
+Unicode Bidirectional Text algorithm will be applied to the text in <em class="parameter"><code>rq</code></em>
+,
+text shaping, and any other part of the layout process.</p>
+<div class="refsect3">
+<a name="raqm-layout.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-layout.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if the layout process was successful, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-get-glyphs"></a><h3>raqm_get_glyphs ()</h3>
+<pre class="programlisting"><a class="link" href="raqm-Raqm.html#raqm-glyph-t" title="raqm_glyph_t"><span class="returnvalue">raqm_glyph_t</span></a> *
+raqm_get_glyphs (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                 <em class="parameter"><code><span class="type">size_t</span> *length</code></em>);</pre>
+<p>Gets the final result of Raqm layout process, an array of <a class="link" href="raqm-Raqm.html#raqm-glyph-t" title="raqm_glyph_t"><span class="type">raqm_glyph_t</span></a>
+containing the glyph indices in the font, their positions and other possible
+information.</p>
+<div class="refsect3">
+<a name="raqm-get-glyphs.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>length</p></td>
+<td class="parameter_description"><p>output array length. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>]</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-get-glyphs.returns"></a><h4>Returns</h4>
+<p>An array of <a class="link" href="raqm-Raqm.html#raqm-glyph-t" title="raqm_glyph_t"><span class="type">raqm_glyph_t</span></a>, or <code class="literal">NULL</code> in case of error. This is owned by <em class="parameter"><code>rq</code></em>
+and must not be freed. </p>
+<p><span class="annotation">[<acronym title="The data is owned by the callee, which is responsible of freeing it."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-get-par-resolved-direction"></a><h3>raqm_get_par_resolved_direction ()</h3>
+<pre class="programlisting"><a class="link" href="raqm-Raqm.html#raqm-direction-t" title="enum raqm_direction_t"><span class="returnvalue">raqm_direction_t</span></a>
+raqm_get_par_resolved_direction (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>);</pre>
+<p>Gets the resolved direction of the paragraph;</p>
+<div class="refsect3">
+<a name="raqm-get-par-resolved-direction.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-get-par-resolved-direction.returns"></a><h4>Returns</h4>
+<p>The <a class="link" href="raqm-Raqm.html#raqm-direction-t" title="enum raqm_direction_t"><span class="type">raqm_direction_t</span></a> specifying the resolved direction of text,
+or <a class="link" href="raqm-Raqm.html#RAQM-DIRECTION-DEFAULT:CAPS"><span class="type">RAQM_DIRECTION_DEFAULT</span></a> if <a class="link" href="raqm-Raqm.html#raqm-layout" title="raqm_layout ()"><code class="function">raqm_layout()</code></a> has not been called on <em class="parameter"><code>rq</code></em>
+.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-8.html#api-index-0.8">0.8</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-get-direction-at-index"></a><h3>raqm_get_direction_at_index ()</h3>
+<pre class="programlisting"><a class="link" href="raqm-Raqm.html#raqm-direction-t" title="enum raqm_direction_t"><span class="returnvalue">raqm_direction_t</span></a>
+raqm_get_direction_at_index (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                             <em class="parameter"><code><span class="type">size_t</span> index</code></em>);</pre>
+<p>Gets the resolved direction of the character at specified index;</p>
+<div class="refsect3">
+<a name="raqm-get-direction-at-index.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>index</p></td>
+<td class="parameter_description"><p>character index. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for input. Default is transfer none."><span class="acronym">in</span></acronym>]</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-get-direction-at-index.returns"></a><h4>Returns</h4>
+<p>The <a class="link" href="raqm-Raqm.html#raqm-direction-t" title="enum raqm_direction_t"><span class="type">raqm_direction_t</span></a> specifying the resolved direction of text at the
+specified index, or <a class="link" href="raqm-Raqm.html#RAQM-DIRECTION-DEFAULT:CAPS"><span class="type">RAQM_DIRECTION_DEFAULT</span></a> if <a class="link" href="raqm-Raqm.html#raqm-layout" title="raqm_layout ()"><code class="function">raqm_layout()</code></a> has not been
+called on <em class="parameter"><code>rq</code></em>
+.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-8.html#api-index-0.8">0.8</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-index-to-position"></a><h3>raqm_index_to_position ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_index_to_position (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                        <em class="parameter"><code><span class="type">size_t</span> *index</code></em>,
+                        <em class="parameter"><code><span class="type">int</span> *x</code></em>,
+                        <em class="parameter"><code><span class="type">int</span> *y</code></em>);</pre>
+<p>Calculates the cursor position after the character at <em class="parameter"><code>index</code></em>
+. If the character
+is right-to-left, then the cursor will be at the left of it, whereas if the
+character is left-to-right, then the cursor will be at the right of it.</p>
+<div class="refsect3">
+<a name="raqm-index-to-position.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>index</p></td>
+<td class="parameter_description"><p>character index. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for input and for returning results. Default is transfer full."><span class="acronym">inout</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>x</p></td>
+<td class="parameter_description"><p>output x position. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>y</p></td>
+<td class="parameter_description"><p>output y position. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>]</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-index-to-position.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if the process was successful, <code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-2.html#api-index-0.2">0.2</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-position-to-index"></a><h3>raqm_position_to_index ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_position_to_index (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
+                        <em class="parameter"><code><span class="type">int</span> x</code></em>,
+                        <em class="parameter"><code><span class="type">int</span> y</code></em>,
+                        <em class="parameter"><code><span class="type">size_t</span> *index</code></em>);</pre>
+<p>Returns the <em class="parameter"><code>index</code></em>
+ of the character at <em class="parameter"><code>x</code></em>
+ and <em class="parameter"><code>y</code></em>
+ position within text.
+If the position is outside the text, the last character is chosen as
+<em class="parameter"><code>index</code></em>
+.</p>
+<div class="refsect3">
+<a name="raqm-position-to-index.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>rq</p></td>
+<td class="parameter_description"><p>a <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>x</p></td>
+<td class="parameter_description"><p>x position.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>y</p></td>
+<td class="parameter_description"><p>y position.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>index</p></td>
+<td class="parameter_description"><p>output character index. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>]</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-position-to-index.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if the process was successful, <code class="literal">false</code> in case of error.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-2.html#api-index-0.2">0.2</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-version"></a><h3>raqm_version ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+raqm_version (<em class="parameter"><code>unsigned <span class="type">int</span> *major</code></em>,
+              <em class="parameter"><code>unsigned <span class="type">int</span> *minor</code></em>,
+              <em class="parameter"><code>unsigned <span class="type">int</span> *micro</code></em>);</pre>
+<p>Returns library version as three integer components.</p>
+<div class="refsect3">
+<a name="raqm-version.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>major</p></td>
+<td class="parameter_description"><p>Library major version component. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>minor</p></td>
+<td class="parameter_description"><p>Library minor version component. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>micro</p></td>
+<td class="parameter_description"><p>Library micro version component. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter for returning results. Default is transfer full."><span class="acronym">out</span></acronym>]</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-version-atleast"></a><h3>raqm_version_atleast ()</h3>
+<pre class="programlisting"><span class="returnvalue">bool</span>
+raqm_version_atleast (<em class="parameter"><code>unsigned <span class="type">int</span> major</code></em>,
+                      <em class="parameter"><code>unsigned <span class="type">int</span> minor</code></em>,
+                      <em class="parameter"><code>unsigned <span class="type">int</span> micro</code></em>);</pre>
+<p>Checks if library version is less than or equal the specified version.</p>
+<div class="refsect3">
+<a name="raqm-version-atleast.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>major</p></td>
+<td class="parameter_description"><p>Library major version component.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>minor</p></td>
+<td class="parameter_description"><p>Library minor version component.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>micro</p></td>
+<td class="parameter_description"><p>Library micro version component.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="raqm-version-atleast.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if library version is less than or equal the specified version,
+<code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-version-string"></a><h3>raqm_version_string ()</h3>
+<pre class="programlisting">const <span class="returnvalue">char</span> *
+raqm_version_string (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<p>Returns library version as a string with three components.</p>
+<div class="refsect3">
+<a name="raqm-version-string.returns"></a><h4>Returns</h4>
+<p> library version string.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="RAQM-VERSION-ATLEAST:CAPS"></a><h3>RAQM_VERSION_ATLEAST()</h3>
+<pre class="programlisting">#define             RAQM_VERSION_ATLEAST(major,minor,micro)</pre>
+<p>Checks if library version is less than or equal the specified version.</p>
+<div class="refsect3">
+<a name="RAQM-VERSION-ATLEAST.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>major</p></td>
+<td class="parameter_description"><p>Library major version component.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>minor</p></td>
+<td class="parameter_description"><p>Library minor version component.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>micro</p></td>
+<td class="parameter_description"><p>Library micro version component.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="RAQM-VERSION-ATLEAST.returns"></a><h4>Returns</h4>
+<p><code class="literal">true</code> if library version is less than or equal the specified version,
+<code class="literal">false</code> otherwise.</p>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
+</div>
+</div>
+<div class="refsect1">
+<a name="raqm-Raqm.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="RAQM-VERSION-MAJOR:CAPS"></a><h3>RAQM_VERSION_MAJOR</h3>
+<pre class="programlisting">#define RAQM_VERSION_MAJOR 0
+</pre>
+<p>Library major version component.</p>
+<p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="RAQM-VERSION-MICRO:CAPS"></a><h3>RAQM_VERSION_MICRO</h3>
+<pre class="programlisting">#define RAQM_VERSION_MICRO 0
+</pre>
+<p>Library micro version component.</p>
+<p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="RAQM-VERSION-MINOR:CAPS"></a><h3>RAQM_VERSION_MINOR</h3>
+<pre class="programlisting">#define RAQM_VERSION_MINOR 10
+</pre>
+<p>Library minor version component.</p>
+<p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="RAQM-VERSION-STRING:CAPS"></a><h3>RAQM_VERSION_STRING</h3>
+<pre class="programlisting">#define RAQM_VERSION_STRING "0.10.0"
+</pre>
+<p>Library version as a string with three components.</p>
+<p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-t"></a><h3>raqm_t</h3>
+<pre class="programlisting">typedef struct _raqm raqm_t;
+</pre>
+<p>This is the main object holding all state of the currently processed text as
+well as its output.</p>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-direction-t"></a><h3>enum raqm_direction_t</h3>
+<p>Base paragraph direction, see <a class="link" href="raqm-Raqm.html#raqm-set-par-direction" title="raqm_set_par_direction ()"><code class="function">raqm_set_par_direction()</code></a>.</p>
+<div class="refsect3">
+<a name="raqm-direction-t.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="RAQM-DIRECTION-DEFAULT:CAPS"></a>RAQM_DIRECTION_DEFAULT</p></td>
+<td class="enum_member_description">
+<p>Detect paragraph direction automatically.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="RAQM-DIRECTION-RTL:CAPS"></a>RAQM_DIRECTION_RTL</p></td>
+<td class="enum_member_description">
+<p>Paragraph is mainly right-to-left text.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="RAQM-DIRECTION-LTR:CAPS"></a>RAQM_DIRECTION_LTR</p></td>
+<td class="enum_member_description">
+<p>Paragraph is mainly left-to-right text.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="RAQM-DIRECTION-TTB:CAPS"></a>RAQM_DIRECTION_TTB</p></td>
+<td class="enum_member_description">
+<p>Paragraph is mainly vertical top-to-bottom text.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="raqm-glyph-t"></a><h3>raqm_glyph_t</h3>
+<pre class="programlisting">typedef struct {
+    unsigned int index;
+    int x_advance;
+    int y_advance;
+    int x_offset;
+    int y_offset;
+    uint32_t cluster;
+    FT_Face ftface;
+} raqm_glyph_t;
+</pre>
+<p>The structure that holds information about output glyphs, returned from
+<a class="link" href="raqm-Raqm.html#raqm-get-glyphs" title="raqm_get_glyphs ()"><code class="function">raqm_get_glyphs()</code></a>.</p>
+<div class="refsect3">
+<a name="raqm-glyph-t.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="struct_members_name">
+<col class="struct_members_description">
+<col width="200px" class="struct_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="struct_member_name"><p>unsigned <span class="type">int</span> <em class="structfield"><code><a name="raqm-glyph-t.index"></a>index</code></em>;</p></td>
+<td class="struct_member_description"><p>the index of the glyph in the font file.</p></td>
+<td class="struct_member_annotations"> </td>
+</tr>
+<tr>
+<td class="struct_member_name"><p><span class="type">int</span> <em class="structfield"><code><a name="raqm-glyph-t.x-advance"></a>x_advance</code></em>;</p></td>
+<td class="struct_member_description"><p>the glyph advance width in horizontal text.</p></td>
+<td class="struct_member_annotations"> </td>
+</tr>
+<tr>
+<td class="struct_member_name"><p><span class="type">int</span> <em class="structfield"><code><a name="raqm-glyph-t.y-advance"></a>y_advance</code></em>;</p></td>
+<td class="struct_member_description"><p>the glyph advance width in vertical text.</p></td>
+<td class="struct_member_annotations"> </td>
+</tr>
+<tr>
+<td class="struct_member_name"><p><span class="type">int</span> <em class="structfield"><code><a name="raqm-glyph-t.x-offset"></a>x_offset</code></em>;</p></td>
+<td class="struct_member_description"><p>the horizontal movement of the glyph from the current point.</p></td>
+<td class="struct_member_annotations"> </td>
+</tr>
+<tr>
+<td class="struct_member_name"><p><span class="type">int</span> <em class="structfield"><code><a name="raqm-glyph-t.y-offset"></a>y_offset</code></em>;</p></td>
+<td class="struct_member_description"><p>the vertical movement of the glyph from the current point.</p></td>
+<td class="struct_member_annotations"> </td>
+</tr>
+<tr>
+<td class="struct_member_name"><p><span class="type">uint32_t</span> <em class="structfield"><code><a name="raqm-glyph-t.cluster"></a>cluster</code></em>;</p></td>
+<td class="struct_member_description"><p>the index of original character in input text.</p></td>
+<td class="struct_member_annotations"> </td>
+</tr>
+<tr>
+<td class="struct_member_name"><p><span class="type">FT_Face</span> <em class="structfield"><code><a name="raqm-glyph-t.ftface"></a>ftface</code></em>;</p></td>
+<td class="struct_member_description"><p>the <em class="parameter"><code>FT_Face</code></em>
+of the glyph.</p></td>
+<td class="struct_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>Generated by GTK-Doc V1.33.1</div>
+</body>
+</html>

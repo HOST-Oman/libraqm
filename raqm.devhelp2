@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<book xmlns="http://www.devhelp.net/book" title="Raqm Reference Manual" link="index.html" author="" name="raqm" version="2" language="c" online="https://host-oman.github.io/libraqm/">
+  <chapters>
+    <sub name="Raqm API" link="ch01.html">
+      <sub name="Raqm" link="raqm-Raqm.html"/>
+    </sub>
+    <sub name="API Index" link="api-index-full.html"/>
+    <sub name="Index of new symbols in 0.1.x" link="api-index-0-1.html"/>
+    <sub name="Index of new symbols in 0.2.x" link="api-index-0-2.html"/>
+    <sub name="Index of new symbols in 0.3.x" link="api-index-0-3.html"/>
+    <sub name="Index of new symbols in 0.6.x" link="api-index-0-6.html"/>
+    <sub name="Index of new symbols in 0.7.x" link="api-index-0-7.html"/>
+    <sub name="Index of new symbols in 0.8.x" link="api-index-0-8.html"/>
+    <sub name="Index of new symbols in 0.9.x" link="api-index-0-9.html"/>
+    <sub name="Index of new symbols in 0.10.x" link="api-index-0-10.html"/>
+    <sub name="Annotation Glossary" link="annotation-glossary.html"/>
+  </chapters>
+  <functions>
+    <keyword type="function" name="raqm_create ()" link="raqm-Raqm.html#raqm-create" since="0.1"/>
+    <keyword type="function" name="raqm_reference ()" link="raqm-Raqm.html#raqm-reference" since="0.1"/>
+    <keyword type="function" name="raqm_destroy ()" link="raqm-Raqm.html#raqm-destroy" since="0.1"/>
+    <keyword type="function" name="raqm_clear_contents ()" link="raqm-Raqm.html#raqm-clear-contents" since="0.9"/>
+    <keyword type="function" name="raqm_set_text ()" link="raqm-Raqm.html#raqm-set-text" since="0.1"/>
+    <keyword type="function" name="raqm_set_text_utf8 ()" link="raqm-Raqm.html#raqm-set-text-utf8" since="0.1"/>
+    <keyword type="function" name="raqm_set_text_utf16 ()" link="raqm-Raqm.html#raqm-set-text-utf16" since="0.10"/>
+    <keyword type="function" name="raqm_set_par_direction ()" link="raqm-Raqm.html#raqm-set-par-direction" since="0.1"/>
+    <keyword type="function" name="raqm_set_language ()" link="raqm-Raqm.html#raqm-set-language" since="0.2" stability="Unstable"/>
+    <keyword type="function" name="raqm_set_freetype_face ()" link="raqm-Raqm.html#raqm-set-freetype-face" since="0.1"/>
+    <keyword type="function" name="raqm_set_freetype_face_range ()" link="raqm-Raqm.html#raqm-set-freetype-face-range" since="0.1"/>
+    <keyword type="function" name="raqm_set_freetype_load_flags ()" link="raqm-Raqm.html#raqm-set-freetype-load-flags" since="0.3"/>
+    <keyword type="function" name="raqm_set_freetype_load_flags_range ()" link="raqm-Raqm.html#raqm-set-freetype-load-flags-range" since="0.9"/>
+    <keyword type="function" name="raqm_set_letter_spacing_range ()" link="raqm-Raqm.html#raqm-set-letter-spacing-range" since="0.10"/>
+    <keyword type="function" name="raqm_set_word_spacing_range ()" link="raqm-Raqm.html#raqm-set-word-spacing-range" since="0.10"/>
+    <keyword type="function" name="raqm_set_invisible_glyph ()" link="raqm-Raqm.html#raqm-set-invisible-glyph" since="0.6"/>
+    <keyword type="function" name="raqm_add_font_feature ()" link="raqm-Raqm.html#raqm-add-font-feature" since="0.1"/>
+    <keyword type="function" name="raqm_layout ()" link="raqm-Raqm.html#raqm-layout" since="0.1"/>
+    <keyword type="function" name="raqm_get_glyphs ()" link="raqm-Raqm.html#raqm-get-glyphs" since="0.1"/>
+    <keyword type="function" name="raqm_get_par_resolved_direction ()" link="raqm-Raqm.html#raqm-get-par-resolved-direction" since="0.8"/>
+    <keyword type="function" name="raqm_get_direction_at_index ()" link="raqm-Raqm.html#raqm-get-direction-at-index" since="0.8"/>
+    <keyword type="function" name="raqm_index_to_position ()" link="raqm-Raqm.html#raqm-index-to-position" since="0.2"/>
+    <keyword type="function" name="raqm_position_to_index ()" link="raqm-Raqm.html#raqm-position-to-index" since="0.2"/>
+    <keyword type="function" name="raqm_version ()" link="raqm-Raqm.html#raqm-version" since="0.7"/>
+    <keyword type="function" name="raqm_version_atleast ()" link="raqm-Raqm.html#raqm-version-atleast" since="0.7"/>
+    <keyword type="function" name="raqm_version_string ()" link="raqm-Raqm.html#raqm-version-string" since="0.7"/>
+    <keyword type="macro" name="RAQM_VERSION_ATLEAST()" link="raqm-Raqm.html#RAQM-VERSION-ATLEAST:CAPS" since="0.7"/>
+    <keyword type="macro" name="RAQM_VERSION_MAJOR" link="raqm-Raqm.html#RAQM-VERSION-MAJOR:CAPS" since="0.7"/>
+    <keyword type="macro" name="RAQM_VERSION_MICRO" link="raqm-Raqm.html#RAQM-VERSION-MICRO:CAPS" since="0.7"/>
+    <keyword type="macro" name="RAQM_VERSION_MINOR" link="raqm-Raqm.html#RAQM-VERSION-MINOR:CAPS" since="0.7"/>
+    <keyword type="macro" name="RAQM_VERSION_STRING" link="raqm-Raqm.html#RAQM-VERSION-STRING:CAPS" since="0.7"/>
+    <keyword type="typedef" name="raqm_t" link="raqm-Raqm.html#raqm-t" since="0.1"/>
+    <keyword type="enum" name="enum raqm_direction_t" link="raqm-Raqm.html#raqm-direction-t" since="0.1"/>
+    <keyword type="struct" name="raqm_glyph_t" link="raqm-Raqm.html#raqm-glyph-t"/>
+    <keyword type="constant" name="RAQM_DIRECTION_DEFAULT" link="raqm-Raqm.html#RAQM-DIRECTION-DEFAULT:CAPS"/>
+    <keyword type="constant" name="RAQM_DIRECTION_RTL" link="raqm-Raqm.html#RAQM-DIRECTION-RTL:CAPS"/>
+    <keyword type="constant" name="RAQM_DIRECTION_LTR" link="raqm-Raqm.html#RAQM-DIRECTION-LTR:CAPS"/>
+    <keyword type="constant" name="RAQM_DIRECTION_TTB" link="raqm-Raqm.html#RAQM-DIRECTION-TTB:CAPS"/>
+    <keyword type="member" name="raqm-glyph-t.index" link="raqm-Raqm.html#raqm-glyph-t.index"/>
+    <keyword type="member" name="raqm-glyph-t.x-advance" link="raqm-Raqm.html#raqm-glyph-t.x-advance"/>
+    <keyword type="member" name="raqm-glyph-t.y-advance" link="raqm-Raqm.html#raqm-glyph-t.y-advance"/>
+    <keyword type="member" name="raqm-glyph-t.x-offset" link="raqm-Raqm.html#raqm-glyph-t.x-offset"/>
+    <keyword type="member" name="raqm-glyph-t.y-offset" link="raqm-Raqm.html#raqm-glyph-t.y-offset"/>
+    <keyword type="member" name="raqm-glyph-t.cluster" link="raqm-Raqm.html#raqm-glyph-t.cluster"/>
+    <keyword type="member" name="raqm-glyph-t.ftface" link="raqm-Raqm.html#raqm-glyph-t.ftface"/>
+  </functions>
+</book>
