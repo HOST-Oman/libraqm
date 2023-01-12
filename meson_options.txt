@@ -1,9 +1,13 @@
-option('docs',
-       description: 'Build API reference using GTK-Doc',
-       type: 'boolean',
-       value: false)
+option(
+    'docs',
+    description: 'Build API reference using GTK-Doc',
+    type: 'boolean',
+    value: false,
+)
 
-option('sheenbidi',
-       description: 'Use SheenBidi instead of Fribidi',
-       type: 'boolean',
-       value: false)
+option(
+    'sheenbidi',
+    description: 'Use SheenBidi instead of Fribidi',
+    type: 'boolean',
+    value: false,
+)
