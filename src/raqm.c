@@ -1428,7 +1428,7 @@ raqm_get_glyphs (raqm_t *rq,
  *
  * Since: 0.8
  */
-RAQM_API raqm_direction_t
+raqm_direction_t
 raqm_get_par_resolved_direction (raqm_t *rq)
 {
   if (!rq)
@@ -1451,7 +1451,7 @@ raqm_get_par_resolved_direction (raqm_t *rq)
  *
  * Since: 0.8
  */
-RAQM_API raqm_direction_t
+raqm_direction_t
 raqm_get_direction_at_index (raqm_t *rq,
                              size_t index)
 {
