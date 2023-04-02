@@ -1,0 +1,46 @@
+fonts/sha1sum/83db7d61f9292c18c951662f254f4ad038e41639.otf
+عַرַبִي
+
+Direction is: DEFAULT
+
+Before script detection:
+script for ch[0]	Arab
+script for ch[1]	Zinh
+script for ch[2]	Arab
+script for ch[3]	Zinh
+script for ch[4]	Arab
+script for ch[5]	Zinh
+script for ch[6]	Arab
+
+After script detection:
+script for ch[0]	Arab
+script for ch[1]	Arab
+script for ch[2]	Arab
+script for ch[3]	Arab
+script for ch[4]	Arab
+script for ch[5]	Arab
+script for ch[6]	Arab
+
+Resolved direction is: RTL
+
+Number of runs before script itemization: 1
+
+BiDi Runs:
+run[0]:	 start: 0	length: 7	level: 1
+
+Number of runs after script itemization: 1
+
+Final Runs:
+run[0]:	 start: 0	length: 7	direction: rtl	script: Arab	font: Noto AH Test
+
+Glyph information:
+glyph [12]	x_offset: 0	y_offset: 0	x_advance: 687	font: Noto AH Test
+glyph [15]	x_offset: 57	y_offset: -239	x_advance: 0	font: Noto AH Test
+glyph [4]	x_offset: 0	y_offset: 0	x_advance: 275	font: Noto AH Test
+glyph [16]	x_offset: -23	y_offset: -258	x_advance: 0	font: Noto AH Test
+glyph [6]	x_offset: 0	y_offset: 0	x_advance: 404	font: Noto AH Test
+glyph [16]	x_offset: 133	y_offset: -100	x_advance: 0	font: Noto AH Test
+glyph [10]	x_offset: 0	y_offset: 0	x_advance: 505	font: Noto AH Test
+
+UTF-32 clusters: 06 04 04 02 02 00 00
+UTF-8 clusters:  12 08 08 04 04 00 00

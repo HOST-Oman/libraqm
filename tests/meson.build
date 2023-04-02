@@ -50,6 +50,7 @@ tests = [
     'scripts-backward-rtl.test',
     'scripts-backward.test',
     'scripts-common.test',
+    'scripts-combinig-marks.test',
     'scripts-forward-ltr.test',
     'scripts-forward-rtl.test',
     'scripts-forward.test',
