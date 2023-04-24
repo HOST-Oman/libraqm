@@ -1110,12 +1110,12 @@ _raqm_set_spacing (raqm_t *rq,
       {
         if (_raqm_allowed_grapheme_boundary (rq->text[i], rq->text[i+1]))
         {
-          /* CSS word seperators, word spacing is only applied on these.*/
+          /* CSS word separators, word spacing is only applied on these.*/
           if (rq->text[i] == 0x0020  || /* Space */
               rq->text[i] == 0x00A0  || /* No Break Space */
               rq->text[i] == 0x1361  || /* Ethiopic Word Space */
-              rq->text[i] == 0x10100 || /* Aegean Word Seperator Line */
-              rq->text[i] == 0x10101 || /* Aegean Word Seperator Dot */
+              rq->text[i] == 0x10100 || /* Aegean Word Separator Line */
+              rq->text[i] == 0x10101 || /* Aegean Word Separator Dot */
               rq->text[i] == 0x1039F || /* Ugaric Word Divider */
               rq->text[i] == 0x1091F)   /* Phoenician Word Separator */
           {
