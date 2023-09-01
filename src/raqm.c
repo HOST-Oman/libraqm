@@ -595,9 +595,9 @@ _raqm_get_utf16_codepoint (const void *str,
 {
   const uint16_t *s = (const uint16_t *)str;
 
-  if (s[0] > 0xD800 && s[0] < 0xDBFF)
+  if (s[0] >= 0xD800 && s[0] <= 0xDBFF)
   {
-    if (s[1] > 0xDC00 && s[1] < 0xDFFF)
+    if (s[1] >= 0xDC00 && s[1] <= 0xDFFF)
     {
       uint32_t X = ((s[0] & ((1 << 6) -1)) << 10) | (s[1] & ((1 << 10) -1));
       uint32_t W = (s[0] >> 6) & ((1 << 5) - 1);
