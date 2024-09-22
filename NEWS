@@ -1,3 +1,9 @@
+Overview of changes leading to 0.10.2
+Sunday, September 22, 2024
+====================================
+
+Fix Unicode codepoint conversion from UTF-16.
+
 Overview of changes leading to 0.10.1
 Wednesday, April 12, 2023
 ====================================
