@@ -544,28 +544,33 @@ raqm_set_text (raqm_t         *rq,
 
 static void *
 _raqm_get_utf8_codepoint (const void *str,
-                          uint32_t *out_codepoint)
+                          uint32_t *out_codepoint,
+                          int *codepoint_len)
 {
   const char *s = (const char *)str;
 
   if (0xf0 == (0xf8 & s[0]))
   {
     *out_codepoint = ((0x07 & s[0]) << 18) | ((0x3f & s[1]) << 12) | ((0x3f & s[2]) << 6) | (0x3f & s[3]);
+    *codepoint_len = 4;
     s += 4;
   }
   else if (0xe0 == (0xf0 & s[0]))
   {
     *out_codepoint = ((0x0f & s[0]) << 12) | ((0x3f & s[1]) << 6) | (0x3f & s[2]);
+    *codepoint_len = 3;
     s += 3;
   }
   else if (0xc0 == (0xe0 & s[0]))
   {
     *out_codepoint = ((0x1f & s[0]) << 6) | (0x3f & s[1]);
+    *codepoint_len = 2;
     s += 2;
   }
   else
   {
     *out_codepoint = s[0];
+    *codepoint_len = 1;
     s += 1;
   }
 
@@ -581,9 +586,10 @@ _raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
 
   while ((*in_utf8 != '\0') && (in_len < len))
   {
-    in_utf8 = _raqm_get_utf8_codepoint (in_utf8, out_utf32);
+    int codepoint_len;
+    in_utf8 = _raqm_get_utf8_codepoint (in_utf8, out_utf32, &codepoint_len);
     ++out_utf32;
-    ++in_len;
+    in_len += codepoint_len;
   }
 
   return (out_utf32 - unicode);
@@ -591,7 +597,8 @@ _raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
 
 static void *
 _raqm_get_utf16_codepoint (const void *str,
-                          uint32_t *out_codepoint)
+                          uint32_t *out_codepoint,
+                          int* codepoint_len)
 {
   const uint16_t *s = (const uint16_t *)str;
 
@@ -602,18 +609,21 @@ _raqm_get_utf16_codepoint (const void *str,
       uint32_t X = ((s[0] & ((1 << 6) -1)) << 10) | (s[1] & ((1 << 10) -1));
       uint32_t W = (s[0] >> 6) & ((1 << 5) - 1);
       *out_codepoint = (W+1) << 16 | X;
+      *codepoint_len = 2;
       s += 2;
     }
     else
     {
       /* A single high surrogate, this is an error. */
       *out_codepoint = s[0];
+      *codepoint_len = 1;
       s += 1;
     }
   }
   else
   {
       *out_codepoint = s[0];
+      *codepoint_len = 1;
       s += 1;
   }
   return (void *)s;
@@ -628,9 +638,10 @@ _raqm_u16_to_u32 (const uint16_t *text, size_t len, uint32_t *unicode)
 
   while ((*in_utf16 != '\0') && (in_len < len))
   {
-    in_utf16 = _raqm_get_utf16_codepoint (in_utf16, out_utf32);
+    int codepoint_len;
+    in_utf16 = _raqm_get_utf16_codepoint (in_utf16, out_utf32, &codepoint_len);
     ++out_utf32;
-    ++in_len;
+    in_len += codepoint_len;
   }
 
   return (out_utf32 - unicode);
