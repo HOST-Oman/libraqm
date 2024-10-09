@@ -542,34 +542,32 @@ raqm_set_text (raqm_t         *rq,
   return true;
 }
 
-static void *
-_raqm_get_utf8_codepoint (const void *str,
+static const char *
+_raqm_get_utf8_codepoint (const char *str,
                           uint32_t *out_codepoint)
 {
-  const char *s = (const char *)str;
-
-  if (0xf0 == (0xf8 & s[0]))
+  if (0xf0 == (0xf8 & str[0]))
   {
-    *out_codepoint = ((0x07 & s[0]) << 18) | ((0x3f & s[1]) << 12) | ((0x3f & s[2]) << 6) | (0x3f & s[3]);
-    s += 4;
+    *out_codepoint = ((0x07 & str[0]) << 18) | ((0x3f & str[1]) << 12) | ((0x3f & str[2]) << 6) | (0x3f & str[3]);
+    str += 4;
   }
-  else if (0xe0 == (0xf0 & s[0]))
+  else if (0xe0 == (0xf0 & str[0]))
   {
-    *out_codepoint = ((0x0f & s[0]) << 12) | ((0x3f & s[1]) << 6) | (0x3f & s[2]);
-    s += 3;
+    *out_codepoint = ((0x0f & str[0]) << 12) | ((0x3f & str[1]) << 6) | (0x3f & str[2]);
+    str += 3;
   }
-  else if (0xc0 == (0xe0 & s[0]))
+  else if (0xc0 == (0xe0 & str[0]))
   {
-    *out_codepoint = ((0x1f & s[0]) << 6) | (0x3f & s[1]);
-    s += 2;
+    *out_codepoint = ((0x1f & str[0]) << 6) | (0x3f & str[1]);
+    str += 2;
   }
   else
   {
-    *out_codepoint = s[0];
-    s += 1;
+    *out_codepoint = str[0];
+    str += 1;
   }
 
-  return (void *)s;
+  return str;
 }
 
 static size_t
@@ -590,34 +588,32 @@ _raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
   return (out_utf32 - unicode);
 }
 
-static void *
-_raqm_get_utf16_codepoint (const void *str,
-                          uint32_t *out_codepoint)
+static const uint16_t *
+_raqm_get_utf16_codepoint (const uint16_t *str,
+                           uint32_t *out_codepoint)
 {
-  const uint16_t *s = (const uint16_t *)str;
-
-  if (s[0] >= 0xD800 && s[0] <= 0xDBFF)
+  if (str[0] >= 0xD800 && str[0] <= 0xDBFF)
   {
-    if (s[1] >= 0xDC00 && s[1] <= 0xDFFF)
+    if (str[1] >= 0xDC00 && str[1] <= 0xDFFF)
     {
-      uint32_t X = ((s[0] & ((1 << 6) -1)) << 10) | (s[1] & ((1 << 10) -1));
-      uint32_t W = (s[0] >> 6) & ((1 << 5) - 1);
+      uint32_t X = ((str[0] & ((1 << 6) -1)) << 10) | (str[1] & ((1 << 10) -1));
+      uint32_t W = (str[0] >> 6) & ((1 << 5) - 1);
       *out_codepoint = (W+1) << 16 | X;
-      s += 2;
+      str += 2;
     }
     else
     {
       /* A single high surrogate, this is an error. */
-      *out_codepoint = s[0];
-      s += 1;
+      *out_codepoint = str[0];
+      str += 1;
     }
   }
   else
   {
-      *out_codepoint = s[0];
-      s += 1;
+      *out_codepoint = str[0];
+      str += 1;
   }
-  return (void *)s;
+  return str;
 }
 
 static size_t
