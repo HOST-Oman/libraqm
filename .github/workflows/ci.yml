@@ -36,7 +36,7 @@ jobs:
       with:
         arch: x64
     - name: Meson Setup
-      run: meson build $(test $MATRIX_OS = "ubuntu-latest" && echo "-Ddocs=true")
+      run: meson setup build $(test $MATRIX_OS = "ubuntu-latest" && echo "-Ddocs=true")
     - name: Build
       run: ninja -C build
     - name: Test
