@@ -581,9 +581,10 @@ _raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
 
   while ((*in_utf8 != '\0') && (in_len < len))
   {
-    in_utf8 = _raqm_get_utf8_codepoint (in_utf8, out_utf32);
+    const char *out_utf8 = _raqm_get_utf8_codepoint (in_utf8, out_utf32);
+    in_len += out_utf8 - in_utf8;
+    in_utf8 = out_utf8;
     ++out_utf32;
-    ++in_len;
   }
 
   return (out_utf32 - unicode);
@@ -628,9 +629,10 @@ _raqm_u16_to_u32 (const uint16_t *text, size_t len, uint32_t *unicode)
 
   while ((*in_utf16 != '\0') && (in_len < len))
   {
-    in_utf16 = _raqm_get_utf16_codepoint (in_utf16, out_utf32);
+    const uint16_t *out_utf16 = _raqm_get_utf16_codepoint (in_utf16, out_utf32);
+    in_len += (out_utf16 - in_utf16);
+    in_utf16 = out_utf16;
     ++out_utf32;
-    ++in_len;
   }
 
   return (out_utf32 - unicode);
