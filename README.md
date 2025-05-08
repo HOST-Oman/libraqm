@@ -1,5 +1,5 @@
 Raqm
-====
+===
 
 [![Build](https://github.com/HOST-Oman/libraqm/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/HOST-Oman/libraqm/actions)
 
