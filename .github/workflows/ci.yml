@@ -51,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -60,6 +60,11 @@ jobs:
         python-version: '3.10'
     - name: Install Python Dependencies
       run: pip install --upgrade meson ninja
+    - name: MSVC Setup
+      if: matrix.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
     - name: Meson Setup
       run: meson -Dsheenbidi=true build
     - name: Build
