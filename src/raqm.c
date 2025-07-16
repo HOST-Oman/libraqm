@@ -30,7 +30,11 @@
 #include <string.h>
 
 #ifdef RAQM_SHEENBIDI
+#ifdef RAQM_SHEENBIDI_GT_2_9
+#include <SheenBidi/SheenBidi.h>
+#else
 #include <SheenBidi.h>
+#endif
 #else
 #include <fribidi.h>
 #endif
