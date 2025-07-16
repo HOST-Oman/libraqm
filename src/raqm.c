@@ -2165,6 +2165,10 @@ _raqm_ft_transform (int      *x,
   *y = vector.y;
 }
 
+#if !HB_VERSION_ATLEAST (10, 4, 0)
+# define hb_ft_font_get_ft_face hb_ft_font_get_face
+#endif
+
 static bool
 _raqm_shape (raqm_t *rq)
 {
@@ -2197,7 +2201,7 @@ _raqm_shape (raqm_t *rq)
       hb_glyph_position_t *pos;
       unsigned int len;
 
-      FT_Get_Transform (hb_ft_font_get_face (run->font), &matrix, NULL);
+      FT_Get_Transform (hb_ft_font_get_ft_face (run->font), &matrix, NULL);
       pos = hb_buffer_get_glyph_positions (run->buffer, &len);
       info = hb_buffer_get_glyph_infos (run->buffer, &len);
 
