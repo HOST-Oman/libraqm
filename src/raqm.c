@@ -156,6 +156,7 @@
 
 #ifdef RAQM_TESTING
 #include <stdio.h>
+#include <hb-ot.h> // for family name
 # define RAQM_TEST(...) printf (__VA_ARGS__)
 # define SCRIPT_TO_STRING(script) \
     char buff[5]; \
@@ -1203,6 +1204,15 @@ raqm_get_glyphs (raqm_t *rq,
     hb_glyph_info_t *info;
     hb_glyph_position_t *position;
 
+#ifdef RAQM_TESTING
+    char family[128];
+    uint32_t family_name_len = sizeof(family);
+    hb_face_t *face = hb_font_get_face(run->font);
+    hb_ot_name_id_t name_id = HB_OT_NAME_ID_FONT_FAMILY;
+    hb_language_t language  = HB_LANGUAGE_INVALID;
+    hb_ot_name_get_utf8 (face, name_id, language, &family_name_len, family);
+#endif
+
     len = hb_buffer_get_length (run->buffer);
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
@@ -1217,9 +1227,10 @@ raqm_get_glyphs (raqm_t *rq,
       rq->glyphs[count + i].y_offset = position[i].y_offset;
       rq->glyphs[count + i].hbfont = rq->text_info[info[i].cluster].hbfont;
 
-      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\t\n",
+      RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\tfont: %s\n",
           rq->glyphs[count + i].index, rq->glyphs[count + i].x_offset,
-          rq->glyphs[count + i].y_offset, rq->glyphs[count + i].x_advance);
+          rq->glyphs[count + i].y_offset, rq->glyphs[count + i].x_advance,
+          family);
     }
 
     count += len;
@@ -1702,10 +1713,19 @@ _raqm_itemize (raqm_t *rq)
   RAQM_TEST ("Final Runs:\n");
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
+#ifdef RAQM_TESTING
+    char family[128];
+    uint32_t family_name_len = sizeof(family);
+    hb_face_t *face = hb_font_get_face(run->font);
+    hb_ot_name_id_t name_id = HB_OT_NAME_ID_FONT_FAMILY;
+    hb_language_t language  = HB_LANGUAGE_INVALID;
+    hb_ot_name_get_utf8 (face, name_id, language, &family_name_len, family);
+#endif
+
     SCRIPT_TO_STRING (run->script);
-    RAQM_TEST ("run[%zu]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\n",
+    RAQM_TEST ("run[%zu]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
                run_count++, run->pos, run->len,
-               hb_direction_to_string (run->direction), buff);
+               hb_direction_to_string (run->direction), buff, family);
   }
   RAQM_TEST ("\n");
 #endif
