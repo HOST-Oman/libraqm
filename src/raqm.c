@@ -28,6 +28,9 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
+
+#include <stdio.h> // debug
 
 #ifdef RAQM_SHEENBIDI
 #ifdef RAQM_SHEENBIDI_GT_2_9
@@ -40,7 +43,9 @@
 #endif
 
 #include <hb.h>
+#ifdef RAQM_FREETYPE
 #include <hb-ft.h>
+#endif
 
 #include "raqm.h"
 
@@ -152,7 +157,10 @@
 #define RAQM_DBG(...)
 #endif
 
+#define RAQM_TESTING
+
 #ifdef RAQM_TESTING
+#include <stdio.h>
 # define RAQM_TEST(...) printf (__VA_ARGS__)
 # define SCRIPT_TO_STRING(script) \
     char buff[5]; \
@@ -173,8 +181,12 @@
 
 typedef struct
 {
+#ifdef RAQM_FREETYPE
   FT_Face       ftface;
   int           ftloadflags;
+#else
+  hb_font_t    *hbfont;
+#endif
   hb_language_t lang;
   hb_script_t   script;
   int           spacing_after;
@@ -236,8 +248,12 @@ _raqm_init_text_info (raqm_t *rq)
   hb_language_t default_lang = hb_language_get_default ();
   for (size_t i = 0; i < rq->text_len; i++)
   {
+#ifdef RAQM_FREETYPE
     rq->text_info[i].ftface = NULL;
     rq->text_info[i].ftloadflags = -1;
+#else
+    rq->text_info[i].hbfont = NULL;
+#endif
     rq->text_info[i].lang = default_lang;
     rq->text_info[i].script = HB_SCRIPT_INVALID;
     rq->text_info[i].spacing_after = 0;
@@ -250,22 +266,29 @@ _raqm_release_text_info (raqm_t *rq)
   if (!rq->text_info)
     return;
 
+#ifdef RAQM_FREETYPE
   for (size_t i = 0; i < rq->text_len; i++)
   {
     if (rq->text_info[i].ftface)
       FT_Done_Face (rq->text_info[i].ftface);
   }
+#endif
 }
 
 static bool
 _raqm_compare_text_info (_raqm_text_info a,
                          _raqm_text_info b)
 {
+#ifdef RAQM_FREETYPE
   if (a.ftface != b.ftface)
     return false;
 
   if (a.ftloadflags != b.ftloadflags)
     return false;
+#else
+  if (a.hbfont != b.hbfont)
+    return false;
+#endif
 
   if (a.lang != b.lang)
     return false;
@@ -358,8 +381,10 @@ _raqm_free_runs (raqm_run_t *runs)
     if (run->buffer)
       hb_buffer_destroy (run->buffer);
 
+#ifdef RAQM_FREETYPE
     if (run->font)
       hb_font_destroy (run->font);
+#endif
 
     free (run);
   }
@@ -483,11 +508,15 @@ raqm_clear_contents (raqm_t *rq)
     if (run->buffer)
       hb_buffer_reset (run->buffer);
 
+#ifdef RAQM_FREETYPE
     if (run->font)
     {
       hb_font_destroy (run->font);
       run->font = NULL;
     }
+#else
+    run->font = NULL;
+#endif
 
     if (!run->next)
     {
@@ -880,6 +909,8 @@ raqm_add_font_feature (raqm_t     *rq,
   return ok;
 }
 
+#ifdef RAQM_FREETYPE
+
 static hb_font_t *
 _raqm_create_hb_font (raqm_t *rq,
                       FT_Face face,
@@ -1080,6 +1111,65 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
 
   return _raqm_set_freetype_load_flags (rq, flags, start, end);
 }
+
+#else
+
+
+static bool
+_raqm_set_hb_font (raqm_t *rq,
+                   hb_font_t* font,
+                   size_t  start,
+                   size_t  end)
+{
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  if (start >= rq->text_len || end > rq->text_len)
+    return false;
+
+  if (!rq->text_info)
+    return false;
+
+  for (size_t i = start; i < end; i++)
+  {
+    rq->text_info[i].hbfont = font;
+  }
+
+  return true;
+}
+
+RAQM_API bool
+raqm_set_hb_font (raqm_t *rq,
+                  hb_font_t* font)
+{
+
+  return _raqm_set_hb_font (rq, font, 0, rq->text_len);
+}
+
+RAQM_API bool
+raqm_set_hb_font_range (raqm_t *rq,
+                        hb_font_t* font,
+                        size_t  start,
+                        size_t  len)
+{
+  size_t end;
+
+  if (!rq)
+    return false;
+
+  if (!rq->text_len)
+    return true;
+
+  end = _raqm_encoding_to_u32_index (rq, start + len);
+  start = _raqm_encoding_to_u32_index (rq, start);
+
+  return _raqm_set_hb_font (rq, font, start, end);
+}
+
+#endif // RAQM_FREETYPE
 
 static bool
 _raqm_set_spacing (raqm_t *rq,
@@ -1292,8 +1382,13 @@ raqm_layout (raqm_t *rq)
 
   for (size_t i = 0; i < rq->text_len; i++)
   {
+#ifdef RAQM_FREETYPE
       if (!rq->text_info[i].ftface)
           return false;
+#else
+      if (!rq->text_info[i].hbfont)
+          return false;
+#endif
   }
 
   if (!_raqm_itemize (rq))
@@ -1378,12 +1473,21 @@ raqm_get_glyphs (raqm_t *rq,
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
+#ifdef RAQM_FREETYPE
       rq->glyphs[count + i].ftface = rq->text_info[info[i].cluster].ftface;
+#else
+      rq->glyphs[count + i].hbfont = rq->text_info[info[i].cluster].hbfont;
+#endif
 
       RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\tfont: %s\n",
           rq->glyphs[count + i].index, rq->glyphs[count + i].x_offset,
           rq->glyphs[count + i].y_offset, rq->glyphs[count + i].x_advance,
-          rq->glyphs[count + i].ftface->family_name);
+#ifdef RAQM_FREETYPE
+          rq->glyphs[count + i].ftface->family_name
+#else
+          "TODO: family name"
+#endif
+          );
     }
 
     count += len;
@@ -1794,8 +1898,13 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos + runs[i].len - 1;
       run->script = rq->text_info[run->pos].script;
+#ifdef RAQM_FREETYPE
       run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface,
           rq->text_info[run->pos].ftloadflags);
+#else
+      run->font = rq->text_info[run->pos].hbfont;
+#endif
+
       for (int j = runs[i].len - 1; j >= 0; j--)
       {
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
@@ -1811,8 +1920,13 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = info.script;
+
+#ifdef RAQM_FREETYPE
           newrun->font = _raqm_create_hb_font (rq, info.ftface,
               info.ftloadflags);
+#else
+          newrun->font = info.hbfont;
+#endif
           run->next = newrun;
           run = newrun;
         }
@@ -1827,8 +1941,12 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos;
       run->script = rq->text_info[run->pos].script;
+#ifdef RAQM_FREETYPE
       run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface,
           rq->text_info[run->pos].ftloadflags);
+#else
+      run->font = rq->text_info[run->pos].hbfont;
+#endif
       for (size_t j = 0; j < runs[i].len; j++)
       {
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
@@ -1844,8 +1962,12 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = info.script;
+#ifdef RAQM_FREETYPE
           newrun->font = _raqm_create_hb_font (rq, info.ftface,
               info.ftloadflags);
+#else
+          newrun->font = info.hbfont;
+#endif
           run->next = newrun;
           run = newrun;
         }
@@ -1872,7 +1994,12 @@ _raqm_itemize (raqm_t *rq)
     RAQM_TEST ("run[%zu]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
                run_count++, run->pos, run->len,
                hb_direction_to_string (run->direction), buff,
-               rq->text_info[run->pos].ftface->family_name);
+#ifdef RAQM_FREETYPE
+               rq->text_info[run->pos].ftface->family_name
+#else
+               "TODO: family name"
+#endif
+               );
   }
   RAQM_TEST ("\n");
 #endif
@@ -2150,6 +2277,7 @@ _raqm_resolve_scripts (raqm_t *rq)
   return true;
 }
 
+#ifdef RAQM_FREETYPE
 static void
 _raqm_ft_transform (int      *x,
                     int      *y,
@@ -2164,6 +2292,7 @@ _raqm_ft_transform (int      *x,
   *x = vector.x;
   *y = vector.y;
 }
+#endif
 
 #if !HB_VERSION_ATLEAST (10, 4, 0)
 # define hb_ft_font_get_ft_face hb_ft_font_get_face
@@ -2196,19 +2325,25 @@ _raqm_shape (raqm_t *rq)
                    NULL);
 
     {
+#ifdef RAQM_FREETYPE
       FT_Matrix matrix;
+#endif
       hb_glyph_info_t *info;
       hb_glyph_position_t *pos;
       unsigned int len;
 
+#ifdef RAQM_FREETYPE
       FT_Get_Transform (hb_ft_font_get_ft_face (run->font), &matrix, NULL);
+#endif
       pos = hb_buffer_get_glyph_positions (run->buffer, &len);
       info = hb_buffer_get_glyph_infos (run->buffer, &len);
 
       for (unsigned int i = 0; i < len; i++)
       {
+#ifdef RAQM_FREETYPE
         _raqm_ft_transform (&pos[i].x_advance, &pos[i].y_advance, matrix);
         _raqm_ft_transform (&pos[i].x_offset, &pos[i].y_offset, matrix);
+#endif
 
         bool set_spacing = false;
         if (run->direction == HB_DIRECTION_RTL)

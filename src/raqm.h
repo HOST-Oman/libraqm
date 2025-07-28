@@ -36,8 +36,11 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#ifdef RAQM_FREETYPE
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,25 +79,30 @@ typedef enum
 
 /**
  * raqm_glyph_t:
+ * @hbfont: the harfbuzz font of the glyph. (Only available if RAQM_FREETYPE is not defined)
+ * @ftface: the @FT_Face of the glyph. (Only available if RAQM_FREETYPE is defined)
  * @index: the index of the glyph in the font file.
  * @x_advance: the glyph advance width in horizontal text.
  * @y_advance: the glyph advance width in vertical text.
  * @x_offset: the horizontal movement of the glyph from the current point.
  * @y_offset: the vertical movement of the glyph from the current point.
  * @cluster: the index of original character in input text.
- * @ftface: the @FT_Face of the glyph.
  *
  * The structure that holds information about output glyphs, returned from
  * raqm_get_glyphs().
  */
 typedef struct raqm_glyph_t {
+#ifdef RAQM_FREETYPE
+    FT_Face ftface;
+#else
+    hb_font_t* hbfont;
+#endif
     unsigned int index;
     int x_advance;
     int y_advance;
     int x_offset;
     int y_offset;
     uint32_t cluster;
-    FT_Face ftface;
 } raqm_glyph_t;
 
 RAQM_API raqm_t *
@@ -138,6 +146,8 @@ raqm_add_font_feature  (raqm_t     *rq,
                         const char *feature,
                         int         len);
 
+#ifdef RAQM_FREETYPE
+
 RAQM_API bool
 raqm_set_freetype_face (raqm_t *rq,
                         FT_Face face);
@@ -157,6 +167,19 @@ raqm_set_freetype_load_flags_range (raqm_t *rq,
                                     int     flags,
                                     size_t  start,
                                     size_t  len);
+#else
+
+RAQM_API bool
+raqm_set_hb_font (raqm_t *rq,
+                        hb_font_t* font);
+
+RAQM_API bool
+raqm_set_hb_font_range (raqm_t *rq,
+                              hb_font_t* font,
+                              size_t  start,
+                              size_t  len);
+
+#endif // RAQM_FREETYPE
 
 RAQM_API bool
 raqm_set_letter_spacing_range(raqm_t *rq,
