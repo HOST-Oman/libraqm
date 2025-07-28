@@ -30,8 +30,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <stdio.h> // debug
-
 #ifdef RAQM_SHEENBIDI
 #ifdef RAQM_SHEENBIDI_GT_2_9
 #include <SheenBidi/SheenBidi.h>
