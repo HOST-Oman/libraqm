@@ -154,8 +154,6 @@
 #define RAQM_DBG(...)
 #endif
 
-#define RAQM_TESTING
-
 #ifdef RAQM_TESTING
 #include <stdio.h>
 # define RAQM_TEST(...) printf (__VA_ARGS__)
