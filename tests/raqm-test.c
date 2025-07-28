@@ -27,6 +27,8 @@
 #include <assert.h>
 #include <errno.h>
 #include <locale.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <hb.h>
@@ -48,6 +50,15 @@ static int invisible_glyph = 0;
 
 /* Special exit code, recognized by automake that we're skipping a test. */
 static const int skip_exit_status = 77;
+
+typedef struct _font_data
+{
+  hb_blob_t *blob;
+  hb_face_t *face;
+  hb_font_t *font;
+  void      *data;
+  struct _font_data* next;
+} font_data_t;
 
 static char*
 encode_bytes (const char *bytes)
@@ -134,28 +145,87 @@ has_requirement (char *req)
     return ver >= req_ver;
   }
 
-  if (strcmp (req, "FT_") > 0)
-  {
-    long req_ver = strtol (req + strlen ("FT_"), NULL, 10);
-    long ver = FREETYPE_MAJOR*10000 + FREETYPE_MINOR*100 + FREETYPE_PATCH;
-    return ver >= req_ver;
-  }
-
   fprintf (stderr, "Unknown requirement: %s\n", req);
   return false;
+}
+
+static void*
+read_file (const char* path, size_t* file_size)
+{
+    void* mem;
+    size_t size, nread;
+    FILE* file;
+
+    file = fopen(path, "rb");
+    if (!file)
+    {
+        printf("Failed to load %s\n", path);
+        return 0;
+    }
+
+    fseek(file, 0, SEEK_END);
+    size = (size_t)ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    mem = malloc(size);
+
+    nread = fread(mem, 1, size, file);
+    fclose(file);
+
+    if (nread != size)
+    {
+        fprintf(stderr, "Failed to read %zu bytes from %s\n", size, path);
+        free(mem);
+        return 0;
+    }
+
+    if (file_size)
+        *file_size = size;
+
+    return mem;
+}
+
+static font_data_t*
+load_font(const char* path)
+{
+    size_t fontdata_size;
+    font_data_t *font = (font_data_t*)malloc(sizeof(font_data_t));
+    font->next = 0;
+    font->data = read_file(path, &fontdata_size);
+    assert (font->data != 0);
+
+    font->blob = hb_blob_create(font->data, fontdata_size, HB_MEMORY_MODE_READONLY, 0, 0);
+    assert (font->blob != 0);
+    font->face = hb_face_create(font->blob, 0);
+    assert (font->face != 0);
+    font->font = hb_font_create(font->face);
+    assert (font->font != 0);
+
+    return font;
+}
+
+static void
+free_font(font_data_t* font)
+{
+  if (font->font)
+    hb_font_destroy(font->font);
+  if (font->face)
+    hb_face_destroy(font->face);
+  if (font->blob)
+    hb_blob_destroy(font->blob);
+  free((void*)font->data);
+  free((void*)font);
 }
 
 int
 main (int argc, char **argv)
 {
-  FT_Library library;
-  FT_Face face;
-
   raqm_t *rq;
   raqm_glyph_t *glyphs;
   size_t count, start_index, index;
   raqm_direction_t dir;
   int x = 0, y = 0;
+  font_data_t* fontdata = 0;
 
   unsigned int major, minor, micro;
 
@@ -198,23 +268,23 @@ main (int argc, char **argv)
   rq = raqm_create ();
   assert (raqm_set_text_utf8 (rq, text, strlen (text)));
   assert (raqm_set_par_direction (rq, dir));
-  assert (!FT_Init_FreeType (&library));
 
   if (fonts)
   {
     for (char *tok = strtok (fonts, ","); tok; tok = strtok (NULL, ","))
     {
       int start, length;
-      assert (!FT_New_Face (library, tok, 0, &face));
-      assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
+      font_data_t* font = load_font(tok);
+      assert (font != 0);
+      font->next = fontdata;
       start = atoi (strtok (NULL, ","));
       length = atoi (strtok (NULL, ","));
-      assert (raqm_set_freetype_face_range(rq, face, start, length));
+      assert (raqm_set_hb_font_range(rq, font->font, start, length));
     }
   } else {
-    assert (!FT_New_Face (library, font, 0, &face));
-    assert (!FT_Set_Char_Size (face, face->units_per_EM, 0, 0, 0));
-    assert (raqm_set_freetype_face (rq, face));
+    fontdata = load_font(font);
+    assert (font != 0);
+    assert (raqm_set_hb_font (rq, fontdata->font));
   }
 
   if (languages)
@@ -279,8 +349,13 @@ main (int argc, char **argv)
 
   free (text);
   raqm_destroy (rq);
-  FT_Done_Face (face);
-  FT_Done_FreeType (library);
+
+  while (fontdata != 0)
+  {
+    font_data_t* next = fontdata->next;
+    free_font (fontdata);
+    fontdata = next;
+  }
 
   return 0;
 }
