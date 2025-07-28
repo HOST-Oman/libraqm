@@ -37,11 +37,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef RAQM_FREETYPE
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -79,8 +74,7 @@ typedef enum
 
 /**
  * raqm_glyph_t:
- * @hbfont: the harfbuzz font of the glyph. (Only available if RAQM_FREETYPE is not defined)
- * @ftface: the @FT_Face of the glyph. (Only available if RAQM_FREETYPE is defined)
+ * @hbfont: the harfbuzz font of the glyph.
  * @index: the index of the glyph in the font file.
  * @x_advance: the glyph advance width in horizontal text.
  * @y_advance: the glyph advance width in vertical text.
@@ -92,11 +86,7 @@ typedef enum
  * raqm_get_glyphs().
  */
 typedef struct raqm_glyph_t {
-#ifdef RAQM_FREETYPE
-    FT_Face ftface;
-#else
     hb_font_t* hbfont;
-#endif
     unsigned int index;
     int x_advance;
     int y_advance;
@@ -146,29 +136,6 @@ raqm_add_font_feature  (raqm_t     *rq,
                         const char *feature,
                         int         len);
 
-#ifdef RAQM_FREETYPE
-
-RAQM_API bool
-raqm_set_freetype_face (raqm_t *rq,
-                        FT_Face face);
-
-RAQM_API bool
-raqm_set_freetype_face_range (raqm_t *rq,
-                              FT_Face face,
-                              size_t  start,
-                              size_t  len);
-
-RAQM_API bool
-raqm_set_freetype_load_flags (raqm_t *rq,
-                              int flags);
-
-RAQM_API bool
-raqm_set_freetype_load_flags_range (raqm_t *rq,
-                                    int     flags,
-                                    size_t  start,
-                                    size_t  len);
-#else
-
 RAQM_API bool
 raqm_set_hb_font (raqm_t *rq,
                         hb_font_t* font);
@@ -178,8 +145,6 @@ raqm_set_hb_font_range (raqm_t *rq,
                               hb_font_t* font,
                               size_t  start,
                               size_t  len);
-
-#endif // RAQM_FREETYPE
 
 RAQM_API bool
 raqm_set_letter_spacing_range(raqm_t *rq,
