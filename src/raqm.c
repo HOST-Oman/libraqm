@@ -1206,9 +1206,7 @@ raqm_get_glyphs (raqm_t *rq,
     char family[128];
     uint32_t family_name_len = sizeof(family);
     hb_face_t *face = hb_font_get_face(run->font);
-    hb_ot_name_id_t name_id = HB_OT_NAME_ID_FONT_FAMILY;
-    hb_language_t language  = HB_LANGUAGE_INVALID;
-    hb_ot_name_get_utf8 (face, name_id, language, &family_name_len, family);
+    hb_ot_name_get_utf8 (face, HB_OT_NAME_ID_FONT_FAMILY, HB_LANGUAGE_INVALID, &family_name_len, family);
 #endif
 
     len = hb_buffer_get_length (run->buffer);
@@ -1715,9 +1713,7 @@ _raqm_itemize (raqm_t *rq)
     char family[128];
     uint32_t family_name_len = sizeof(family);
     hb_face_t *face = hb_font_get_face(run->font);
-    hb_ot_name_id_t name_id = HB_OT_NAME_ID_FONT_FAMILY;
-    hb_language_t language  = HB_LANGUAGE_INVALID;
-    hb_ot_name_get_utf8 (face, name_id, language, &family_name_len, family);
+    hb_ot_name_get_utf8 (face, HB_OT_NAME_ID_FONT_FAMILY, HB_LANGUAGE_INVALID, &family_name_len, family);
 #endif
 
     SCRIPT_TO_STRING (run->script);

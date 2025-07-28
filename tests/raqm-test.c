@@ -53,7 +53,6 @@ static const int skip_exit_status = 77;
 
 typedef struct _font_data
 {
-  hb_blob_t *blob;
   hb_face_t *face;
   hb_font_t *font;
   void      *data;
@@ -188,19 +187,21 @@ read_file (const char* path, size_t* file_size)
 static font_data_t*
 load_font(const char* path)
 {
+    hb_blob_t *blob;
     size_t fontdata_size;
     font_data_t *font = (font_data_t*)malloc(sizeof(font_data_t));
     font->next = 0;
     font->data = read_file(path, &fontdata_size);
     assert (font->data != 0);
 
-    font->blob = hb_blob_create(font->data, fontdata_size, HB_MEMORY_MODE_READONLY, 0, 0);
-    assert (font->blob != 0);
-    font->face = hb_face_create(font->blob, 0);
+    blob = hb_blob_create(font->data, fontdata_size, HB_MEMORY_MODE_READONLY, 0, 0);
+    assert (blob != 0);
+    font->face = hb_face_create(blob, 0);
     assert (font->face != 0);
     font->font = hb_font_create(font->face);
     assert (font->font != 0);
 
+    hb_blob_destroy(blob);
     return font;
 }
 
@@ -211,8 +212,6 @@ free_font(font_data_t* font)
     hb_font_destroy(font->font);
   if (font->face)
     hb_face_destroy(font->face);
-  if (font->blob)
-    hb_blob_destroy(font->blob);
   free((void*)font->data);
   free((void*)font);
 }
