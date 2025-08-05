@@ -8,7 +8,7 @@
 <link rel="up" href="ch01.html" title="Raqm API">
 <link rel="prev" href="ch01.html" title="Raqm API">
 <link rel="next" href="api-index-full.html" title="API Index">
-<meta name="generator" content="GTK-Doc V1.33.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.34.0 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -388,83 +388,83 @@ layout process, and finally query about the output. For example:</p>
 75
 76
 77</pre></td>
-        <td class="listing_code"><pre class="programlisting"><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raqm.h&quot;</span><span class="cp"></span>
+        <td class="listing_code"><pre class="programlisting"><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;raqm.h&quot;</span>
 
-<span class="kt">int</span><span class="w"></span>
-<span class="nf">main</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"></span>
-<span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">fontfile</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">text</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">direction</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">language</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="kt">int</span>
+<span class="nf">main</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">fontfile</span><span class="p">;</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">text</span><span class="p">;</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">direction</span><span class="p">;</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">language</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 
-<span class="w">    </span><span class="n">FT_Library</span><span class="w"> </span><span class="n">library</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">FT_Face</span><span class="w"> </span><span class="n">face</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">FT_Library</span><span class="w"> </span><span class="n">library</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+<span class="w">    </span><span class="n">FT_Face</span><span class="w"> </span><span class="n">face</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">printf</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;Usage: %s FONT_FILE TEXT DIRECTION LANG</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span><span class="w"></span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">printf</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;Usage: %s FONT_FILE TEXT DIRECTION LANG</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="n">fontfile</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w"></span>
-<span class="w">    </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
-<span class="w">    </span><span class="n">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span><span class="w"></span>
-<span class="w">    </span><span class="n">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="n">fontfile</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="w">    </span><span class="n">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<span class="w">    </span><span class="n">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argv</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
 
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_Init_FreeType</span><span class="w"> </span><span class="p">(</span><span class="o">&amp;</span><span class="n">library</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_New_Face</span><span class="w"> </span><span class="p">(</span><span class="n">library</span><span class="p">,</span><span class="w"> </span><span class="n">fontfile</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">face</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_Set_Char_Size</span><span class="w"> </span><span class="p">(</span><span class="n">face</span><span class="p">,</span><span class="w"> </span><span class="n">face</span><span class="o">-&gt;</span><span class="n">units_per_EM</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
-<span class="w">        </span><span class="p">{</span><span class="w"></span>
-<span class="w">          </span><span class="n">raqm_t</span><span class="w"> </span><span class="o">*</span><span class="n">rq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raqm_create</span><span class="w"> </span><span class="p">();</span><span class="w"></span>
-<span class="w">          </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"></span>
-<span class="w">          </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="n">raqm_direction_t</span><span class="w"> </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_DEFAULT</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_Init_FreeType</span><span class="w"> </span><span class="p">(</span><span class="o">&amp;</span><span class="n">library</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_New_Face</span><span class="w"> </span><span class="p">(</span><span class="n">library</span><span class="p">,</span><span class="w"> </span><span class="n">fontfile</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">face</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FT_Set_Char_Size</span><span class="w"> </span><span class="p">(</span><span class="n">face</span><span class="p">,</span><span class="w"> </span><span class="n">face</span><span class="o">-&gt;</span><span class="n">units_per_EM</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="n">raqm_t</span><span class="w"> </span><span class="o">*</span><span class="n">rq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raqm_create</span><span class="w"> </span><span class="p">();</span>
+<span class="w">          </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="n">raqm_direction_t</span><span class="w"> </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_DEFAULT</span><span class="p">;</span>
 
-<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="w"> </span><span class="p">(</span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;r&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
-<span class="w">              </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_RTL</span><span class="p">;</span><span class="w"></span>
-<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="w"> </span><span class="p">(</span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
-<span class="w">              </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_LTR</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="w"> </span><span class="p">(</span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;r&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">              </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_RTL</span><span class="p">;</span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="w"> </span><span class="p">(</span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;l&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">              </span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RAQM_DIRECTION_LTR</span><span class="p">;</span>
 
-<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">raqm_set_text_utf8</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="w"> </span><span class="p">(</span><span class="n">text</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
-<span class="w">                </span><span class="n">raqm_set_freetype_face</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">face</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
-<span class="w">                </span><span class="n">raqm_set_par_direction</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">dir</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
-<span class="w">                </span><span class="n">raqm_set_language</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">language</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="w"> </span><span class="p">(</span><span class="n">text</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"></span>
-<span class="w">                </span><span class="n">raqm_layout</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">))</span><span class="w"></span>
-<span class="w">            </span><span class="p">{</span><span class="w"></span>
-<span class="w">              </span><span class="kt">size_t</span><span class="w"> </span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
-<span class="w">              </span><span class="n">raqm_glyph_t</span><span class="w"> </span><span class="o">*</span><span class="n">glyphs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raqm_get_glyphs</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">count</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">raqm_set_text_utf8</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="w"> </span><span class="p">(</span><span class="n">text</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">                </span><span class="n">raqm_set_freetype_face</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">face</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">                </span><span class="n">raqm_set_par_direction</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">dir</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">                </span><span class="n">raqm_set_language</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="n">language</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">strlen</span><span class="w"> </span><span class="p">(</span><span class="n">text</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">                </span><span class="n">raqm_layout</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">))</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="kt">size_t</span><span class="w"> </span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">              </span><span class="n">raqm_glyph_t</span><span class="w"> </span><span class="o">*</span><span class="n">glyphs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raqm_get_glyphs</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">count</span><span class="p">);</span>
 
-<span class="w">              </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">glyphs</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">              </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">glyphs</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 
-<span class="w">              </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;glyph count: %zu</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span><span class="w"></span>
-<span class="w">              </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
-<span class="w">              </span><span class="p">{</span><span class="w"></span>
-<span class="w">                  </span><span class="n">printf</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;gid#%d off: (%d, %d) adv: (%d, %d) idx: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">index</span><span class="p">,</span><span class="w"></span>
-<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">x_offset</span><span class="p">,</span><span class="w"></span>
-<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">y_offset</span><span class="p">,</span><span class="w"></span>
-<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">x_advance</span><span class="p">,</span><span class="w"></span>
-<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">y_advance</span><span class="p">,</span><span class="w"></span>
-<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cluster</span><span class="p">);</span><span class="w"></span>
-<span class="w">              </span><span class="p">}</span><span class="w"></span>
-<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">              </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;glyph count: %zu</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">);</span>
+<span class="w">              </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="w">              </span><span class="p">{</span>
+<span class="w">                  </span><span class="n">printf</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;gid#%d off: (%d, %d) adv: (%d, %d) idx: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">index</span><span class="p">,</span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">x_offset</span><span class="p">,</span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">y_offset</span><span class="p">,</span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">x_advance</span><span class="p">,</span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">y_advance</span><span class="p">,</span>
+<span class="w">                          </span><span class="n">glyphs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">cluster</span><span class="p">);</span>
+<span class="w">              </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
 
-<span class="w">            </span><span class="n">raqm_destroy</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">);</span><span class="w"></span>
-<span class="w">          </span><span class="p">}</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="n">raqm_destroy</span><span class="w"> </span><span class="p">(</span><span class="n">rq</span><span class="p">);</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
 
-<span class="w">        </span><span class="n">FT_Done_Face</span><span class="w"> </span><span class="p">(</span><span class="n">face</span><span class="p">);</span><span class="w"></span>
-<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">FT_Done_Face</span><span class="w"> </span><span class="p">(</span><span class="n">face</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
 
-<span class="w">      </span><span class="n">FT_Done_FreeType</span><span class="w"> </span><span class="p">(</span><span class="n">library</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">      </span><span class="n">FT_Done_FreeType</span><span class="w"> </span><span class="p">(</span><span class="n">library</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span></pre></td>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
+<span class="p">}</span></pre></td>
       </tr>
     </tbody>
   </table>
@@ -477,7 +477,7 @@ To compile this example:</p>
     <tbody>
       <tr>
         <td class="listing_lines" align="right"><pre>1</pre></td>
-        <td class="listing_code"><pre class="programlisting"><span class="n">cc</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">test</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="err">`</span><span class="n">pkg</span><span class="o">-</span><span class="n">config</span><span class="w"> </span><span class="o">--</span><span class="n">libs</span><span class="w"> </span><span class="o">--</span><span class="n">cflags</span><span class="w"> </span><span class="n">raqm</span><span class="err">`</span><span class="w"></span></pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="n">cc</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">test</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="err">`</span><span class="n">pkg</span><span class="o">-</span><span class="n">config</span><span class="w"> </span><span class="o">--</span><span class="n">libs</span><span class="w"> </span><span class="o">--</span><span class="n">cflags</span><span class="w"> </span><span class="n">raqm</span><span class="err">`</span></pre></td>
       </tr>
     </tbody>
   </table>
@@ -1623,7 +1623,7 @@ raqm_version_string (<em class="parameter"><code><span class="type">void</span><
 <hr>
 <div class="refsect2">
 <a name="RAQM-VERSION-MICRO:CAPS"></a><h3>RAQM_VERSION_MICRO</h3>
-<pre class="programlisting">#define RAQM_VERSION_MICRO 2
+<pre class="programlisting">#define RAQM_VERSION_MICRO 3
 </pre>
 <p>Library micro version component.</p>
 <p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
@@ -1639,7 +1639,7 @@ raqm_version_string (<em class="parameter"><code><span class="type">void</span><
 <hr>
 <div class="refsect2">
 <a name="RAQM-VERSION-STRING:CAPS"></a><h3>RAQM_VERSION_STRING</h3>
-<pre class="programlisting">#define RAQM_VERSION_STRING "0.10.2"
+<pre class="programlisting">#define RAQM_VERSION_STRING "0.10.3"
 </pre>
 <p>Library version as a string with three components.</p>
 <p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
@@ -1766,6 +1766,6 @@ of the glyph.</p></td>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.33.1</div>
+<hr>Generated by GTK-Doc V1.34.0</div>
 </body>
 </html>
