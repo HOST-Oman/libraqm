@@ -28,6 +28,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef RAQM_SHEENBIDI
 #ifdef RAQM_SHEENBIDI_GT_2_9
@@ -40,7 +41,6 @@
 #endif
 
 #include <hb.h>
-#include <hb-ft.h>
 
 #include "raqm.h"
 
@@ -153,6 +153,8 @@
 #endif
 
 #ifdef RAQM_TESTING
+#include <stdio.h>
+#include <hb-ot.h> // for family name
 # define RAQM_TEST(...) printf (__VA_ARGS__)
 # define SCRIPT_TO_STRING(script) \
     char buff[5]; \
@@ -173,8 +175,7 @@
 
 typedef struct
 {
-  FT_Face       ftface;
-  int           ftloadflags;
+  hb_font_t    *hbfont;
   hb_language_t lang;
   hb_script_t   script;
   int           spacing_after;
@@ -236,8 +237,7 @@ _raqm_init_text_info (raqm_t *rq)
   hb_language_t default_lang = hb_language_get_default ();
   for (size_t i = 0; i < rq->text_len; i++)
   {
-    rq->text_info[i].ftface = NULL;
-    rq->text_info[i].ftloadflags = -1;
+    rq->text_info[i].hbfont = NULL;
     rq->text_info[i].lang = default_lang;
     rq->text_info[i].script = HB_SCRIPT_INVALID;
     rq->text_info[i].spacing_after = 0;
@@ -249,22 +249,13 @@ _raqm_release_text_info (raqm_t *rq)
 {
   if (!rq->text_info)
     return;
-
-  for (size_t i = 0; i < rq->text_len; i++)
-  {
-    if (rq->text_info[i].ftface)
-      FT_Done_Face (rq->text_info[i].ftface);
-  }
 }
 
 static bool
 _raqm_compare_text_info (_raqm_text_info a,
                          _raqm_text_info b)
 {
-  if (a.ftface != b.ftface)
-    return false;
-
-  if (a.ftloadflags != b.ftloadflags)
+  if (a.hbfont != b.hbfont)
     return false;
 
   if (a.lang != b.lang)
@@ -357,9 +348,6 @@ _raqm_free_runs (raqm_run_t *runs)
 
     if (run->buffer)
       hb_buffer_destroy (run->buffer);
-
-    if (run->font)
-      hb_font_destroy (run->font);
 
     free (run);
   }
@@ -483,11 +471,7 @@ raqm_clear_contents (raqm_t *rq)
     if (run->buffer)
       hb_buffer_reset (run->buffer);
 
-    if (run->font)
-    {
-      hb_font_destroy (run->font);
-      run->font = NULL;
-    }
+    run->font = NULL;
 
     if (!run->next)
     {
@@ -880,24 +864,11 @@ raqm_add_font_feature (raqm_t     *rq,
   return ok;
 }
 
-static hb_font_t *
-_raqm_create_hb_font (raqm_t *rq,
-                      FT_Face face,
-                      int     loadflags)
-{
-  hb_font_t *font = hb_ft_font_create_referenced (face);
-
-  if (loadflags >= 0)
-    hb_ft_font_set_load_flags (font, loadflags);
-
-  return font;
-}
-
 static bool
-_raqm_set_freetype_face (raqm_t *rq,
-                         FT_Face face,
-                         size_t  start,
-                         size_t  end)
+_raqm_set_hb_font (raqm_t *rq,
+                   hb_font_t* font,
+                   size_t  start,
+                   size_t  end)
 {
   if (!rq)
     return false;
@@ -913,65 +884,24 @@ _raqm_set_freetype_face (raqm_t *rq,
 
   for (size_t i = start; i < end; i++)
   {
-    if (rq->text_info[i].ftface)
-        FT_Done_Face (rq->text_info[i].ftface);
-    rq->text_info[i].ftface = face;
-    FT_Reference_Face (face);
+    rq->text_info[i].hbfont = font;
   }
 
   return true;
 }
 
-/**
- * raqm_set_freetype_face:
- * @rq: a #raqm_t.
- * @face: an #FT_Face.
- *
- * Sets an #FT_Face to be used for all characters in @rq.
- *
- * See also raqm_set_freetype_face_range().
- *
- * Return value:
- * `true` if no errors happened, `false` otherwise.
- *
- * Since: 0.1
- */
-bool
-raqm_set_freetype_face (raqm_t *rq,
-                        FT_Face face)
+RAQM_API bool
+raqm_set_hb_font (raqm_t *rq,
+                  hb_font_t* font)
 {
-  return _raqm_set_freetype_face (rq, face, 0, rq->text_len);
+  return _raqm_set_hb_font (rq, font, 0, rq->text_len);
 }
 
-/**
- * raqm_set_freetype_face_range:
- * @rq: a #raqm_t.
- * @face: an #FT_Face.
- * @start: index of first character that should use @face from the input string.
- * @len: number of elements using @face.
- *
- * Sets an #FT_Face to be used for @len-number of characters staring at @start.
- * The @start and @len are input string array indices, counting elements
- * according to the underlying encoding. @start must always be aligned to the
- * start of an encoded codepoint, and @len must always end at a codepoint's
- * final element.
- *
- * This method can be used repeatedly to set different faces for different
- * parts of the text. It is the responsibility of the client to make sure that
- * face ranges cover the whole text, and is properly aligned.
- *
- * See also raqm_set_freetype_face().
- *
- * Return value:
- * `true` if no errors happened, `false` otherwise.
- *
- * Since: 0.1
- */
-bool
-raqm_set_freetype_face_range (raqm_t *rq,
-                              FT_Face face,
-                              size_t  start,
-                              size_t  len)
+RAQM_API bool
+raqm_set_hb_font_range (raqm_t *rq,
+                        hb_font_t* font,
+                        size_t  start,
+                        size_t  len)
 {
   size_t end;
 
@@ -984,101 +914,7 @@ raqm_set_freetype_face_range (raqm_t *rq,
   end = _raqm_encoding_to_u32_index (rq, start + len);
   start = _raqm_encoding_to_u32_index (rq, start);
 
-  return _raqm_set_freetype_face (rq, face, start, end);
-}
-
-static bool
-_raqm_set_freetype_load_flags (raqm_t *rq,
-                               int     flags,
-                               size_t  start,
-                               size_t  end)
-{
-  if (!rq)
-    return false;
-
-  if (!rq->text_len)
-    return true;
-
-  if (start >= rq->text_len || end > rq->text_len)
-    return false;
-
-  if (!rq->text_info)
-    return false;
-
-  for (size_t i = start; i < end; i++)
-    rq->text_info[i].ftloadflags = flags;
-
-  return true;
-}
-
-/**
- * raqm_set_freetype_load_flags:
- * @rq: a #raqm_t.
- * @flags: FreeType load flags.
- *
- * Sets the load flags passed to FreeType when loading glyphs, should be the
- * same flags used by the client when rendering FreeType glyphs.
- *
- * This requires version of HarfBuzz that has hb_ft_font_set_load_flags(), for
- * older version the flags will be ignored.
- *
- * Return value:
- * `true` if no errors happened, `false` otherwise.
- *
- * Since: 0.3
- */
-bool
-raqm_set_freetype_load_flags (raqm_t *rq,
-                              int     flags)
-{
-  return _raqm_set_freetype_load_flags(rq, flags, 0, rq->text_len);
-}
-
-/**
- * raqm_set_freetype_load_flags_range:
- * @rq: a #raqm_t.
- * @flags: FreeType load flags.
- * @start: index of first character that should use @flags.
- * @len: number of characters using @flags.
- *
- * Sets the load flags passed to FreeType when loading glyphs for @len-number
- * of characters staring at @start. Flags should be the same as used by the
- * client when rendering corresponding FreeType glyphs. The @start and @len
- * are input string array indices (i.e. counting bytes in UTF-8 and scaler
- * values in UTF-32).
- *
- * This method can be used repeatedly to set different flags for different
- * parts of the text. It is the responsibility of the client to make sure that
- * flag ranges cover the whole text.
- *
- * This requires version of HarfBuzz that has hb_ft_font_set_load_flags(), for
- * older version the flags will be ignored.
- *
- * See also raqm_set_freetype_load_flags().
- *
- * Return value:
- * `true` if no errors happened, `false` otherwise.
- *
- * Since: 0.9
- */
-bool
-raqm_set_freetype_load_flags_range (raqm_t *rq,
-                                    int     flags,
-                                    size_t  start,
-                                    size_t  len)
-{
-  size_t end;
-
-  if (!rq)
-    return false;
-
-  if (!rq->text_len)
-    return true;
-
-  end = _raqm_encoding_to_u32_index (rq, start + len);
-  start = _raqm_encoding_to_u32_index (rq, start);
-
-  return _raqm_set_freetype_load_flags (rq, flags, start, end);
+  return _raqm_set_hb_font (rq, font, start, end);
 }
 
 static bool
@@ -1292,7 +1128,7 @@ raqm_layout (raqm_t *rq)
 
   for (size_t i = 0; i < rq->text_len; i++)
   {
-      if (!rq->text_info[i].ftface)
+      if (!rq->text_info[i].hbfont)
           return false;
   }
 
@@ -1366,6 +1202,13 @@ raqm_get_glyphs (raqm_t *rq,
     hb_glyph_info_t *info;
     hb_glyph_position_t *position;
 
+#ifdef RAQM_TESTING
+    char family[128];
+    uint32_t family_name_len = sizeof(family);
+    hb_face_t *face = hb_font_get_face(run->font);
+    hb_ot_name_get_utf8 (face, HB_OT_NAME_ID_FONT_FAMILY, HB_LANGUAGE_INVALID, &family_name_len, family);
+#endif
+
     len = hb_buffer_get_length (run->buffer);
     info = hb_buffer_get_glyph_infos (run->buffer, NULL);
     position = hb_buffer_get_glyph_positions (run->buffer, NULL);
@@ -1378,12 +1221,12 @@ raqm_get_glyphs (raqm_t *rq,
       rq->glyphs[count + i].y_advance = position[i].y_advance;
       rq->glyphs[count + i].x_offset = position[i].x_offset;
       rq->glyphs[count + i].y_offset = position[i].y_offset;
-      rq->glyphs[count + i].ftface = rq->text_info[info[i].cluster].ftface;
+      rq->glyphs[count + i].hbfont = rq->text_info[info[i].cluster].hbfont;
 
       RAQM_TEST ("glyph [%d]\tx_offset: %d\ty_offset: %d\tx_advance: %d\tfont: %s\n",
           rq->glyphs[count + i].index, rq->glyphs[count + i].x_offset,
           rq->glyphs[count + i].y_offset, rq->glyphs[count + i].x_advance,
-          rq->glyphs[count + i].ftface->family_name);
+          family);
     }
 
     count += len;
@@ -1794,8 +1637,8 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos + runs[i].len - 1;
       run->script = rq->text_info[run->pos].script;
-      run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface,
-          rq->text_info[run->pos].ftloadflags);
+      run->font = rq->text_info[run->pos].hbfont;
+
       for (int j = runs[i].len - 1; j >= 0; j--)
       {
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
@@ -1811,8 +1654,8 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = info.script;
-          newrun->font = _raqm_create_hb_font (rq, info.ftface,
-              info.ftloadflags);
+
+          newrun->font = info.hbfont;
           run->next = newrun;
           run = newrun;
         }
@@ -1827,8 +1670,7 @@ _raqm_itemize (raqm_t *rq)
     {
       run->pos = runs[i].pos;
       run->script = rq->text_info[run->pos].script;
-      run->font = _raqm_create_hb_font (rq, rq->text_info[run->pos].ftface,
-          rq->text_info[run->pos].ftloadflags);
+      run->font = rq->text_info[run->pos].hbfont;
       for (size_t j = 0; j < runs[i].len; j++)
       {
         _raqm_text_info info = rq->text_info[runs[i].pos + j];
@@ -1844,8 +1686,7 @@ _raqm_itemize (raqm_t *rq)
           newrun->len = 1;
           newrun->direction = _raqm_hb_dir (rq, runs[i].level);
           newrun->script = info.script;
-          newrun->font = _raqm_create_hb_font (rq, info.ftface,
-              info.ftloadflags);
+          newrun->font = info.hbfont;
           run->next = newrun;
           run = newrun;
         }
@@ -1868,11 +1709,17 @@ _raqm_itemize (raqm_t *rq)
   RAQM_TEST ("Final Runs:\n");
   for (raqm_run_t *run = rq->runs; run != NULL; run = run->next)
   {
+#ifdef RAQM_TESTING
+    char family[128];
+    uint32_t family_name_len = sizeof(family);
+    hb_face_t *face = hb_font_get_face(run->font);
+    hb_ot_name_get_utf8 (face, HB_OT_NAME_ID_FONT_FAMILY, HB_LANGUAGE_INVALID, &family_name_len, family);
+#endif
+
     SCRIPT_TO_STRING (run->script);
     RAQM_TEST ("run[%zu]:\t start: %d\tlength: %d\tdirection: %s\tscript: %s\tfont: %s\n",
                run_count++, run->pos, run->len,
-               hb_direction_to_string (run->direction), buff,
-               rq->text_info[run->pos].ftface->family_name);
+               hb_direction_to_string (run->direction), buff, family);
   }
   RAQM_TEST ("\n");
 #endif
@@ -2150,21 +1997,6 @@ _raqm_resolve_scripts (raqm_t *rq)
   return true;
 }
 
-static void
-_raqm_ft_transform (int      *x,
-                    int      *y,
-                    FT_Matrix matrix)
-{
-  FT_Vector vector;
-  vector.x = *x;
-  vector.y = *y;
-
-  FT_Vector_Transform (&vector, &matrix);
-
-  *x = vector.x;
-  *y = vector.y;
-}
-
 #if !HB_VERSION_ATLEAST (10, 4, 0)
 # define hb_ft_font_get_ft_face hb_ft_font_get_face
 #endif
@@ -2196,20 +2028,15 @@ _raqm_shape (raqm_t *rq)
                    NULL);
 
     {
-      FT_Matrix matrix;
       hb_glyph_info_t *info;
       hb_glyph_position_t *pos;
       unsigned int len;
 
-      FT_Get_Transform (hb_ft_font_get_ft_face (run->font), &matrix, NULL);
       pos = hb_buffer_get_glyph_positions (run->buffer, &len);
       info = hb_buffer_get_glyph_infos (run->buffer, &len);
 
       for (unsigned int i = 0; i < len; i++)
       {
-        _raqm_ft_transform (&pos[i].x_advance, &pos[i].y_advance, matrix);
-        _raqm_ft_transform (&pos[i].x_offset, &pos[i].y_offset, matrix);
-
         bool set_spacing = false;
         if (run->direction == HB_DIRECTION_RTL)
         {
