@@ -1201,7 +1201,7 @@ raqm_set_letter_spacing_range(raqm_t *rq,
  *
  * Set the word spacing for a given range. Word spacing will only be applied to
  * 'word separator' characters, such as 'space', 'no break space' and
- * Ethiopic word separator.
+ * 'Ethiopic word separator'.
  * The value will be added onto the advance and offset for RTL, and the advance
  * for other directions.
  *
