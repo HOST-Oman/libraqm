@@ -1019,9 +1019,6 @@ _raqm_set_freetype_load_flags (raqm_t *rq,
  * Sets the load flags passed to FreeType when loading glyphs, should be the
  * same flags used by the client when rendering FreeType glyphs.
  *
- * This requires a version of HarfBuzz that has hb_ft_font_set_load_flags(), for
- * older versions the flags will be ignored.
- *
  * Return value:
  * `true` if no errors happened, `false` otherwise.
  *
@@ -1050,9 +1047,6 @@ raqm_set_freetype_load_flags (raqm_t *rq,
  * This method can be used repeatedly to set different flags for different
  * parts of the text. It is the responsibility of the client to make sure that
  * flag ranges cover the whole text.
- *
- * This requires a version of HarfBuzz that has hb_ft_font_set_load_flags(), for
- * older versions the flags will be ignored.
  *
  * See also raqm_set_freetype_load_flags().
  *
