@@ -6,6 +6,13 @@ option(
 )
 
 option(
+    'tests',
+    description: 'Enable or disable tests',
+    type: 'boolean',
+    value: true,
+)
+
+option(
     'sheenbidi',
     description: 'Use SheenBidi instead of Fribidi',
     type: 'boolean',
