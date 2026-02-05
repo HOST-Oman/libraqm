@@ -301,7 +301,7 @@
 </div>
 <div class="refsect1">
 <a name="raqm-Raqm.description"></a><h2>Description</h2>
-<p>Raqm is a light weight text layout library with strong emphasis on
+<p>Raqm is a lightweight text layout library with strong emphasis on
 supporting languages and writing systems that require complex text layout.</p>
 <p>The main object in Raqm API is <a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a>, it stores all the states of the
 input text, its properties, and the output of the layout process.</p>
@@ -592,7 +592,7 @@ raqm_set_text (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#
 <p>Adds <em class="parameter"><code>text</code></em>
  to <em class="parameter"><code>rq</code></em>
  to be used for layout. It must be a valid UTF-32 text, any
-invalid character will be replaced with U+FFFD. The text should typically
+invalid characters will be replaced with U+FFFD. The text should typically
 represent a full paragraph, since doing the layout of chunks of text
 separately can give improper output.</p>
 <div class="refsect3">
@@ -775,11 +775,11 @@ raqm_set_language (<em class="parameter"><code><a class="link" href="raqm-Raqm.h
 <p>Sets a <a class="ulink" href="https://www.w3.org/International/articles/language-tags/" target="_top">BCP47 language
 code</a> to be used
 for <em class="parameter"><code>len</code></em>
--number of characters staring at <em class="parameter"><code>start</code></em>
+-number of characters starting at <em class="parameter"><code>start</code></em>
 .  The <em class="parameter"><code>start</code></em>
  and <em class="parameter"><code>len</code></em>
  are
-input string array indices (i.e. counting bytes in UTF-8 and scaler values
+input string array indices (i.e. counting bytes in UTF-8 and scalar values
 in UTF-32).</p>
 <p>This method can be used repeatedly to set different languages for different
 parts of the text.</p>
@@ -804,7 +804,7 @@ parts of the text.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>start</p></td>
-<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>face</code></em>
+<td class="parameter_description"><p>index of the first character that should use <em class="parameter"><code>face</code></em>
 .</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
@@ -895,7 +895,7 @@ start of an encoded codepoint, and <em class="parameter"><code>len</code></em>
 final element.</p>
 <p>This method can be used repeatedly to set different faces for different
 parts of the text. It is the responsibility of the client to make sure that
-face ranges cover the whole text, and is properly aligned.</p>
+face ranges cover the whole text, and are properly aligned.</p>
 <p>See also <a class="link" href="raqm-Raqm.html#raqm-set-freetype-face" title="raqm_set_freetype_face ()"><code class="function">raqm_set_freetype_face()</code></a>.</p>
 <div class="refsect3">
 <a name="raqm-set-freetype-face-range.parameters"></a><h4>Parameters</h4>
@@ -918,7 +918,7 @@ face ranges cover the whole text, and is properly aligned.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>start</p></td>
-<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>face</code></em>
+<td class="parameter_description"><p>index of the first character that should use <em class="parameter"><code>face</code></em>
 from the input string.</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
@@ -945,8 +945,6 @@ raqm_set_freetype_load_flags (<em class="parameter"><code><a class="link" href="
                               <em class="parameter"><code><span class="type">int</span> flags</code></em>);</pre>
 <p>Sets the load flags passed to FreeType when loading glyphs, should be the
 same flags used by the client when rendering FreeType glyphs.</p>
-<p>This requires version of HarfBuzz that has <code class="function">hb_ft_font_set_load_flags()</code>, for
-older version the flags will be ignored.</p>
 <div class="refsect3">
 <a name="raqm-set-freetype-load-flags.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table class="informaltable" width="100%" border="0">
@@ -990,13 +988,11 @@ of characters staring at <em class="parameter"><code>start</code></em>
 client when rendering corresponding FreeType glyphs. The <em class="parameter"><code>start</code></em>
  and <em class="parameter"><code>len</code></em>
 
-are input string array indices (i.e. counting bytes in UTF-8 and scaler
+are input string array indices (i.e. counting bytes in UTF-8 and scalar
 values in UTF-32).</p>
 <p>This method can be used repeatedly to set different flags for different
 parts of the text. It is the responsibility of the client to make sure that
 flag ranges cover the whole text.</p>
-<p>This requires version of HarfBuzz that has <code class="function">hb_ft_font_set_load_flags()</code>, for
-older version the flags will be ignored.</p>
 <p>See also <a class="link" href="raqm-Raqm.html#raqm-set-freetype-load-flags" title="raqm_set_freetype_load_flags ()"><code class="function">raqm_set_freetype_load_flags()</code></a>.</p>
 <div class="refsect3">
 <a name="raqm-set-freetype-load-flags-range.parameters"></a><h4>Parameters</h4>
@@ -1019,7 +1015,7 @@ older version the flags will be ignored.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>start</p></td>
-<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>flags</code></em>
+<td class="parameter_description"><p>index of the first character that should use <em class="parameter"><code>flags</code></em>
 .</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
@@ -1076,7 +1072,7 @@ the font features for best spacing results.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>start</p></td>
-<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>spacing</code></em>
+<td class="parameter_description"><p>index of the first character that should use <em class="parameter"><code>spacing</code></em>
 .</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
@@ -1105,7 +1101,7 @@ raqm_set_word_spacing_range (<em class="parameter"><code><a class="link" href="r
                              <em class="parameter"><code><span class="type">size_t</span> len</code></em>);</pre>
 <p>Set the word spacing for a given range. Word spacing will only be applied to
 'word separator' characters, such as 'space', 'no break space' and
-Ethiopic word separator'.
+'Ethiopic word separator'.
 The value will be added onto the advance and offset for RTL, and the advance
 for other directions.</p>
 <div class="refsect3">
@@ -1129,7 +1125,7 @@ for other directions.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>start</p></td>
-<td class="parameter_description"><p>index of first character that should use <em class="parameter"><code>spacing</code></em>
+<td class="parameter_description"><p>index of the first character that should use <em class="parameter"><code>spacing</code></em>
 .</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
@@ -1154,7 +1150,7 @@ for other directions.</p>
 <pre class="programlisting"><span class="returnvalue">bool</span>
 raqm_set_invisible_glyph (<em class="parameter"><code><a class="link" href="raqm-Raqm.html#raqm-t" title="raqm_t"><span class="type">raqm_t</span></a> *rq</code></em>,
                           <em class="parameter"><code><span class="type">int</span> gid</code></em>);</pre>
-<p>Sets the glyph id to be used for invisible glyhphs.</p>
+<p>Sets the glyph id to be used for invisible glyphs.</p>
 <p>If <em class="parameter"><code>gid</code></em>
  is negative, invisible glyphs will be suppressed from the output.</p>
 <p>If <em class="parameter"><code>gid</code></em>
@@ -1524,7 +1520,7 @@ raqm_version (<em class="parameter"><code>unsigned <span class="type">int</span>
 raqm_version_atleast (<em class="parameter"><code>unsigned <span class="type">int</span> major</code></em>,
                       <em class="parameter"><code>unsigned <span class="type">int</span> minor</code></em>,
                       <em class="parameter"><code>unsigned <span class="type">int</span> micro</code></em>);</pre>
-<p>Checks if library version is less than or equal the specified version.</p>
+<p>Checks if library version is less than or equal to the specified version.</p>
 <div class="refsect3">
 <a name="raqm-version-atleast.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table class="informaltable" width="100%" border="0">
@@ -1554,7 +1550,7 @@ raqm_version_atleast (<em class="parameter"><code>unsigned <span class="type">in
 </div>
 <div class="refsect3">
 <a name="raqm-version-atleast.returns"></a><h4>Returns</h4>
-<p><code class="literal">true</code> if library version is less than or equal the specified version,
+<p><code class="literal">true</code> if library version is less than or equal to the specified version,
 <code class="literal">false</code> otherwise.</p>
 </div>
 <p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
@@ -1575,7 +1571,7 @@ raqm_version_string (<em class="parameter"><code><span class="type">void</span><
 <div class="refsect2">
 <a name="RAQM-VERSION-ATLEAST:CAPS"></a><h3>RAQM_VERSION_ATLEAST()</h3>
 <pre class="programlisting">#define             RAQM_VERSION_ATLEAST(major,minor,micro)</pre>
-<p>Checks if library version is less than or equal the specified version.</p>
+<p>Checks if library version is less than or equal to the specified version.</p>
 <div class="refsect3">
 <a name="RAQM-VERSION-ATLEAST.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table class="informaltable" width="100%" border="0">
@@ -1605,7 +1601,7 @@ raqm_version_string (<em class="parameter"><code><span class="type">void</span><
 </div>
 <div class="refsect3">
 <a name="RAQM-VERSION-ATLEAST.returns"></a><h4>Returns</h4>
-<p><code class="literal">true</code> if library version is less than or equal the specified version,
+<p><code class="literal">true</code> if library version is less than or equal to the specified version,
 <code class="literal">false</code> otherwise.</p>
 </div>
 <p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
@@ -1623,7 +1619,7 @@ raqm_version_string (<em class="parameter"><code><span class="type">void</span><
 <hr>
 <div class="refsect2">
 <a name="RAQM-VERSION-MICRO:CAPS"></a><h3>RAQM_VERSION_MICRO</h3>
-<pre class="programlisting">#define RAQM_VERSION_MICRO 3
+<pre class="programlisting">#define RAQM_VERSION_MICRO 4
 </pre>
 <p>Library micro version component.</p>
 <p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
@@ -1639,7 +1635,7 @@ raqm_version_string (<em class="parameter"><code><span class="type">void</span><
 <hr>
 <div class="refsect2">
 <a name="RAQM-VERSION-STRING:CAPS"></a><h3>RAQM_VERSION_STRING</h3>
-<pre class="programlisting">#define RAQM_VERSION_STRING "0.10.3"
+<pre class="programlisting">#define RAQM_VERSION_STRING "0.10.4"
 </pre>
 <p>Library version as a string with three components.</p>
 <p class="since">Since: <a class="link" href="api-index-0-7.html#api-index-0.7">0.7</a></p>
@@ -1649,7 +1645,7 @@ raqm_version_string (<em class="parameter"><code><span class="type">void</span><
 <a name="raqm-t"></a><h3>raqm_t</h3>
 <pre class="programlisting">typedef struct _raqm raqm_t;
 </pre>
-<p>This is the main object holding all state of the currently processed text as
+<p>This is the main object holding all the states of the currently processed text as
 well as its output.</p>
 <p class="since">Since: <a class="link" href="api-index-0-1.html#api-index-0.1">0.1</a></p>
 </div>
@@ -1750,7 +1746,7 @@ well as its output.</p>
 </tr>
 <tr>
 <td class="struct_member_name"><p><span class="type">uint32_t</span> <em class="structfield"><code><a name="raqm-glyph-t.cluster"></a>cluster</code></em>;</p></td>
-<td class="struct_member_description"><p>the index of original character in input text.</p></td>
+<td class="struct_member_description"><p>the index of the original character in the input text.</p></td>
 <td class="struct_member_annotations"> </td>
 </tr>
 <tr>
