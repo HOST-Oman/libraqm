@@ -41,9 +41,26 @@ jobs:
       run: ninja -C build
     - name: Test
       run: ninja -C build test
-    - name: Deploy documentation
-      if: matrix.os == 'ubuntu-latest'
-      run: .ci/deploy-docs.sh
+    - name: Upload documentation
+      if: matrix.os == 'ubuntu-latest' && github.ref_type == 'tag'
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: build/docs/html
+
+  deploy-docs:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
 
   build-sheenbidi:
 
