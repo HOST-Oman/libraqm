@@ -208,6 +208,10 @@ RAQM_API const char *
 raqm_version_string (void);
 
 RAQM_API bool
+raqm_allowed_grapheme_boundary (raqm_t *rq,
+                                size_t  index);
+
+RAQM_API bool
 raqm_version_atleast (unsigned int major,
                       unsigned int minor,
                       unsigned int micro);
