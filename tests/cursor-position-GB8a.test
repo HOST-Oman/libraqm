@@ -36,6 +36,6 @@ glyph [0]	x_offset: 0	y_offset: 0	x_advance: 748	font: Amiri
 UTF-32 clusters: 00 00 02 02
 UTF-8 clusters:  00 00 08 08
 
-The position is 2244 at index 8
+The position is 748 at index 0
 
-The start-index is 4  at position 1000 
+The start-index is 2  at position 1000
