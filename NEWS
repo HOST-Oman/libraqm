@@ -1,3 +1,9 @@
+Overview of changes leading to 0.10.5
+Saturday, April 11, 2026
+====================================
+
+Check for NULL return from malloc in couple of places.
+
 Overview of changes leading to 0.10.4
 Thursday, February 5, 2026
 ====================================
