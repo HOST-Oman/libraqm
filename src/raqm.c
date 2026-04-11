@@ -2585,45 +2585,45 @@ _raqm_allowed_grapheme_boundary (const uint32_t *text,
   _raqm_grapheme_t r = _raqm_get_grapheme_break (r_char);
 
   /* GB3: CR × LF */
-  if (l == RAQM_GRAPHEM_CR && r == RAQM_GRAPHEM_LF)
+  if (l == RAQM_GRAPHEME_CR && r == RAQM_GRAPHEME_LF)
     return false;
 
   /* GB4: (Control|CR|LF) ÷ */
-  if (l == RAQM_GRAPHEM_CONTROL || l == RAQM_GRAPHEM_CR ||
-      l == RAQM_GRAPHEM_LF)
+  if (l == RAQM_GRAPHEME_CONTROL || l == RAQM_GRAPHEME_CR ||
+      l == RAQM_GRAPHEME_LF)
     return true;
 
   /* GB5: ÷ (Control|CR|LF) */
-  if (r == RAQM_GRAPHEM_CONTROL || r == RAQM_GRAPHEM_CR ||
-      r == RAQM_GRAPHEM_LF)
+  if (r == RAQM_GRAPHEME_CONTROL || r == RAQM_GRAPHEME_CR ||
+      r == RAQM_GRAPHEME_LF)
     return true;
 
   /* GB6: L × (L|V|LV|LVT) */
-  if (l == RAQM_GRAPHEM_L &&
-      (r == RAQM_GRAPHEM_L || r == RAQM_GRAPHEM_V ||
-       r == RAQM_GRAPHEM_LV || r == RAQM_GRAPHEM_LVT))
+  if (l == RAQM_GRAPHEME_L &&
+      (r == RAQM_GRAPHEME_L || r == RAQM_GRAPHEME_V ||
+       r == RAQM_GRAPHEME_LV || r == RAQM_GRAPHEME_LVT))
     return false;
 
   /* GB7: (LV|V) × (V|T) */
-  if ((l == RAQM_GRAPHEM_LV || l == RAQM_GRAPHEM_V) &&
-      (r == RAQM_GRAPHEM_V || r == RAQM_GRAPHEM_T))
+  if ((l == RAQM_GRAPHEME_LV || l == RAQM_GRAPHEME_V) &&
+      (r == RAQM_GRAPHEME_V || r == RAQM_GRAPHEME_T))
     return false;
 
   /* GB8: (LVT|T) × T */
-  if ((l == RAQM_GRAPHEM_LVT || l == RAQM_GRAPHEM_T) &&
-      r == RAQM_GRAPHEM_T)
+  if ((l == RAQM_GRAPHEME_LVT || l == RAQM_GRAPHEME_T) &&
+      r == RAQM_GRAPHEME_T)
     return false;
 
   /* GB9: × (Extend|ZWJ) */
-  if (r == RAQM_GRAPHEM_EXTEND || r == RAQM_GRAPHEM_ZWJ)
+  if (r == RAQM_GRAPHEME_EXTEND || r == RAQM_GRAPHEME_ZWJ)
     return false;
 
   /* GB9a: × SpacingMark */
-  if (r == RAQM_GRAPHEM_SPACING_MARK)
+  if (r == RAQM_GRAPHEME_SPACING_MARK)
     return false;
 
   /* GB9b: Prepend × */
-  if (l == RAQM_GRAPHEM_PREPEND)
+  if (l == RAQM_GRAPHEME_PREPEND)
     return false;
 
   /* GB9c: \p{InCB=Consonant} [\p{InCB=Extend}\p{InCB=Linker}]*
@@ -2654,16 +2654,16 @@ _raqm_allowed_grapheme_boundary (const uint32_t *text,
   }
 
   /* GB11: ExtPict Extend* ZWJ × ExtPict */
-  if (l == RAQM_GRAPHEM_ZWJ &&
-      r == RAQM_GRAPHEM_EXTENDED_PICTOGRAPHIC)
+  if (l == RAQM_GRAPHEME_ZWJ &&
+      r == RAQM_GRAPHEME_EXTENDED_PICTOGRAPHIC)
   {
     /* Look back past the ZWJ at index for Extend* ExtPict */
     for (size_t j = index; j > 0; j--)
     {
       _raqm_grapheme_t g = _raqm_get_grapheme_break (text[j - 1]);
-      if (g == RAQM_GRAPHEM_EXTEND)
+      if (g == RAQM_GRAPHEME_EXTEND)
         continue;
-      if (g == RAQM_GRAPHEM_EXTENDED_PICTOGRAPHIC)
+      if (g == RAQM_GRAPHEME_EXTENDED_PICTOGRAPHIC)
         return false;
       break;
     }
@@ -2671,13 +2671,13 @@ _raqm_allowed_grapheme_boundary (const uint32_t *text,
 
   /* GB12/GB13: Do not break between regional indicator symbols if there is
    * an odd number of RI characters before the break point. */
-  if (l == RAQM_GRAPHEM_REGIONAL_INDICATOR &&
-      r == RAQM_GRAPHEM_REGIONAL_INDICATOR)
+  if (l == RAQM_GRAPHEME_REGIONAL_INDICATOR &&
+      r == RAQM_GRAPHEME_REGIONAL_INDICATOR)
   {
     size_t ri_count = 0;
     for (size_t j = index + 1; j > 0; j--)
     {
-      if (_raqm_get_grapheme_break (text[j - 1]) != RAQM_GRAPHEM_REGIONAL_INDICATOR)
+      if (_raqm_get_grapheme_break (text[j - 1]) != RAQM_GRAPHEME_REGIONAL_INDICATOR)
         break;
       ri_count++;
     }
