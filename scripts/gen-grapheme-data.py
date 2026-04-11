@@ -21,21 +21,21 @@ OUTFILE = SRCDIR / "src" / "grapheme-data.h"
 TESTFILE = SRCDIR / "tests" / "GraphemeBreakTest.txt"
 
 GRAPHEME_BREAK_VALUES = {
-    "RAQM_GRAPHEM_OTHER": "Other",
-    "RAQM_GRAPHEM_CR": "CR",
-    "RAQM_GRAPHEM_LF": "LF",
-    "RAQM_GRAPHEM_CONTROL": "Control",
-    "RAQM_GRAPHEM_EXTEND": "Extend",
-    "RAQM_GRAPHEM_ZWJ": "ZWJ",
-    "RAQM_GRAPHEM_REGIONAL_INDICATOR": "Regional_Indicator",
-    "RAQM_GRAPHEM_PREPEND": "Prepend",
-    "RAQM_GRAPHEM_SPACING_MARK": "SpacingMark",
-    "RAQM_GRAPHEM_L": "L",
-    "RAQM_GRAPHEM_V": "V",
-    "RAQM_GRAPHEM_T": "T",
-    "RAQM_GRAPHEM_LV": "LV",
-    "RAQM_GRAPHEM_LVT": "LVT",
-    "RAQM_GRAPHEM_EXTENDED_PICTOGRAPHIC": "Extended_Pictographic",
+    "RAQM_GRAPHEME_OTHER": "Other",
+    "RAQM_GRAPHEME_CR": "CR",
+    "RAQM_GRAPHEME_LF": "LF",
+    "RAQM_GRAPHEME_CONTROL": "Control",
+    "RAQM_GRAPHEME_EXTEND": "Extend",
+    "RAQM_GRAPHEME_ZWJ": "ZWJ",
+    "RAQM_GRAPHEME_REGIONAL_INDICATOR": "Regional_Indicator",
+    "RAQM_GRAPHEME_PREPEND": "Prepend",
+    "RAQM_GRAPHEME_SPACING_MARK": "SpacingMark",
+    "RAQM_GRAPHEME_L": "L",
+    "RAQM_GRAPHEME_V": "V",
+    "RAQM_GRAPHEME_T": "T",
+    "RAQM_GRAPHEME_LV": "LV",
+    "RAQM_GRAPHEME_LVT": "LVT",
+    "RAQM_GRAPHEME_EXTENDED_PICTOGRAPHIC": "Extended_Pictographic",
 }
 
 INCB_VALUES = {
@@ -162,7 +162,7 @@ def main():
 
     grapheme_break_sol = packTab.pack_table(
         grapheme_break,
-        "RAQM_GRAPHEM_OTHER",
+        "RAQM_GRAPHEME_OTHER",
         mapping=grapheme_break_mapping,
         compression=9,
     )
