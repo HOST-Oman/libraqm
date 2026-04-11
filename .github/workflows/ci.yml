@@ -46,6 +46,15 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: build/docs/html
+    - name: Create dist tarball
+      if: matrix.os == 'ubuntu-latest' && github.ref_type == 'tag'
+      run: meson dist -C build --no-tests
+    - name: Upload dist tarball
+      if: matrix.os == 'ubuntu-latest' && github.ref_type == 'tag'
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: build/meson-dist/raqm-*.tar.xz
 
   deploy-docs:
     if: github.ref_type == 'tag'
@@ -61,6 +70,26 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: [build, build-sheenbidi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: dist
+    - name: Create release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: >
+        gh release create ${{ github.ref_name }}
+        raqm-*.tar.xz
+        --repo ${{ github.repository }}
+        --generate-notes
+        --title "Version ${GITHUB_REF_NAME#v}"
 
   build-sheenbidi:
 
