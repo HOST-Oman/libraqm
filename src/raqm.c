@@ -334,6 +334,8 @@ _raqm_alloc_run (raqm_t *rq)
   else
   {
     run = malloc (sizeof (raqm_run_t));
+    if (!run)
+      return NULL;
     run->font = NULL;
     run->buffer = NULL;
   }
@@ -1619,6 +1621,11 @@ _raqm_reorder_runs (const FriBidiCharType *types,
   }
 
   runs = malloc (sizeof (_raqm_bidi_run) * count);
+  if (!runs)
+  {
+    *run_count = 0;
+    return NULL;
+  }
 
   while (run_start < len)
   {
