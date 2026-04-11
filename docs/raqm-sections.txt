@@ -36,4 +36,6 @@ raqm_direction_t
 raqm_glyph_t
 <SUBSECTION Private>
 RAQM_API
+_raqm_grapheme_t
+_raqm_incb_t
 </SECTION>
