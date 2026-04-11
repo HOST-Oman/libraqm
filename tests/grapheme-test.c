@@ -2,7 +2,7 @@
  * Unicode Grapheme Cluster Break conformance test.
  *
  * Parses GraphemeBreakTest.txt and verifies that
- * _raqm_allowed_grapheme_boundary produces correct results.
+ * raqm_allowed_grapheme_boundary produces correct results.
  */
 
 #include <stdbool.h>
@@ -11,10 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern bool
-_raqm_allowed_grapheme_boundary (const uint32_t *text,
-                                 size_t          len,
-                                 size_t          index);
+#include "raqm.h"
 
 static int
 run_tests (const char *path)
@@ -94,14 +91,24 @@ run_tests (const char *path)
 
     test_num++;
 
+    raqm_t *rq = raqm_create ();
+    if (!rq || !raqm_set_text (rq, codepoints, n))
+    {
+      fprintf (stderr, "FAIL test %d: raqm_create/raqm_set_text failed\n",
+               test_num);
+      failures++;
+      raqm_destroy (rq);
+      continue;
+    }
+
     /* Test each boundary position.
      * breaks[i] for i > 0 tells us whether there should be a break
      * between codepoints[i-1] and codepoints[i], which corresponds to
-     * _raqm_allowed_grapheme_boundary(codepoints, n, i-1). */
+     * raqm_allowed_grapheme_boundary(rq, i-1). */
     for (size_t i = 1; i < n; i++)
     {
       bool expected = breaks[i];
-      bool actual = _raqm_allowed_grapheme_boundary (codepoints, n, i - 1);
+      bool actual = raqm_allowed_grapheme_boundary (rq, i - 1);
       if (actual != expected)
       {
         fprintf (stderr,
@@ -113,6 +120,8 @@ run_tests (const char *path)
         failures++;
       }
     }
+
+    raqm_destroy (rq);
   }
 
   fclose (f);

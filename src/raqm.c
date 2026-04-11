@@ -229,11 +229,6 @@ static size_t
 _raqm_encoding_to_u32_index (raqm_t *rq,
                              size_t  index);
 
-RAQM_STATIC bool
-_raqm_allowed_grapheme_boundary (const uint32_t *text,
-                                 size_t          len,
-                                 size_t          index);
-
 static void
 _raqm_init_text_info (raqm_t *rq)
 {
@@ -1104,13 +1099,13 @@ _raqm_set_spacing (raqm_t *rq,
   {
     bool set_spacing = i == 0;
     if (!set_spacing)
-      set_spacing = _raqm_allowed_grapheme_boundary (rq->text, rq->text_len, i - 1);
+      set_spacing = raqm_allowed_grapheme_boundary (rq, i - 1);
 
     if (set_spacing)
     {
       if (word_spacing)
       {
-        if (_raqm_allowed_grapheme_boundary (rq->text, rq->text_len, i))
+        if (raqm_allowed_grapheme_boundary (rq, i))
         {
           /* CSS word separators, word spacing is only applied on these.*/
           if (rq->text[i] == 0x0020  || /* Space */
@@ -2403,7 +2398,7 @@ raqm_index_to_position (raqm_t *rq,
 
   while (*index < rq->text_len)
   {
-    if (_raqm_allowed_grapheme_boundary (rq->text, rq->text_len, *index))
+    if (raqm_allowed_grapheme_boundary (rq, *index))
       break;
 
     ++*index;
@@ -2536,7 +2531,7 @@ raqm_position_to_index (raqm_t *rq,
 
           *index = next_cluster;
         }
-        if (_raqm_allowed_grapheme_boundary (rq->text, rq->text_len, *index))
+        if (raqm_allowed_grapheme_boundary (rq, *index))
         {
           RAQM_TEST ("The start-index is %zu  at position %d \n", *index, x);
             return true;
@@ -2544,7 +2539,7 @@ raqm_position_to_index (raqm_t *rq,
 
         while (*index < (unsigned)run->pos + run->len)
         {
-          if (_raqm_allowed_grapheme_boundary (rq->text, rq->text_len, *index))
+          if (raqm_allowed_grapheme_boundary (rq, *index))
           {
             *index += 1;
             break;
@@ -2570,17 +2565,33 @@ raqm_position_to_index (raqm_t *rq,
   return true;
 }
 
-RAQM_STATIC bool
-_raqm_allowed_grapheme_boundary (const uint32_t *text,
-                                 size_t          len,
-                                 size_t          index)
+/**
+ * raqm_allowed_grapheme_boundary:
+ * @rq: a #raqm_t.
+ * @index: the index of the boundary to check.
+ *
+ * Checks whether a grapheme cluster boundary is allowed between the characters
+ * at @index and @index + 1, according to the Unicode Standard Annex #29 rules.
+ *
+ * The @rq must have had text set on it using raqm_set_text().
+ *
+ * Returns: `true` if a boundary is allowed, `false` otherwise.
+ *
+ * Since: 0.11
+ **/
+RAQM_API bool
+raqm_allowed_grapheme_boundary (raqm_t *rq,
+                                size_t  index)
 {
-  /* GB1/GB2: break at start and end of text */
-  if (index >= len - 1)
+  if (!rq)
     return true;
 
-  uint32_t l_char = text[index];
-  uint32_t r_char = text[index + 1];
+  /* GB1/GB2: break at start and end of text */
+  if (index >= rq->text_len - 1)
+    return true;
+
+  uint32_t l_char = rq->text[index];
+  uint32_t r_char = rq->text[index + 1];
   _raqm_grapheme_t l = _raqm_get_grapheme_break (l_char);
   _raqm_grapheme_t r = _raqm_get_grapheme_break (r_char);
 
@@ -2637,7 +2648,7 @@ _raqm_allowed_grapheme_boundary (const uint32_t *text,
     while (j > 0)
     {
       j--;
-      _raqm_incb_t incb = _raqm_get_incb (text[j]);
+      _raqm_incb_t incb = _raqm_get_incb (rq->text[j]);
       if (incb == RAQM_INCB_LINKER)
         found_linker = true;
       else if (incb == RAQM_INCB_EXTEND)
@@ -2660,7 +2671,7 @@ _raqm_allowed_grapheme_boundary (const uint32_t *text,
     /* Look back past the ZWJ at index for Extend* ExtPict */
     for (size_t j = index; j > 0; j--)
     {
-      _raqm_grapheme_t g = _raqm_get_grapheme_break (text[j - 1]);
+      _raqm_grapheme_t g = _raqm_get_grapheme_break (rq->text[j - 1]);
       if (g == RAQM_GRAPHEME_EXTEND)
         continue;
       if (g == RAQM_GRAPHEME_EXTENDED_PICTOGRAPHIC)
@@ -2677,7 +2688,7 @@ _raqm_allowed_grapheme_boundary (const uint32_t *text,
     size_t ri_count = 0;
     for (size_t j = index + 1; j > 0; j--)
     {
-      if (_raqm_get_grapheme_break (text[j - 1]) != RAQM_GRAPHEME_REGIONAL_INDICATOR)
+      if (_raqm_get_grapheme_break (rq->text[j - 1]) != RAQM_GRAPHEME_REGIONAL_INDICATOR)
         break;
       ri_count++;
     }

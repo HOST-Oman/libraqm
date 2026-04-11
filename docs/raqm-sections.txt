@@ -23,6 +23,7 @@ raqm_get_par_resolved_direction
 raqm_get_direction_at_index
 raqm_index_to_position
 raqm_position_to_index
+raqm_allowed_grapheme_boundary
 raqm_version
 raqm_version_atleast
 raqm_version_string
