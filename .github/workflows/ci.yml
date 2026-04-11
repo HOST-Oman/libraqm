@@ -43,7 +43,7 @@ jobs:
       run: ninja -C build test
     - name: Upload documentation
       if: matrix.os == 'ubuntu-latest' && github.ref_type == 'tag'
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         path: build/docs/html
     - name: Create dist tarball
@@ -51,7 +51,7 @@ jobs:
       run: meson dist -C build --no-tests
     - name: Upload dist tarball
       if: matrix.os == 'ubuntu-latest' && github.ref_type == 'tag'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: dist
         path: build/meson-dist/raqm-*.tar.xz
@@ -69,7 +69,7 @@ jobs:
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5
 
   release:
     if: github.ref_type == 'tag'
@@ -78,7 +78,7 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       with:
         name: dist
     - name: Create release
