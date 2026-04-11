@@ -107,8 +107,29 @@ def ranges_to_dict(ranges, value):
     return d
 
 
+def parse_all_property_values(text):
+    values = set()
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith("@"):
+            continue
+        m = re.match(r"[0-9A-Fa-f]+(?:\.\.[0-9A-Fa-f]+)?\s*;\s*(\w+)", line)
+        if m:
+            values.add(m.group(1))
+    return values
+
+
 def build_grapheme_break_data(emoji_data, grapheme_break_data):
     prop_to_enum = {v: k for k, v in GRAPHEME_BREAK_VALUES.items() if v != "Other"}
+
+    found = parse_all_property_values(grapheme_break_data)
+    found |= {"Extended_Pictographic"} & parse_all_property_values(emoji_data)
+    unknown = found - set(prop_to_enum) - {"Other"}
+    if unknown:
+        raise ValueError(
+            f"Unknown Grapheme_Cluster_Break values in Unicode data: {unknown}. "
+            "Add them to GRAPHEME_BREAK_VALUES and handle in raqm.c."
+        )
 
     data = {}
 
