@@ -547,31 +547,65 @@ raqm_set_text (raqm_t         *rq,
   return true;
 }
 
+/* Ported from HarfBuzz’s hb_utf8_t::next(). */
 static const char *
 _raqm_get_utf8_codepoint (const char *str,
+                          const char *end,
                           uint32_t *out_codepoint)
 {
-  if (0xf0 == (0xf8 & str[0]))
+  uint32_t c = (unsigned char) *str++;
+
+  if (c > 0x7Fu)
   {
-    *out_codepoint = ((0x07 & str[0]) << 18) | ((0x3f & str[1]) << 12) | ((0x3f & str[2]) << 6) | (0x3f & str[3]);
-    str += 4;
-  }
-  else if (0xe0 == (0xf0 & str[0]))
-  {
-    *out_codepoint = ((0x0f & str[0]) << 12) | ((0x3f & str[1]) << 6) | (0x3f & str[2]);
-    str += 3;
-  }
-  else if (0xc0 == (0xe0 & str[0]))
-  {
-    *out_codepoint = ((0x1f & str[0]) << 6) | (0x3f & str[1]);
-    str += 2;
-  }
-  else
-  {
-    *out_codepoint = str[0];
-    str += 1;
+    if (c >= 0xC2u && c <= 0xDFu) /* Two-byte */
+    {
+      unsigned int t1;
+      if (str < end && (t1 = (unsigned char) str[0] - 0x80u) <= 0x3Fu)
+      {
+        c = ((c & 0x1Fu) << 6) | t1;
+        str += 1;
+      }
+      else
+        c = 0xFFFDu;
+    }
+    else if (c >= 0xE0u && c <= 0xEFu) /* Three-byte */
+    {
+      unsigned int t1, t2;
+      if (end - str >= 2 &&
+          (t1 = (unsigned char) str[0] - 0x80u) <= 0x3Fu &&
+          (t2 = (unsigned char) str[1] - 0x80u) <= 0x3Fu)
+      {
+        c = ((c & 0x0Fu) << 12) | (t1 << 6) | t2;
+        if (c < 0x0800u || (c >= 0xD800u && c <= 0xDFFFu))
+          c = 0xFFFDu;
+        else
+          str += 2;
+      }
+      else
+        c = 0xFFFDu;
+    }
+    else if (c >= 0xF0u && c <= 0xF4u) /* Four-byte */
+    {
+      unsigned int t1, t2, t3;
+      if (end - str >= 3 &&
+          (t1 = (unsigned char) str[0] - 0x80u) <= 0x3Fu &&
+          (t2 = (unsigned char) str[1] - 0x80u) <= 0x3Fu &&
+          (t3 = (unsigned char) str[2] - 0x80u) <= 0x3Fu)
+      {
+        c = ((c & 0x07u) << 18) | (t1 << 12) | (t2 << 6) | t3;
+        if (c < 0x10000u || c > 0x10FFFFu)
+          c = 0xFFFDu;
+        else
+          str += 3;
+      }
+      else
+        c = 0xFFFDu;
+    }
+    else
+      c = 0xFFFDu;
   }
 
+  *out_codepoint = c;
   return str;
 }
 
@@ -581,10 +615,11 @@ _raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
   size_t in_len = 0;
   uint32_t *out_utf32 = unicode;
   const char *in_utf8 = text;
+  const char *end = text + len;
 
-  while ((*in_utf8 != '\0') && (in_len < len))
+  while ((in_len < len) && (*in_utf8 != '\0'))
   {
-    const char *out_utf8 = _raqm_get_utf8_codepoint (in_utf8, out_utf32);
+    const char *out_utf8 = _raqm_get_utf8_codepoint (in_utf8, end, out_utf32);
     in_len += out_utf8 - in_utf8;
     in_utf8 = out_utf8;
     ++out_utf32;
@@ -593,31 +628,35 @@ _raqm_u8_to_u32 (const char *text, size_t len, uint32_t *unicode)
   return (out_utf32 - unicode);
 }
 
+/* Ported from HarfBuzz’s hb_utf16_xe_t::next(). */
 static const uint16_t *
 _raqm_get_utf16_codepoint (const uint16_t *str,
+                           const uint16_t *end,
                            uint32_t *out_codepoint)
 {
-  if (str[0] >= 0xD800 && str[0] <= 0xDBFF)
+  uint32_t c = *str++;
+
+  if (c < 0xD800u || c > 0xDFFFu)
   {
-    if (str[1] >= 0xDC00 && str[1] <= 0xDFFF)
+    *out_codepoint = c;
+    return str;
+  }
+
+  if (c <= 0xDBFFu && str < end)
+  {
+    /* High-surrogate in c */
+    uint32_t l = *str;
+    if (l >= 0xDC00u && l <= 0xDFFFu)
     {
-      uint32_t X = ((str[0] & ((1 << 6) -1)) << 10) | (str[1] & ((1 << 10) -1));
-      uint32_t W = (str[0] >> 6) & ((1 << 5) - 1);
-      *out_codepoint = (W+1) << 16 | X;
-      str += 2;
-    }
-    else
-    {
-      /* A single high surrogate, this is an error. */
-      *out_codepoint = str[0];
+      /* Low-surrogate in l */
+      *out_codepoint = (c << 10) + l - ((0xD800u << 10) - 0x10000u + 0xDC00u);
       str += 1;
+      return str;
     }
   }
-  else
-  {
-      *out_codepoint = str[0];
-      str += 1;
-  }
+
+  /* Lonely / out-of-order surrogate. */
+  *out_codepoint = 0xFFFDu;
   return str;
 }
 
@@ -627,10 +666,11 @@ _raqm_u16_to_u32 (const uint16_t *text, size_t len, uint32_t *unicode)
   size_t in_len = 0;
   uint32_t *out_utf32 = unicode;
   const uint16_t *in_utf16 = text;
+  const uint16_t *end = text + len;
 
-  while ((*in_utf16 != '\0') && (in_len < len))
+  while ((in_len < len) && (*in_utf16 != '\0'))
   {
-    const uint16_t *out_utf16 = _raqm_get_utf16_codepoint (in_utf16, out_utf32);
+    const uint16_t *out_utf16 = _raqm_get_utf16_codepoint (in_utf16, end, out_utf32);
     in_len += (out_utf16 - in_utf16);
     in_utf16 = out_utf16;
     ++out_utf32;
