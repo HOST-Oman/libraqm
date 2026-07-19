@@ -184,6 +184,9 @@ RAQM_API raqm_direction_t
 raqm_get_par_resolved_direction (raqm_t *rq);
 
 RAQM_API raqm_direction_t
+raqm_get_par_detected_direction (raqm_t *rq);
+
+RAQM_API raqm_direction_t
 raqm_get_direction_at_index (raqm_t *rq,
                              size_t index);
 

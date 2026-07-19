@@ -1488,6 +1488,37 @@ raqm_get_par_resolved_direction (raqm_t *rq)
   return rq->resolved_dir;
 }
 
+static raqm_direction_t
+_raqm_detect_direction (raqm_t *rq);
+
+/**
+ * raqm_get_par_detected_direction:
+ * @rq: a #raqm_t.
+ *
+ * Gets the natural direction of the text as detected from its content
+ * following the Unicode Bidirectional Algorithm, regardless of the base
+ * direction set with raqm_set_par_direction(). Unlike
+ * raqm_get_par_resolved_direction(), this does not require raqm_layout() to
+ * have been called, and can report that the text is direction neutral.
+ *
+ * Return value:
+ * #RAQM_DIRECTION_LTR or #RAQM_DIRECTION_RTL if the text has a strong
+ * direction, or #RAQM_DIRECTION_DEFAULT if the text is direction neutral (has
+ * no strong characters) or no text has been set. #RAQM_DIRECTION_TTB is never
+ * returned, as vertical direction is a layout property, not a property of the
+ * text content.
+ *
+ * Since: 0.11
+ */
+raqm_direction_t
+raqm_get_par_detected_direction (raqm_t *rq)
+{
+  if (!rq || !rq->text || rq->text_len == 0)
+    return RAQM_DIRECTION_DEFAULT;
+
+  return _raqm_detect_direction (rq);
+}
+
 /**
  * raqm_get_direction_at_index:
  * @rq: a #raqm_t.
@@ -1607,6 +1638,31 @@ _raqm_bidi_itemize (raqm_t *rq, size_t *run_count)
   SBAlgorithmRelease (bidi);
 
   return runs;
+}
+
+static raqm_direction_t
+_raqm_detect_direction (raqm_t *rq)
+{
+  raqm_direction_t dir = RAQM_DIRECTION_DEFAULT;
+  size_t isolate = 0;
+
+  /* UBA: P2 and P3. */
+  for (size_t i = 0; i < rq->text_len; i++)
+  {
+    SBBidiType type = SBCodepointGetBidiType (rq->text[i]);
+
+    if (type == SBBidiTypeLRI || type == SBBidiTypeRLI || type == SBBidiTypeFSI)
+      isolate++;
+    else if (type == SBBidiTypePDI && isolate > 0)
+      isolate--;
+    else if (isolate == 0 && SBBidiTypeIsStrong (type))
+    {
+      dir = (type == SBBidiTypeL) ? RAQM_DIRECTION_LTR : RAQM_DIRECTION_RTL;
+      break;
+    }
+  }
+
+  return dir;
 }
 #else
 static void
@@ -1760,6 +1816,30 @@ done:
   free (btypes);
 
   return runs;
+}
+
+static raqm_direction_t
+_raqm_detect_direction (raqm_t *rq)
+{
+  raqm_direction_t dir = RAQM_DIRECTION_DEFAULT;
+  FriBidiParType par_type;
+  FriBidiCharType *types;
+
+  types = calloc (rq->text_len, sizeof (FriBidiCharType));
+  if (types)
+  {
+    fribidi_get_bidi_types (rq->text, rq->text_len, types);
+    par_type = fribidi_get_par_direction (types, rq->text_len);
+
+    if (par_type == FRIBIDI_PAR_LTR)
+      dir = RAQM_DIRECTION_LTR;
+    else if (par_type == FRIBIDI_PAR_RTL)
+      dir = RAQM_DIRECTION_RTL;
+
+    free (types);
+  }
+
+  return dir;
 }
 #endif
 

@@ -78,6 +78,21 @@ test(
     args: [files('GraphemeBreakTest.txt')],
 )
 
+detected_direction_test = executable(
+    'detected-direction-test',
+    'detected-direction-test.c',
+    include_directories: include_directories(['../src']),
+    link_with: libraqm_test,
+    override_options: ['b_ndebug=false'],
+    dependencies: deps,
+    install: false,
+)
+
+test(
+    'detected-direction',
+    detected_direction_test,
+)
+
 foreach filename : tests
     testname = filename.split('.')[0]
 
