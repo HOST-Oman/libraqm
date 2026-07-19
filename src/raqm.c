@@ -516,6 +516,9 @@ raqm_clear_contents (raqm_t *rq)
  * represent a single full paragraph, since doing the layout of chunks of text
  * separately can give improper output.
  *
+ * The text must be set before any of the functions that assign attributes to
+ * it, e.g. raqm_set_freetype_face(), raqm_set_language(), etc.
+ *
  * Return value:
  * `true` if no errors happened, `false` otherwise.
  *
@@ -969,6 +972,9 @@ _raqm_set_freetype_face (raqm_t *rq,
  * @face: an #FT_Face.
  *
  * Sets an #FT_Face to be used for all characters in @rq.
+ *
+ * The text must be set with raqm_set_text() or one of its variants before
+ * calling this function.
  *
  * See also raqm_set_freetype_face_range().
  *
