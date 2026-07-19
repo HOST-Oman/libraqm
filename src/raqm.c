@@ -512,8 +512,8 @@ raqm_clear_contents (raqm_t *rq)
  * @len: the length of @text.
  *
  * Adds @text to @rq to be used for layout. It must be a valid UTF-32 text, any
- * invalid characters will be replaced with U+FFFD. The text should typically
- * represent a full paragraph, since doing the layout of chunks of text
+ * invalid characters will be replaced with U+FFFD. The text must
+ * represent a single full paragraph, since doing the layout of chunks of text
  * separately can give improper output.
  *
  * Return value:
@@ -1300,6 +1300,15 @@ _raqm_itemize (raqm_t *rq);
 static bool
 _raqm_shape (raqm_t *rq);
 
+static bool
+_raqm_is_paragraph_separator (uint32_t ch)
+{
+  /* Unicode characters with Bidi class B (Paragraph_Separator). */
+  return ch == 0x000A || ch == 0x000D ||
+         ch == 0x001C || ch == 0x001D || ch == 0x001E ||
+         ch == 0x0085 || ch == 0x2029;
+}
+
 /**
  * raqm_layout:
  * @rq: a #raqm_t.
@@ -1309,7 +1318,8 @@ _raqm_shape (raqm_t *rq);
  * text shaping, and any other part of the layout process.
  *
  * Return value:
- * `true` if the layout process was successful, `false` otherwise.
+ * `true` if the layout process was successful, `false` otherwise. It also fails
+ * if the text is not a single paragraph (see raqm_set_text()).
  *
  * Since: 0.1
  */
@@ -1328,6 +1338,10 @@ raqm_layout (raqm_t *rq)
   for (size_t i = 0; i < rq->text_len; i++)
   {
       if (!rq->text_info[i].ftface)
+          return false;
+
+      /* The text must be a single paragraph. */
+      if (_raqm_is_paragraph_separator (rq->text[i]))
           return false;
   }
 
